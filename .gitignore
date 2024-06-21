@@ -1,0 +1,7 @@
+.env
+.dockerignore
+db.sqlite3
+env
+__pycache__
+migrations
+config.py

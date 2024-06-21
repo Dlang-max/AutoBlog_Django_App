@@ -1,0 +1,51 @@
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.forms import ModelForm, Form
+from .models import User, Member, Blog
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField()
+    class Meta:
+        model = User
+        fields = ["username", "email", "password1", "password2"]
+
+class LoginForm(AuthenticationForm):
+    class Meta:
+        model = User
+
+class MemberInfoForm(ModelForm):
+    class Meta:
+        model = Member
+        fields = ["wordpress_url", "wordpress_username", "wordpress_application_password"]
+        
+class GenerateBlogForm(Form):
+    title = forms.CharField(max_length=200)
+    additional_info = forms.CharField(max_length=200)
+    class Meta:
+        fields = ["title", "info"]
+
+class BlogForm(Form):
+    title = forms.CharField(max_length=200)
+    
+    # BLOG
+    subheading_1 = forms.CharField(max_length=200)
+    section_1 = forms.CharField()
+
+    subheading_2 = forms.CharField(max_length=200)
+    section_2 = forms.CharField()
+
+    subheading_3 = forms.CharField(max_length=200)
+    section_3 = forms.CharField()
+
+    subheading_4 = forms.CharField(max_length=200)
+    section_4 = forms.CharField()
+
+    subheading_5 = forms.CharField(max_length=200)
+    section_5 = forms.CharField()
+   
+
+    class Meta:
+        model = Blog
+
+

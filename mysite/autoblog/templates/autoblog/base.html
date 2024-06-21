@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'autoblog/style.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <div id="nav-container">
+        <nav id="navbar">
+            <ul id="nav-links">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'home' %}">About</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.is_member %}
+                        <li><a href="{% url 'member_dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'generate_blog' %}">Write</a></li>
+                    {% else %}
+                        <li><a href="{% url 'member_info' %}">Join</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+    </div>
+
+
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

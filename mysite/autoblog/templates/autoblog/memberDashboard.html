@@ -1,0 +1,58 @@
+{% extends "autoblog/base.html" %}
+
+{% block title %}Member Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="introduction">Member Dashboard for {{member.user.username}}</h1>
+<div class="member-container">
+    <p>Blogs Remaining: {{member.blogs_remaining}}</p>
+    <p>Has Paid: {{member.has_paid}}</p>
+    <p>Stripe {{member.stripe_customer_id}}</p>
+    <p>Sub {{member.stripe_subscription_id}}</p>
+    <p>Level {{member.membership_level}}</p>
+</div>
+    <div class="blog-container">
+        {% if blog.subheading_1 %}
+            <main>
+                <article style="font-family: Arial;">
+                    <h2 id="title" contentEditable="true">{{ blog.title }}</h2>
+                    <section>
+                        <h3 id="subheading_1" contentEditable="true">{{ blog.subheading_1 }}</h3>
+                        <p id="section_1" contentEditable="true">{{ blog.section_1 }}</p>
+                    </section>
+                    <section>
+                        <h3 id="subheading_2" contentEditable="true">{{ blog.subheading_2 }}</h3>
+                        <p id="section_2" contentEditable="true">{{ blog.section_2 }}</p>
+                    </section>
+                    <section>
+                        <h3 id="subheading_3" contentEditable="true">{{ blog.subheading_3 }}</h3>
+                        <p id="section_3" contentEditable="true">{{ blog.section_3 }}</p>
+                    </section>
+                    <section>
+                        <h3 id="subheading_4" contentEditable="true">{{ blog.subheading_4 }}</h3>
+                        <p id="section_4" contentEditable="true">{{ blog.section_4 }}</p>
+                    </section>
+                    <section>
+                        <h3 id="subheading_5" contentEditable="true">{{ blog.subheading_5 }}</h3>
+                        <p id="section_5" contentEditable="true">{{ blog.section_5 }}</p>
+                    </section>
+                </article>
+
+
+
+
+                <form id="blog-form" method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {{ field.as_hidden }}
+                    {% endfor %}
+                    <input type="submit" formaction="{% url 'post_blog' %}" value="Post">
+                    <input type="submit" formaction="{% url 'save_blog' %}" value="Save">
+                    <input type="submit" formaction="{% url 'delete_blog' %}" value="Delete">
+                </form>
+            </main>
+            {% load static %}
+            <script src="{% static 'autoblog/script.js' %}"></script>
+        {% endif %}
+    </div>
+{% endblock %}

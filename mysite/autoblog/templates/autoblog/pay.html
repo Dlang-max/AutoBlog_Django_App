@@ -1,0 +1,23 @@
+{% extends "autoblog/base.html" %}
+
+{% block title %}Pay{% endblock %}
+
+{% block content %}
+<h1 class="introduction">Hello</h1>
+<form action="create-checkout-session/" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="payment" value="good" />
+    <input type="submit" name="payment" value="better" />
+    <input type="submit" name="payment" value="best" />
+</form>
+<form action="cancel-subscription/" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="payment" value="cancel" />
+</form>
+<form action="upgrade-subscription/" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="upgrade-option" value="good" />
+    <input type="submit" name="upgrade-option" value="better" />
+    <input type="submit" name="upgrade-option" value="best" />
+</form>
+{% endblock %}

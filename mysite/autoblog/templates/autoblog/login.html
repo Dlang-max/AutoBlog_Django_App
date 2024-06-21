@@ -1,0 +1,17 @@
+{% extends "autoblog/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h1 class="introduction">Login</h1>
+<form method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+        <div>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+        </div>
+    {% endfor %}
+    <button type="submit">Login</button>
+</form>
+{% endblock %}
