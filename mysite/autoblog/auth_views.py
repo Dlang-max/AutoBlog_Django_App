@@ -28,8 +28,7 @@ def register(request):
             auth_login(request, user)
             return redirect('/home')
         
-    form = RegisterForm()
-    return render(request, "autoblog/register.html", {'form' : form})
+    return render(request, "autoblog/register.html")
 
 
 def login(request):
@@ -61,9 +60,8 @@ def login(request):
                 auth_login(request=request, user=user)
                 return redirect('/home')
             else:
-                return render(request, "autoblog/login.html", {'form' : form})
-    form = LoginForm()
-    return render(request, "autoblog/login.html", {'form' : form})
+                return render(request, "autoblog/login.html")
+    return render(request, "autoblog/login.html")
 
 
 

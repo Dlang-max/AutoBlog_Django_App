@@ -68,8 +68,7 @@ def generate_blog(request):
             task = write_blog.delay(username=username, title=title, addition_info=additional_info)
             return redirect("/memberDash")
         
-    form = GenerateBlogForm()
-    return render(request, "autoblog/generateBlog.html", {"form" : form})
+    return render(request, "autoblog/generateBlog.html")
 
 # SAVE BLOG
 @login_required(login_url="/login")

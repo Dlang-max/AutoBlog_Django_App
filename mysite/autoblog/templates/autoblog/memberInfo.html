@@ -3,15 +3,13 @@
 {% block title %}Member Info{% endblock %}
 
 {% block content %}
-<h1 class="introduction">Member Info</h1>
-<form method="POST">
+<form class="auth-form" method="POST">
     {% csrf_token %}
-    {% for field in form %}
-            <div>
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-            </div>
-        {% endfor %}
-    <button type="submit">Update Info</button>
+    <h2 class="introduction">WordPress Information</h2>
+    {% csrf_token %}
+    <input class="auth-input" type="url" name="wordpress_url" placeholder="WordPress URL">
+    <input class="auth-input" type="text" name="wordpress_username" placeholder="WordPress Username">
+    <input class="auth-input" type="text" name="wordpress_application_password" placeholder="WordPress Application Password">
+    <button id="register-button" class="submit-button" type="submit">Update WordPress Info</button>
 </form>
 {% endblock %}
