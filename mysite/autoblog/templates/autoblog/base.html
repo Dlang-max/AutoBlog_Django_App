@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Advanced Automated Blog Writting">
+    <meta name="keywords" content="AI, Automation, AutoBlogging, AutoBlogger, AI Blogs, Digital Marketing">
+    <meta name="author" content="Daniel Lang">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     {% load static %}
     <link rel="stylesheet" href="{% static 'autoblog/style.css' %}">
     <title>{% block title %}{% endblock %}</title>
@@ -10,17 +18,17 @@
     <div id="nav-container">
         <nav id="navbar">
             <ul id="nav-links">
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'home' %}">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">About</a></li>
                 {% if user.is_authenticated %}
                     {% if user.is_member %}
-                        <li><a href="{% url 'member_dashboard' %}">Dashboard</a></li>
-                        <li><a href="{% url 'generate_blog' %}">Write</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'generate_blog' %}">Write</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'member_dashboard' %}">Dashboard</a></li>
                     {% else %}
-                        <li><a href="{% url 'member_info' %}">Join</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'member_info' %}">Join</a></li>
                     {% endif %}
                 {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
                 {% endif %}
             </ul>
         </nav>
