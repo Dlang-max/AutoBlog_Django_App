@@ -31,9 +31,10 @@ class Member(models.Model):
 class Blog(models.Model):
     author = models.OneToOneField(Member, on_delete=models.CASCADE, primary_key=True)
     date = models.DateField(auto_now_add=True)
-    title = models.CharField(max_length=200)
     
     # BLOG
+    title = models.CharField(max_length=200)
+
     subheading_1 = models.CharField(max_length=200, default="")
     section_1 = models.TextField(default="")
 

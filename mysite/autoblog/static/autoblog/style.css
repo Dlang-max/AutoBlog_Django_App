@@ -39,7 +39,7 @@ body {
 
 .nav-link {
     text-decoration: none;
-    color: gray;
+    color: rgb(87, 87, 87);
 }
 
 .nav-link:hover {
@@ -168,6 +168,31 @@ section {
 
 #delete-blog{
     background-color: rgb(255, 0, 0);
+}
+
+.no-blogs-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-blogs-container h2{
+    font-family: var(--font);
+    text-align: center;
+    display: block;
+    width:80%;
+}
+
+.no-blogs-container h2 a{
+    font-family: var(--font);
+    text-decoration: none;
+    color: var(--button-blue);
+}
+
+.no-blogs-container h2 a:hover{
+    color: var(--button-hover-blue);
+    cursor: pointer;
+    transition: 500ms;
 }
 
 /*

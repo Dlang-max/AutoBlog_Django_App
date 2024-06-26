@@ -3,11 +3,27 @@
 {% block title %}Generate Blog{% endblock %}
 
 {% block content %}
-<form class="auth-form" method="POST">
-    <h2 class="introduction">Create Blog</h2>
-    {% csrf_token %}
-    <input class="auth-input" type="text" name="title" placeholder="Title">
-    <input class="auth-input" type="text" name="additional_info" placeholder="Additional Info">
-    <button id="register-button" class="submit-button" type="submit">Create</button>
-</form>
+    {% if member.blogs_remaining > 0 %}
+        <form class="auth-form" method="POST">
+            <h2 class="introduction">Create Blog</h2>
+            {% csrf_token %}
+            <input class="auth-input" type="text" name="title" placeholder="Title">
+            <input class="auth-input" type="text" name="additional_info" placeholder="Additional Info">
+            <button id="register-button" class="submit-button" type="submit">Create</button>
+        </form>
+    {% else %}
+        {% if not user.is_member %}
+        <div class="no-blogs-container">
+            <h2><a href="{% url 'pay' %}">Purchase</a> a subscription to write more blogs!</h2>
+        </div> 
+        {% elif member.membership_level == "Good" or member.membership_level == "Better"%}
+            <div class="no-blogs-container">
+                <h2>No blogs remaining. Come back next month or <a href="{% url 'pay' %}">upgrade</a> your subscription plan!</h2>
+            </div>
+        {% else %}
+            <div class="no-blogs-container">
+                <h2>No blogs remaining. Come back next month for more!</h2>
+            </div>
+        {% endif %}
+    {% endif %}
 {% endblock %}

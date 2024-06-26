@@ -58,7 +58,11 @@ def member_info(request):
 @login_required(login_url="/login")
 def generate_blog(request):
     user = request.user
-    member = Member.objects.get(user=user)
+
+    try:
+        member = Member.objects.get(user=user)
+    except Member.DoesNotExist:
+        return redirect('/memberInfo')
     
     try:
         blog = Blog.objects.get(author=member)
@@ -71,14 +75,21 @@ def generate_blog(request):
     if request.method == "POST":
         form = GenerateBlogForm(request.POST)
         if form.is_valid():
+            blog = Blog.objects.create()
+
+
+
+            
             username = request.user.username
             title = form.cleaned_data["title"]
             additional_info = form.cleaned_data["additional_info"]
 
             task = write_blog.delay(username=username, title=title, addition_info=additional_info)
+            member.blogs_remaining -= 1
+            member.save()
             return redirect("/memberDash")
         
-    return render(request, "autoblog/generateBlog.html")
+    return render(request, "autoblog/generateBlog.html", {"member": member})
 
 # SAVE BLOG
 @login_required(login_url="/login")
