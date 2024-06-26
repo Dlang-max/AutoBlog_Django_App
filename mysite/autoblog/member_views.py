@@ -57,6 +57,16 @@ def member_info(request):
 # GENERATE BLOG
 @login_required(login_url="/login")
 def generate_blog(request):
+    user = request.user
+    member = Member.objects.get(user=user)
+    
+    try:
+        blog = Blog.objects.get(author=member)
+        if blog:
+            return redirect('/memberDash')
+    except Blog.DoesNotExist:
+        pass
+
 
     if request.method == "POST":
         form = GenerateBlogForm(request.POST)

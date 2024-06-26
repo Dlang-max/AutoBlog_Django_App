@@ -16,9 +16,9 @@ class Member(models.Model):
 
     membership_levels = {
         'none' : 'none',
-        'good' : 'good',
-        'better' : 'better',
-        'best' : 'best'
+        'Good' : 'Good',
+        'Better' : 'Better',
+        'Best' : 'Best'
     }
 
     membership_level = models.CharField(max_length=10, choices=membership_levels, default='none')

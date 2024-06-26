@@ -1,3 +1,10 @@
+:root {
+    --font:  "Rubik", sans-serif;
+    --button-blue: #006edb;
+    --button-hover-blue:  #00468b;
+    --font-color: white;
+}
+
 body {
     margin: 0;
     width: 100%;
@@ -48,7 +55,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: "Rubik", sans-serif;
+    font-family: var(--font);
     margin-left: 10%;
     margin-right: 10%;
 }
@@ -61,7 +68,7 @@ body {
 }
 
 .auth-input {
-    font-family: "Rubik", sans-serif;
+    font-family: var(--font);
     padding: 10px;
     border: 1px solid black;
     border-radius: 5px;
@@ -77,17 +84,18 @@ body {
 }
 
 #redirect-sign-in{
-    font-family: "Rubik", sans-serif;
+    font-family: var(--font);
 }
 
 #redirect-sign-in a {
-    font-family: "Rubik", sans-serif;
+    font-family: var(--font);
     text-decoration: none;
-    color: rgb(0, 113, 227);
+    color: var(--button-blue);
 }
 
 #redirect-sign-in a:hover {
-    color: #006edb;
+    background-color: var(--button-hover-blue);
+    transition: 500ms;
 }
 
 
@@ -135,7 +143,7 @@ section {
 }
 
 .submit-button {
-    font-family: "Rubik", sans-serif;
+    font-family: var(--font);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -148,19 +156,69 @@ section {
     padding-bottom: 10px;
     border-radius: 20px;
     border: none;
-    background-color: rgb(0, 113, 227);
+    background-color: var(--button-blue);
     color: white;
 }
 
 .submit-button:hover {
-    background-color: #006edb;
+    background-color: var(--button-hover-blue);
     cursor: pointer;
+    transition: 500ms;
 }
 
 #delete-blog{
     background-color: rgb(255, 0, 0);
 }
 
+/*
+* Stripe Payments
+*/
+.stripe-form {
+    font-family: var(--font);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.payment-card-container {
+    display: flex;
+    flex-direction: row;
+}
+.payment-card {
+    display: flex;
+    flex-direction: column;
+    justify-content:  space-evenly;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 10px;
+    width: 400px;
+    height: 500px;
+    margin: 10px;
+    transition: 850ms;
+}
+
+.payment-card:hover {
+    transition: 850ms;
+    transform: scale(1.01);
+}
+
+.payment-button {
+    font-family: var(--font);
+    width: 50%;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    background-color: var(--button-blue);
+}
+
+.payment-button:hover {
+    background-color: var(--button-hover-blue);
+    cursor: pointer;
+    transition: 500ms;
+}
 
 
 @media only screen and (max-width: 1000px){
@@ -176,7 +234,6 @@ section {
     /*
     * Register
     */
-
     .introduction {
         font-size: large;
     }
@@ -187,7 +244,7 @@ section {
     }
 
     #register-button{
-        width: 80%;
+        width: 300px;
     }
 
     #redirect-sign-in {
@@ -217,12 +274,40 @@ section {
 
     .submit-button{
         font-size: large;
-        width: 30%;
+        width: 300px;
         border-radius: 50px;
     }
 
     #blog-form {
         margin-bottom: 40px;
     }
+
+    /*
+    * Stripe Payments
+    */
+    .payment-card-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .payment-card-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .payment-card {
+        width: 85%;
+        height: 300px;
+        margin: 0px;
+        margin-bottom: 15px;
+    }
+
+    .payment-card:hover{
+        transition: none;
+        transform: none;
+    }
+
 }
 
