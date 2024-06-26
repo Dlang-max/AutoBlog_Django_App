@@ -51,7 +51,6 @@ def create_checkout_session(request):
             )
 
             member.stripe_customer_id = customer.id
-            member.membership_level = option
             member.save()
             return redirect(checkout_session.url)
         
