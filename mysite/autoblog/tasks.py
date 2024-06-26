@@ -10,6 +10,7 @@ client = OpenAI()
 def write_blog(username=None, title='', addition_info=''):
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
+    blog = Blog.objects.get(author=member)
     outline = writeBlogOutline(title=title)
 
     # BUILD BLOG
@@ -28,13 +29,16 @@ def write_blog(username=None, title='', addition_info=''):
 
         subheading_5 = writeHeading(section='concluding', outline=outline)
         section_5 = writeSection(section='concluding', subheading=subheading_5, outline=outline)
-        blog = Blog.objects.create(author=member, title=title,
-                               subheading_1=subheading_1, section_1=section_1,
-                               subheading_2=subheading_2, section_2=section_2,
-                               subheading_3=subheading_3, section_3=section_3,
-                               subheading_4=subheading_4, section_4=section_4,
-                               subheading_5=subheading_5, section_5=section_5)
+        
+        
+        blog.title = title
+        blog.subheading_1, blog.section_1 = subheading_1, section_1 
+        blog.subheading_2, blog.section_2 = subheading_2, section_2 
+        blog.subheading_3, blog.section_3 = subheading_3, section_3 
+        blog.subheading_4, blog.section_4 = subheading_4, section_4 
+        blog.subheading_5, blog.section_5 = subheading_5, section_5 
         blog.save()
+
     except openai.APIError as e:
         member.blogs_remaining += 1
         member.save()
