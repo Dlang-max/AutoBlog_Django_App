@@ -14,7 +14,13 @@ stripe.api_key = STRIPE_SECRET_KEY
 
 @login_required(login_url='login/')
 def pay(request):
-    return render(request, 'autoblog/pay.html')
+    user = request.user
+    try:
+        member = Member.objects.get(user=user)
+    except Member.DoesNotExist:
+        return redirect('member_info')
+    
+    return render(request, 'autoblog/pay.html', {"member" : member})
 
 # FIRST TIME PAYING
 @login_required(login_url='login/')

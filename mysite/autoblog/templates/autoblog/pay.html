@@ -3,26 +3,26 @@
 {% block title %}Pay{% endblock %}
 
 {% block content %}
-<form class="stripe-form" action="create-checkout-session/" method="POST">
+<form class="stripe-form" method="POST">
     {% csrf_token %}
     <div class="payment-card-container">
         <div id="good-card" class="payment-card">
             <h2>Good</h2>
             <p>$10.00</p>
             <p>1 Blog per Month</p>
-            <input class="payment-button" type="submit" name="payment" value="Good" />
+            <input class="payment-button" formaction="{% url 'checkout' %}" type="submit" name="payment" value="Good" />
         </div>
         <div id="better-card" class="payment-card">
             <h2>Better</h2>
             <p>$20.00</p>
             <p>2 Blogs per Month</p>
-            <input class="payment-button" type="submit" name="payment" value="Better" />
+            <input class="payment-button" formaction="{% url 'checkout' %}" type="submit" name="payment" value="Better" />
         </div>
         <div id="best-card" class="payment-card">
             <h2>Best</h2>
             <p>$30.00</p>
             <p>4 Blogs per Month</p>
-            <input class="payment-button" type="submit" name="payment" value="Best" />
+            <input class="payment-button" formaction="{% url 'checkout' %}" type="submit" name="payment" value="Best" />
         </div>
     </div>
 </form>
@@ -43,6 +43,7 @@
     {% csrf_token %}
     <input type="submit" name="payment" value="cancel" />
 </form>
+
 <form action="upgrade-subscription/" method="POST">
     {% csrf_token %}
     <input type="submit" name="upgrade-option" value="Good" />
