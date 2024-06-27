@@ -42,6 +42,8 @@
             </main>
             {% load static %}
             <script src="{% static 'autoblog/script.js' %}"></script>
+        {% elif not blog %}
+            <div class="no-blogs-container"><h2>You currently don't have a blog written. Would you like to <a href="{% url 'generate_blog' %}">create</a> one?</h2></div>
         {% endif %}
     </div>
 {% endblock %}

@@ -2,7 +2,7 @@
     --font:  "Rubik", sans-serif;
     --button-blue: #006edb;
     --button-hover-blue:  #00468b;
-    --button-red: red;
+    --button-red: rgb(255, 0, 0);
     --button-hover-red: rgb(142, 9, 9);
     --font-color: white;
 }
@@ -113,7 +113,7 @@ main {
 }
 
 article {
-    background-color:rgb(250, 250, 252);;
+    background-color:rgb(250, 250, 252);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -235,7 +235,9 @@ section {
     width: 400px;
     height: 500px;
     margin: 10px;
-    transition: 850ms;
+    transition: 850ms; 
+    
+    background-color:rgb(250, 250, 252);
 }
 
 .payment-card:hover {
