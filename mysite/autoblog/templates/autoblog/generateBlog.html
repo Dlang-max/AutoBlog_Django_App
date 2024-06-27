@@ -12,10 +12,10 @@
             <button id="register-button" class="submit-button" type="submit">Create</button>
         </form>
     {% else %}
-        {% if not user.is_member %}
-        <div class="no-blogs-container">
-            <h2><a href="{% url 'pay' %}">Purchase</a> a subscription to write more blogs!</h2>
-        </div> 
+        {% if member.membership_level == "none" %}
+            <div class="no-blogs-container">
+                <h2><a href="{% url 'pay' %}">Purchase</a> a subscription to write more blogs!</h2>
+            </div> 
         {% elif member.membership_level == "Good" or member.membership_level == "Better"%}
             <div class="no-blogs-container">
                 <h2>No blogs remaining. Come back next month or <a href="{% url 'pay' %}">upgrade</a> your subscription plan!</h2>

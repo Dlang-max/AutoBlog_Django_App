@@ -331,6 +331,22 @@ section {
         margin-bottom: 40px;
     }
 
+    #member-info-link h3{
+        font-family: var(--font);
+    }
+
+    #member-info-link a{
+        text-decoration: none;
+        font-family: var(--font);
+        color: var(--button-blue);
+    }
+
+    #member-info-link a:hover{
+        font-family: var(--font);
+        color: var(--button-hover-blue);
+        cursor: pointer;
+    }
+
     /*
     * Stripe Payments
     */

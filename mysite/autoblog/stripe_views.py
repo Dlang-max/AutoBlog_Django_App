@@ -1,10 +1,11 @@
 import os
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from .models import Member
 from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan
+from .decorators import member_required
 import stripe
 import stripe.webhook
 
@@ -13,6 +14,7 @@ STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 stripe.api_key = STRIPE_SECRET_KEY
 
 @login_required(login_url='login/')
+@user_passes_test(member_required, login_url='member_info')
 def pay(request):
     user = request.user
     try:
@@ -70,15 +72,18 @@ def handle_suscription_update(request):
     if request.method == 'POST':
         option = request.POST['payment']
         if option in plan_to_price_id:
-            member = Member.objects.get(user=request.user)
-            stripe_customer_id = member.stripe_customer_id
-            stripe_subscription_id = member.stripe_subscription_id
-            member_subsription_info = stripe.Subscription.list(customer=stripe_customer_id)
-            
-            stripe.Subscription.modify(
-                stripe_subscription_id,
-                items=[{"id": member_subsription_info['data'][0]['items']['data'][0]['id'], "price": plan_to_price_id[option]}],
-            )
+            try:
+                member = Member.objects.get(user=request.user)
+                stripe_customer_id = member.stripe_customer_id
+                stripe_subscription_id = member.stripe_subscription_id
+                member_subsription_info = stripe.Subscription.list(customer=stripe_customer_id)
+                
+                stripe.Subscription.modify(
+                    stripe_subscription_id,
+                    items=[{"id": member_subsription_info['data'][0]['items']['data'][0]['id'], "price": plan_to_price_id[option]}],
+                )
+            except stripe.InvalidRequestError:
+                pass
 
     return redirect('member_dashboard')
 
@@ -88,8 +93,11 @@ def handle_suscription_update(request):
 def handle_suscription_cancelled(request):
     if request.method == 'POST':
         member = Member.objects.get(user=request.user)
-        stripe.Subscription.cancel(member.stripe_subscription_id)
-    
+        try:
+            stripe.Subscription.cancel(member.stripe_subscription_id)
+        except stripe.InvalidRequestError:
+            pass
+
     return redirect('member_dashboard')
 
 @csrf_exempt

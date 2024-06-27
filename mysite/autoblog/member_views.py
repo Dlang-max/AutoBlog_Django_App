@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import MemberInfoForm, GenerateBlogForm, BlogForm
 from django.http import HttpResponse
 from .models import Member, Blog
+from .decorators import member_required
 from .tasks import write_blog
 
 def home(request):
@@ -39,11 +40,16 @@ def member_info(request):
             wordpress_username = form.cleaned_data["wordpress_username"]
             wordpress_application_password = form.cleaned_data["wordpress_application_password"]
 
-            member = Member.objects.create(user=user, wordpress_url=wordpress_url, 
+            try:
+                member = Member.objects.get(user=user)
+                member.wordpress_url = wordpress_url
+                member.wordpress_username = wordpress_username
+                member.wordpress_application_password = wordpress_application_password
+            except Member.DoesNotExist:
+                member = Member.objects.create(user=user, wordpress_url=wordpress_url, 
                                 wordpress_username=wordpress_username, 
                                 wordpress_application_password=wordpress_application_password)
             member.save()
-
             user.is_member = True
             user.save()
             return redirect('/home')
@@ -62,7 +68,10 @@ def generate_blog(request):
     try:
         member = Member.objects.get(user=user)
     except Member.DoesNotExist:
-        return redirect('/memberInfo')
+        member = Member.objects.create(user=user)
+        member.save()
+        user.is_member = True
+        user.save()
     
     try:
         blog = Blog.objects.get(author=member)
@@ -90,8 +99,28 @@ def generate_blog(request):
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
 
+
+
+@login_required(login_url="/login")
+def member_dashboard(request):
+    form = BlogForm()
+    user = request.user
+    try:
+        member = Member.objects.get(user=user)
+        blog = Blog.objects.get(author=member)
+        return render(request, "autoblog/memberDashboard.html", {"blog" : blog, "member" : member, "form" : form})
+    except Member.DoesNotExist:
+        member = Member.objects.create(user=user)
+        member.save()
+        user.is_member = True
+        user.save()
+    except Blog.DoesNotExist:
+        pass
+    return render(request, "autoblog/memberDashboard.html", {"member" : member, "form" : form})
+
 # SAVE BLOG
 @login_required(login_url="/login")
+@user_passes_test(member_required, login_url='member_info')
 def save_blog(request):
     if request.method == 'POST':
         user = request.user
@@ -109,11 +138,14 @@ def save_blog(request):
 
 # POST BLOG
 @login_required(login_url="/login")
+@user_passes_test(member_required, login_url='member_info')
+
 def post_blog(request):
     pass
 
 # DELETE BLOG
 @login_required(login_url='/login')
+@user_passes_test(member_required, login_url='member_info')
 def delete_blog(request):
     if request.method == 'POST':
         user = request.user
@@ -126,26 +158,8 @@ def delete_blog(request):
 
     return redirect('/memberDash')
 
-
-
-
-@login_required(login_url="/login")
-def member_dashboard(request):
-    
-    form = BlogForm()
-    try:
-        member = Member.objects.get(user=request.user)
-        blog = Blog.objects.get(author=member)
-        return render(request, "autoblog/memberDashboard.html", {"blog" : blog, "member" : member, "form" : form})
-    except Member.DoesNotExist:
-        return redirect("/memberInfo")
-    except Blog.DoesNotExist:
-        pass
-    return render(request, "autoblog/memberDashboard.html", {"member" : member, "form" : form})
-
 # HELPER METHODS
 #############################################################################
-
 def update_blog_in_db(form, blog):
     # Access blog content from POST request
     title = form.cleaned_data['title']

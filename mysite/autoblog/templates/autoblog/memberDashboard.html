@@ -29,16 +29,19 @@
                         <p id="section_5" contentEditable="true"> &emsp; {{ blog.section_5 }}</p>
                     </section>
                 </article>
-
-                <form id="blog-form" method="POST">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        {{ field.as_hidden }}
-                    {% endfor %}
-                    <input class="submit-button" type="submit" formaction="{% url 'post_blog' %}" value="Post">
-                    <input class="submit-button" type="submit" formaction="{% url 'save_blog' %}" value="Save">
-                    <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' %}" value="Delete">
-                </form>
+                {% if member.wordpress_url != '' %}
+                    <form id="blog-form" method="POST">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            {{ field.as_hidden }}
+                        {% endfor %}
+                        <input class="submit-button" type="submit" formaction="{% url 'post_blog' %}" value="Post">
+                        <input class="submit-button" type="submit" formaction="{% url 'save_blog' %}" value="Save">
+                        <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' %}" value="Delete">
+                    </form>
+                {% else %}
+                    <div id="member-info-link"><h3><a href="{% url 'member_info' %}">Link</a> your WordPress Site!</h3></div>
+                {% endif %}
             </main>
             {% load static %}
             <script src="{% static 'autoblog/script.js' %}"></script>
