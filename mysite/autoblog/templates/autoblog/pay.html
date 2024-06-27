@@ -33,7 +33,7 @@
                 {% if member.membership_level == "none" %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
                 {% elif member.membership_level == "Good" %}
-                    <button type="submit" class="payment-button" formaction="{% url 'upgrade-subscription' %}">Upgrade</button>
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Upgrade</button>
                 {% elif member.membership_level == "Better" %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
                 {% elif member.membership_level == "Best" %}
@@ -52,7 +52,7 @@
                 {% if member.membership_level == "none" %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
                 {% elif member.membership_level == "Good" or member.membership_level == "Better"%}
-                    <button type="submit" class="payment-button" formaction="{% url 'upgrade-subscription' %}">Upgrade</button>
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Upgrade</button>
                 {% elif member.membership_level == "Best" %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
                 {% endif %}

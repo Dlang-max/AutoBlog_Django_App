@@ -22,13 +22,19 @@ def pay(request):
     
     return render(request, 'autoblog/pay.html', {"member" : member})
 
-# FIRST TIME PAYING
+
+
+
+
 @login_required(login_url='login/')
 def create_checkout_session(request):
     if request.method == "POST":
         user = request.user
         member = Member.objects.get(user=user)
         customer = stripe.Customer.create()
+
+        if member.membership_level != "none":
+            stripe.Subscription.cancel(member.stripe_subscription_id)
 
 
         option = request.POST['payment']
@@ -90,25 +96,22 @@ def handle_suscription_cancelled(request):
 def stripe_webhook(request):
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
 
     try:
         event = stripe.Webhook.construct_event(
             payload, sig_header, STRIPE_WEBHOOK_SECRET
         )
     except ValueError as e:
-        # Invalid payload
         return HttpResponse("Value Error", status=400)
     except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
         return HttpResponse("Signature Verification Error", status=400)
     
     match event['type']:
-        # HANDLE FIRST TIME CHECKOUT
+        # HANDLE STRIPE CHECKOUT
         case 'checkout.session.completed':
-            handle_first_time_member_checkout(event=event)
+            handle_member_checkout(event=event)
 
-        # HANDLE MEMBERSHIP UPGRADE
+        # HANDLE UPDATES TO MEMBER SUBSCRIPTIONS
         case 'customer.subscription.updated':
             handle_member_update(event=event)
 
@@ -116,11 +119,16 @@ def stripe_webhook(request):
         case 'invoice.payment_succeeded':
             handle_monthly_payment(event=event)
 
-        # HANDLE CANCEL
+        # HANDLE SUBSCRIPTION CANCELLATIONS
         case 'customer.subscription.deleted':
             handle_member_cancellation(event=event)
  
     return HttpResponse(status=200)
+
+
+
+
+
 
 def success(request):
     return render(request, "autoblog/success.html")
@@ -129,17 +137,22 @@ def cancel(request):
     return render(request, "autoblog/cancel.html")
 
 
+
+
+
+
+
 # HELPER METHODS
 # Implement Error Handling
 #############################################################################
-def handle_first_time_member_checkout(event):
+def handle_member_checkout(event):
     """ Handles updating member information after successful first time stripe 
     checkout
 
     Args:
         event: The stripe webhook event sent after a member checks out with stripe 
     """
-    session = event['data']['object']  
+    session = event['data']['object'] 
     customer_id = session["customer"]
     subscription_id = session['subscription']
     member = Member.objects.get(stripe_customer_id=customer_id)
@@ -149,8 +162,7 @@ def handle_first_time_member_checkout(event):
 
 
 def handle_member_update(event):
-    """ Handles updating member information after a member upgrades or downgrades their
-    subscription
+    """ Handles updating member information after a member joins a subscription plan
 
     Args:
         event: The stripe webhook event sent after a member updates their account
@@ -162,6 +174,7 @@ def handle_member_update(event):
     member = Member.objects.get(stripe_customer_id=customer_id)
     member.membership_level = new_membership_level
     member.save()
+
 
 def handle_monthly_payment(event):
     """ Handles updating member information after a member successfully pays their 
@@ -176,6 +189,7 @@ def handle_monthly_payment(event):
     member = Member.objects.get(stripe_customer_id=customer_id)
     member.blogs_remaining += plan_to_blogs_per_month[member.membership_level]
     member.save()
+
 
 def handle_member_cancellation(event):
     """ Handles updating member information after a member cancels their subscription
