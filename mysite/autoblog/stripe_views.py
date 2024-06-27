@@ -62,13 +62,13 @@ def create_checkout_session(request):
 @login_required(login_url='login/')
 def handle_suscription_update(request):
     if request.method == 'POST':
-        option = request.POST['upgrade-option']
+        option = request.POST['payment']
         if option in plan_to_price_id:
             member = Member.objects.get(user=request.user)
             stripe_customer_id = member.stripe_customer_id
             stripe_subscription_id = member.stripe_subscription_id
             member_subsription_info = stripe.Subscription.list(customer=stripe_customer_id)
-
+            
             stripe.Subscription.modify(
                 stripe_subscription_id,
                 items=[{"id": member_subsription_info['data'][0]['items']['data'][0]['id'], "price": plan_to_price_id[option]}],

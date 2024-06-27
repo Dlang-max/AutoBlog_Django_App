@@ -3,50 +3,61 @@
 {% block title %}Pay{% endblock %}
 
 {% block content %}
-<form class="stripe-form" action="create-checkout-session/" method="POST">
-    {% csrf_token %}
+<div class="stripe-form">
     <div class="payment-card-container">
         <div id="good-card" class="payment-card">
             <h2>Good</h2>
-            <p>$10.00</p>
+            <p>$10.00/Month</p>
             <p>1 Blog per Month</p>
-            <input class="payment-button" type="submit" name="payment" value="Good" />
+
+            <form class="payment-card-form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="payment" value="Good"/>
+                {% if member.membership_level == "none" %}
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
+                {% elif member.membership_level == "Good" %}
+                    <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
+                {% elif member.membership_level == "Better" or member.membership_level == "Best" %}
+                    <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
+                {% endif %}
+            </form>
         </div>
+
         <div id="better-card" class="payment-card">
             <h2>Better</h2>
-            <p>$20.00</p>
+            <p>$20.00/Month</p>
             <p>2 Blogs per Month</p>
-            <input class="payment-button" type="submit" name="payment" value="Better" />
+            <form class="payment-card-form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="payment" value="Better"/>
+                {% if member.membership_level == "none" %}
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
+                {% elif member.membership_level == "Good" %}
+                    <button type="submit" class="payment-button" formaction="{% url 'upgrade-subscription' %}">Upgrade</button>
+                {% elif member.membership_level == "Better" %}
+                    <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
+                {% elif member.membership_level == "Best" %}
+                    <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
+                {% endif %}
+            </form>
         </div>
+
         <div id="best-card" class="payment-card">
             <h2>Best</h2>
-            <p>$30.00</p>
+            <p>$30.00/Month</p>
             <p>4 Blogs per Month</p>
-            <input class="payment-button" type="submit" name="payment" value="Best" />
+            <form class="payment-card-form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="payment" value="Best"/>
+                {% if member.membership_level == "none" %}
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
+                {% elif member.membership_level == "Good" or member.membership_level == "Better"%}
+                    <button type="submit" class="payment-button" formaction="{% url 'upgrade-subscription' %}">Upgrade</button>
+                {% elif member.membership_level == "Best" %}
+                    <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
+                {% endif %}
+            </form>
         </div>
     </div>
-</form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<form action="cancel-subscription/" method="POST">
-    {% csrf_token %}
-    <input type="submit" name="payment" value="cancel" />
-</form>
-<form action="upgrade-subscription/" method="POST">
-    {% csrf_token %}
-    <input type="submit" name="upgrade-option" value="Good" />
-    <input type="submit" name="upgrade-option" value="Better" />
-    <input type="submit" name="upgrade-option" value="Best" />
-</form>
+</div>
 {% endblock %}

@@ -2,6 +2,8 @@
     --font:  "Rubik", sans-serif;
     --button-blue: #006edb;
     --button-hover-blue:  #00468b;
+    --button-red: red;
+    --button-hover-red: rgb(142, 9, 9);
     --font-color: white;
 }
 
@@ -94,7 +96,7 @@ body {
 }
 
 #redirect-sign-in a:hover {
-    background-color: var(--button-hover-blue);
+    color: var(--button-hover-blue);
     transition: 500ms;
 }
 
@@ -167,7 +169,11 @@ section {
 }
 
 #delete-blog{
-    background-color: rgb(255, 0, 0);
+    background-color: var(--button-red);
+}
+
+#delete-blog:hover{
+    background-color: var(--button-hover-red);
 }
 
 .no-blogs-container {
@@ -211,6 +217,14 @@ section {
     display: flex;
     flex-direction: row;
 }
+
+.payment-card-form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    
+}
+
 .payment-card {
     display: flex;
     flex-direction: column;
@@ -243,6 +257,14 @@ section {
     background-color: var(--button-hover-blue);
     cursor: pointer;
     transition: 500ms;
+}
+
+.cancel-button {
+    background-color: var(--button-red);
+}
+
+.cancel-button:hover {
+    background-color: var(--button-hover-red);
 }
 
 
