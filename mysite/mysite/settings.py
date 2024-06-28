@@ -119,7 +119,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_ROOT = '/static/'
+# STATIC_ROOT: path for where all staticfiles can be found
+# python manage.py collectstatic will run on this directory
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = '/static/'
 
 # Default primary key field type

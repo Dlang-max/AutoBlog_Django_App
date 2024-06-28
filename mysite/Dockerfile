@@ -16,8 +16,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+# Create Directory for static files
 
+RUN mkdir -p app/staticfiles
+
+WORKDIR /app
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 # ARG UID=10001
@@ -49,4 +52,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD python manage.py runserver 0.0.0.0:8000
+CMD gunicorn mysite.wsgi:application --bind 0.0.0.0:8000

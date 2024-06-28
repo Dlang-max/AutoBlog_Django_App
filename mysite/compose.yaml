@@ -4,10 +4,11 @@ services:
       context: .
     env_file:
       - .env
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     volumes:
       - ./:/app
+      - static_volume:/home/app/web/staticfiles
     depends_on:
       - redis
 
@@ -39,3 +40,15 @@ services:
     depends_on:
       - redis
       - celery
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+    ports:
+      - 1337:80
+    depends_on:
+      - server
+
+volumes:
+  static_volume:
