@@ -5,3 +5,4 @@ env
 __pycache__
 migrations
 config.py
+staticfiles

@@ -8,7 +8,7 @@ services:
       - 8000
     volumes:
       - ./:/app
-      - static_volume:/home/app/web/staticfiles
+      - static_volume:/app/web/staticfiles
     depends_on:
       - redis
 
@@ -44,7 +44,7 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - static_volume:/home/app/web/staticfiles
+      - static_volume:/app/web/staticfiles
     ports:
       - 1337:80
     depends_on:
