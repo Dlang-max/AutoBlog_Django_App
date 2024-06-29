@@ -9,4 +9,5 @@
 + Set up EC2 and host Django app
 + Sut up Let's Encrypt
 <br/>
+
 + Figure out how to set up development and production environments
