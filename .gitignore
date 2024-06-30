@@ -6,3 +6,4 @@ __pycache__
 migrations
 config.py
 staticfiles
+AutoBlog-key-pair.pem
