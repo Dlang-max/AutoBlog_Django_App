@@ -2,6 +2,7 @@ services:
   server:
     build:
       context: .
+      dockerfile: ./docker/prod/Dockerfile
     image: 194139654926.dkr.ecr.us-east-2.amazonaws.com/autoblog-ec2:server
     env_file:
       - .env
@@ -24,6 +25,7 @@ services:
   celery:
     build:
       context: .
+      dockerfile: ./docker/prod/Dockerfile
     volumes:
       - ./:/app
     env_file:
