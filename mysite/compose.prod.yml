@@ -32,19 +32,6 @@ services:
     depends_on:
       - redis
 
-  flower:
-    container_name: flower
-    build:
-      context: .
-    env_file:
-      - .env
-    ports:
-      - "5555:5555"
-    command: celery -A mysite flower --port=5555
-    depends_on:
-      - redis
-      - celery
-
   nginx-proxy:
     container_name: nginx-proxy
     build: nginx
