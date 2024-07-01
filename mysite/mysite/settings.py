@@ -27,14 +27,14 @@ SECRET_KEY = 'django-insecure-$canup@dw_55=dih$phs-uo#shpeu#4)otob!=etl-#*bb2or8
 DEBUG = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = ["http://localhost:1337", 'https://yourbloggingassistant.com']
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'http://localhost:1337', 'https://yourbloggingassistant.com']
+CSRF_TRUSTED_ORIGINS = ['yourbloggingassistant.com']
+ALLOWED_HOSTS = ['yourbloggingassistant.com']
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 
 AUTH_USER_MODEL = "autoblog.User"
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
