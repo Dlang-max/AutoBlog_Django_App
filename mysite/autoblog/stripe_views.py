@@ -42,7 +42,7 @@ def create_checkout_session(request):
         option = request.POST['payment']
         if option in plan_to_price_id:
             membership_level = plan_to_price_id[option]
-            domain = "http://localhost:1337"
+            domain = "https://yourbloggingassistant.com"
 
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
