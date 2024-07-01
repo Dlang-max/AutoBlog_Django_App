@@ -22,9 +22,40 @@ body::after {
 }
 
 
+
+
+
+
+
 /*
 * Navigation Bar
 */
+/* .hidden-desktop {
+    display: none;
+} */
+
+.hamburger {
+    position: absolute;
+    width: 50px;
+    height: 30px;
+    margin-top: 7px;
+    margin-right: 7px;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hamburger span {
+    width: 40px;
+    height: 7px;
+    margin: 2px;
+    border-radius: 2px;
+    background-color: rgb(87, 87, 87);
+}
+
 #navbar {
     margin-bottom: 10px;
     overflow: hidden;
@@ -56,6 +87,11 @@ body::after {
     transition: 500ms;
     color: black;
 }
+
+
+
+
+
 
 
 /*
