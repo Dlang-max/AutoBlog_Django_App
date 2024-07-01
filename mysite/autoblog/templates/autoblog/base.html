@@ -15,7 +15,7 @@
 </head>
 
 <body>
-    <div class="hamburger hidden-desktop">
+    <div class="hamburger" onclick="myFunction()">
         <span></span>
         <span></span>
         <span></span>
@@ -43,5 +43,16 @@
         <p>A Daniel Lang Product</p>
         <p>AutoBlog © 2024</p>
     </footer>
+    <script>
+        function myFunction() {
+            var navContainer = document.getElementById("nav-container");
+            
+            if (navContainer.style.width === "0px") {
+                navContainer.style.width = "200px";
+            } else {
+                navContainer.style.width = "0px";
+            }
+        }
+    </script>
 </body>
 </html>
