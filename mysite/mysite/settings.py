@@ -27,12 +27,22 @@ SECRET_KEY = 'django-insecure-$canup@dw_55=dih$phs-uo#shpeu#4)otob!=etl-#*bb2or8
 DEBUG = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = ['localhost', 'yourbloggingassistant.com']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:1337', 'yourbloggingassistant.com']
 ALLOWED_HOSTS = ['localhost', 'yourbloggingassistant.com']
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 
 AUTH_USER_MODEL = "autoblog.User"
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
 
 # Application definition
 INSTALLED_APPS = [

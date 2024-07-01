@@ -48,4 +48,12 @@ class BlogForm(Form):
     class Meta:
         model = Blog
 
+class ContactForm(Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    subject = forms.CharField(max_length=100)
+    message = forms.CharField(widget=forms.Textarea)
+
+
+
 

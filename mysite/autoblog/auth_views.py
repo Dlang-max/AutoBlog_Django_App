@@ -64,11 +64,6 @@ def login(request):
     return render(request, "autoblog/login.html")
 
 
-
-
-
-
-
 @login_required(login_url="/login")
 def logout(request):
     """

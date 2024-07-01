@@ -1,7 +1,8 @@
+import os
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm
-from django.http import HttpResponse
+from django.core.mail import EmailMessage
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm
 from .models import Member, Blog
 from .decorators import member_required
 from .tasks import write_blog
@@ -17,6 +18,26 @@ def home(request):
         HttpResponse: The HTTP response sent back to the client. Renders home.html. 
     """    
     return render(request, "autoblog/home.html")
+
+
+@login_required(login_url="/login")
+def contact(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+
+            host = os.environ.get("EMAIL_HOST_USER")
+            
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            subject = form.cleaned_data["subject"]
+            message = form.cleaned_data["message"]
+            EmailMessage(subject, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
+
+            return redirect('member_dashboard')
+    
+
+    return render(request, "autoblog/contact.html")
 
 @login_required(login_url="/login")
 def member_info(request):

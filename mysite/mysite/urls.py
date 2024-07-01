@@ -28,6 +28,7 @@ urlpatterns = [
     path('memberInfo/', member_views.member_info, name='member_info'),
     path('generateBlog/', member_views.generate_blog, name='generate_blog'),
     path('memberDash/', member_views.member_dashboard, name='member_dashboard'),
+    path('contact/', member_views.contact, name='contact'),
 
 
     path('saveBlog/', member_views.save_blog, name='save_blog'),
