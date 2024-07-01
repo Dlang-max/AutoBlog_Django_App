@@ -26,9 +26,9 @@ SECRET_KEY = 'django-insecure-$canup@dw_55=dih$phs-uo#shpeu#4)otob!=etl-#*bb2or8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = ['yourbloggingassistant.com']
-ALLOWED_HOSTS = ['yourbloggingassistant.com']
+#SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = ['localhost:1337', 'yourbloggingassistant.com']
+ALLOWED_HOSTS = ['localhost:1337', 'yourbloggingassistant.com']
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 

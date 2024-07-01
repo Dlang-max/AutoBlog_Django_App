@@ -42,7 +42,7 @@ services:
       - celery
 
   nginx:
-    build: ./nginx
+    build: ./nginx-local
     volumes:
       - static_volume:/app/web/staticfiles
     ports:
