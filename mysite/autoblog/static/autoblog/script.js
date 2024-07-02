@@ -20,7 +20,7 @@ function getAndSaveContent(subheading, section) {
 function navResizeMobile() {
     var navContainer = document.getElementById("nav-container");
     
-    if (navContainer.style.width === "0px") {
+    if (navContainer.style.width === "0px" || navContainer.style.width === '') {
         navContainer.style.width = "200px";
         navContainer.style.display = "flex"
     } else {
