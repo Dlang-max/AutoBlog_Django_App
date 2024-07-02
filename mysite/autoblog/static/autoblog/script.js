@@ -22,9 +22,9 @@ function navResizeMobile() {
     
     if (navContainer.style.width === "0px") {
         navContainer.style.width = "200px";
-        navContainer.style.border = "1px solid black"
+        navContainer.style.display = "flex"
     } else {
         navContainer.style.width = "0px";
-        navContainer.style.border = "0px"
+        navContainer.style.display = "none"
     }
 }
