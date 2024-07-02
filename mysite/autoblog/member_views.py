@@ -32,7 +32,8 @@ def contact(request):
             email = form.cleaned_data["email"]
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
-            EmailMessage(subject, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
+            
+            EmailMessage(subject + " : " + name, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
 
             return redirect('member_dashboard')
     

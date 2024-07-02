@@ -34,6 +34,10 @@ body::after {
     display: none;
 }
 
+#nav-container {
+    border: 0px;
+}
+
 #navbar {
     margin-bottom: 10px;
     overflow: hidden;
@@ -99,6 +103,7 @@ body::after {
     margin-top: 5px;
     margin-bottom: 10px;
     width: 250px;
+    resize: none;
 }
 
 #register-button{
@@ -306,15 +311,20 @@ section {
     flex-direction: column;
 }
 
-.footer a {
-    margin-top: 5px;
+.footer-links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.footer-link {
+    margin: 5px;
     font: var(--font);
-    color: var(--button-blue);
+    color: white;
     text-decoration: none;
 }
 
-.footer a:hover {
-    color: var(--button-hover-blue);
+.footer-link:hover {
     cursor: pointer;
 }
 
@@ -324,6 +334,7 @@ section {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
 
 
 
@@ -349,6 +360,7 @@ section {
 
     .hamburger:hover {
         cursor: pointer;
+        color: black;
     }
     
     .hamburger span {
@@ -365,20 +377,27 @@ section {
         position: absolute;
         top: 0;
         right: 0;
-        height: 100vh;
+        height: 300px;
         background-color: white;
-        border: 1px solid black;
         transition: 500ms;
+        border-radius: 5px;
     }
 
     #navbar {
        font-size: large;
        padding-top: 30px;
+       justify-content: flex-start;
     }
 
     #nav-links {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .nav-item {
+        font-size: large;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 
 
@@ -453,6 +472,13 @@ section {
     /*
     * Stripe Payments
     */
+    .stripe-form {
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        margin-top: 0px;
+        padding-top: 50px;
+    }
     .payment-card-container {
         display: flex;
         flex-direction: column;

@@ -16,3 +16,15 @@ function getAndSaveContent(subheading, section) {
     var section_text = document.getElementById(section).innerText
     document.getElementById("id_" + section).value = section_text;
 }
+
+function navResizeMobile() {
+    var navContainer = document.getElementById("nav-container");
+    
+    if (navContainer.style.width === "0px") {
+        navContainer.style.width = "200px";
+        navContainer.style.border = "1px solid black"
+    } else {
+        navContainer.style.width = "0px";
+        navContainer.style.border = "0px"
+    }
+}

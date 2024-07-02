@@ -15,7 +15,7 @@
 </head>
 
 <body>
-    <div class="hamburger" onclick="myFunction()">
+    <div class="hamburger" onclick="navResizeMobile()">
         <span></span>
         <span></span>
         <span></span>
@@ -28,6 +28,7 @@
                 {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'generate_blog' %}">Write</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'member_dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'pay' %}">Account</a></li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
@@ -39,20 +40,14 @@
         {% block content %}{% endblock %}
     </div>
     <footer class="footer">
-        <a href="{% url 'home' %}">About</a>
+        <div class="footer-links">
+            <a class="footer-link" href="{% url 'home' %}">About</a>
+            <a class="footer-link" href="{% url 'contact' %}">Contact</a>
+        </div>
         <p>A Daniel Lang Product</p>
         <p>AutoBlog © 2024</p>
     </footer>
-    <script>
-        function myFunction() {
-            var navContainer = document.getElementById("nav-container");
-            
-            if (navContainer.style.width === "0px") {
-                navContainer.style.width = "200px";
-            } else {
-                navContainer.style.width = "0px";
-            }
-        }
-    </script>
+    {% load static %}
+    <script src="{% static 'autoblog/script.js' %}"></script>
 </body>
 </html>

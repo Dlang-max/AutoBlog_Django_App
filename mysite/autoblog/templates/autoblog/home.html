@@ -3,11 +3,5 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1 class="introduction">Hello
-    {% if user.is_authenticated %}
-        {{user.username}}!
-    {% else %}
-        World!
-    {% endif %}
-</h1>
+
 {% endblock %}
