@@ -1,4 +1,7 @@
 import os
+import base64
+import requests
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.mail import EmailMessage
@@ -161,9 +164,52 @@ def save_blog(request):
 # POST BLOG
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
-
 def post_blog(request):
-    pass
+    if request.method == 'POST':
+        user = request.user
+        member = Member.objects.get(user=user)
+
+        form = BlogForm(request.POST)
+
+        if form.is_valid():
+            blog = Blog.objects.get(author=member)
+            update_blog_in_db(form=form, blog=blog)
+        else:
+            blog.delete()
+        
+        member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
+        member_wordpress_username = member.wordpress_username
+        member_wordpress_application_password = member.wordpress_application_password
+
+        # Build HTTP Header for POSTing to WordPress REST API
+        credentials = member_wordpress_username + ':' + member_wordpress_application_password
+        token = base64.b64encode(credentials.encode())
+        header = {"Authorization":"Basic " + token.decode("utf-8")}
+
+        # Get a User's Blog
+        try:
+            blog = Blog.objects.get(author=member)
+        except Blog.DoesNotExist:
+            return redirect("member_dashboard")
+
+
+        # Format a User's Blog
+        blog_content = format_blog(blog=blog)
+
+        post = {
+            "title" : blog.title,
+            "content" : blog_content,
+            "status" : "publish"
+        }
+
+        try:
+            response = requests.post(member_wordpress_post_url, headers=header, json=post)
+        except requests.exceptions.ConnectionError:
+            return redirect("member_dashboard")
+        
+        blog.delete()
+
+    return redirect("member_dashboard")
 
 # DELETE BLOG
 @login_required(login_url='/login')
@@ -182,6 +228,51 @@ def delete_blog(request):
 
 # HELPER METHODS
 #############################################################################
+
+def format_blog(blog):
+    content = ""
+
+    subheading_1 = blog.subheading_1
+    section_1 = blog.section_1
+    content += format_subheading_and_section(format_subheading(subheading_1), format_section(section_1))
+
+    subheading_2 = blog.subheading_2
+    section_2 = blog.section_2
+    content += format_subheading_and_section(format_subheading(subheading_2), format_section(section_2))
+
+    subheading_3 = blog.subheading_3
+    section_3 = blog.section_3
+    content += format_subheading_and_section(format_subheading(subheading_3), format_section(section_3))
+
+
+    subheading_4 = blog.subheading_4
+    section_4 = blog.section_4
+    content += format_subheading_and_section(format_subheading(subheading_4), format_section(section_4))
+
+    subheading_5 = blog.subheading_5
+    section_5 = blog.section_5
+    content += format_subheading_and_section(format_subheading(subheading_5), format_section(section_5))
+
+    return f"<article style=\"font-family: Arial; display: flex; flex-direction: column; align-items: center;\">{content}</article>"
+
+
+def format_title(title):
+    title_html = f"<h2>{title}</h2>"
+    return title_html
+
+def format_subheading(subheading):
+    subheading_html = f"<h3 style=\"text-align: center;\">{subheading}</h3>"    
+    return subheading_html
+
+def format_section(section):
+    section_html = f"<p>{section}</p>"
+    return section_html
+
+def format_subheading_and_section(subheading, section):
+    subheading_and_section_html = f"<section style=\"display: flex; flex-direction: column; align-items: center;\">{subheading} {section}</section> "
+    return subheading_and_section_html
+
+
 def update_blog_in_db(form, blog):
     # Access blog content from POST request
     title = form.cleaned_data['title']
