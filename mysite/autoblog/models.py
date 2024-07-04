@@ -33,6 +33,9 @@ class Blog(models.Model):
     date = models.DateField(auto_now_add=True)
     
     # BLOG
+    meta_keywords = models.CharField(max_length=100, default="")
+    meta_description = models.CharField(max_length=200, default="")
+
     title = models.CharField(max_length=200)
 
     subheading_1 = models.CharField(max_length=200, default="")

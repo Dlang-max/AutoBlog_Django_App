@@ -196,10 +196,17 @@ def post_blog(request):
         # Format a User's Blog
         blog_content = format_blog(blog=blog)
 
+        meta = {
+            "description" : blog.meta_description,
+            "keywords" : blog.meta_keywords,
+            "filter" : "raw"
+        }
+
         post = {
             "title" : blog.title,
             "content" : blog_content,
-            "status" : "publish"
+            "status" : "publish",
+            "meta" : meta,
         }
 
         try:
