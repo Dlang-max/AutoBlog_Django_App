@@ -134,10 +134,6 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
-
-
-
-
 def success(request):
     return render(request, "autoblog/success.html")
 
