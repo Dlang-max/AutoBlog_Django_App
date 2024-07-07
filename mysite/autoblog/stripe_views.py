@@ -24,10 +24,6 @@ def pay(request):
     
     return render(request, 'autoblog/pay.html', {"member" : member})
 
-
-
-
-
 @login_required(login_url='login/')
 def create_checkout_session(request):
     if request.method == "POST":
