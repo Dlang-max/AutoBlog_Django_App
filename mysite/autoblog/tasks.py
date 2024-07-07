@@ -1,8 +1,8 @@
-from .models import User, Member, Blog
-from celery import app
-from celery import shared_task
 import openai
+from celery import app
 from openai import OpenAI
+from celery import shared_task
+from .models import User, Member, Blog
 
 client = OpenAI()
 
@@ -52,6 +52,19 @@ def write_blog(username=None, title='', addition_info=''):
         print("openai.APIError encountered when trying to generate blog for ", username, flush=True)
     return True
 
+# STILL NEED TO TEST IMAGE GENERATION
+# VERY EXPENSIVE TO GENERATE IMAGES
+def generateBlogImage(title=''):
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=f"{title}",
+        size="1024x1024",
+        quality="standard",
+    )
+
+    image_url = response.data[0].url
+    return image_url
+
 def writeBlogOutline(title=''):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -83,7 +96,6 @@ def writeMetaKeywords(outline=''):
     )
     keywords = completion.choices[0].message.content
     return keywords
-
 
 def writeMetaDescription(outline=''):
     completion = client.chat.completions.create(
