@@ -238,30 +238,12 @@ def delete_blog(request):
 
 def format_blog(blog):
     content = ""
-
-    subheading_1 = blog.subheading_1
-    section_1 = blog.section_1
-    content += format_subheading_and_section(format_subheading(subheading_1), format_section(section_1))
-
-    subheading_2 = blog.subheading_2
-    section_2 = blog.section_2
-    content += format_subheading_and_section(format_subheading(subheading_2), format_section(section_2))
-
-    subheading_3 = blog.subheading_3
-    section_3 = blog.section_3
-    content += format_subheading_and_section(format_subheading(subheading_3), format_section(section_3))
-
-
-    subheading_4 = blog.subheading_4
-    section_4 = blog.section_4
-    content += format_subheading_and_section(format_subheading(subheading_4), format_section(section_4))
-
-    subheading_5 = blog.subheading_5
-    section_5 = blog.section_5
-    content += format_subheading_and_section(format_subheading(subheading_5), format_section(section_5))
+    for i in range(1, 6):
+        subheading = getattr(blog, f"subheading_{i}")
+        section = getattr(blog, f"section_{i}")
+        content += format_subheading_and_section(format_subheading(subheading), format_section(section))
 
     return f"<article style=\"font-family: Arial; display: flex; flex-direction: column; align-items: center;\">{content}</article>"
-
 
 def format_title(title):
     title_html = f"<h2>{title}</h2>"
@@ -283,27 +265,13 @@ def format_subheading_and_section(subheading, section):
 def update_blog_in_db(form, blog):
     # Access blog content from POST request
     title = form.cleaned_data['title']
-    subheading_1 = form.cleaned_data['subheading_1']
-    section_1 = form.cleaned_data['section_1']
-    subheading_2 = form.cleaned_data['subheading_2']
-    section_2 = form.cleaned_data['section_2']
-    subheading_3 = form.cleaned_data['subheading_3']
-    section_3 = form.cleaned_data['section_3']
-    subheading_4 = form.cleaned_data['subheading_4']
-    section_4 = form.cleaned_data['section_4']
-    subheading_5 = form.cleaned_data['subheading_5']
-    section_5 = form.cleaned_data['section_5']
-
-    # Save updated blog
     blog.title = title
-    blog.subheading_1 = subheading_1
-    blog.section_1 = section_1
-    blog.subheading_2 = subheading_2
-    blog.section_2 = section_2
-    blog.subheading_3 = subheading_3
-    blog.section_3 = section_3
-    blog.subheading_4 = subheading_4
-    blog.section_4 = section_4
-    blog.subheading_5 = subheading_5
-    blog.section_5 = section_5
+
+    for i in range(1, 6):
+        subheading = form.cleaned_data[f"subheading_{i}"]
+        section = form.cleaned_data[f"section_{i}"]
+
+        setattr(blog, f"subheading_{i}", subheading)
+        setattr(blog, f"section_{i}", section)     
+
     blog.save()

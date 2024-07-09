@@ -16,34 +16,23 @@ def write_blog(username=None, title='', addition_info=''):
     # BUILD BLOG
     try:
 
+
         meta_keywords = writeMetaKeywords(outline=outline)
         meta_description = writeMetaDescription(outline=outline)
 
-        subheading_1 = writeHeading(section='first', outline=outline)
-        section_1 = writeSection(section='first', subheading=subheading_1, outline=outline)
-
-        subheading_2 = writeHeading(section='second', outline=outline)
-        section_2 = writeSection(section='second', subheading=subheading_2, outline=outline)
-
-        subheading_3 = writeHeading(section='third', outline=outline)
-        section_3 = writeSection(section='third', subheading=subheading_3, outline=outline)
-
-        subheading_4 = writeHeading(section='fourth', outline=outline)
-        section_4 = writeSection(section='fourth', subheading=subheading_4, outline=outline)
-
-        subheading_5 = writeHeading(section='concluding', outline=outline)
-        section_5 = writeSection(section='concluding', subheading=subheading_5, outline=outline)
-        
-
+        blog.title = title
         blog.meta_keywords = meta_keywords
         blog.meta_description = meta_description
-        
-        blog.title = title
-        blog.subheading_1, blog.section_1 = subheading_1, section_1 
-        blog.subheading_2, blog.section_2 = subheading_2, section_2 
-        blog.subheading_3, blog.section_3 = subheading_3, section_3 
-        blog.subheading_4, blog.section_4 = subheading_4, section_4 
-        blog.subheading_5, blog.section_5 = subheading_5, section_5 
+
+        sections = ["first", "second", "third", "fourth", "concluding"]
+
+        for i, section in enumerate(sections, start=1):
+            subheading = writeHeading(section=section, outline=outline)
+            section = writeSection(section=section, outline=outline)
+
+            setattr(blog, f"subheading_{i}", subheading)
+            setattr(blog, f"section_{i}", section) 
+
         blog.save()
 
     except openai.APIError as e:
