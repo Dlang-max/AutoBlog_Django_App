@@ -6,7 +6,6 @@
 <form class="auth-form" method="POST">
     {% csrf_token %}
     <h2 class="introduction">WordPress Information</h2>
-    {% csrf_token %}
     <input class="auth-input" type="url" name="wordpress_url" placeholder="WordPress URL">
     <input class="auth-input" type="text" name="wordpress_username" placeholder="WordPress Username">
     <input class="auth-input" type="text" name="wordpress_application_password" placeholder="WordPress Application Password">

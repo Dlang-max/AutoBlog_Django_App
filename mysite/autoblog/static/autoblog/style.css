@@ -23,10 +23,6 @@ body::after {
 
 
 
-
-
-
-
 /*
 * Navigation Bar
 */
@@ -233,6 +229,11 @@ section {
     color: var(--button-hover-blue);
     cursor: pointer;
     transition: 500ms;
+}
+
+#blog-header-image {
+    width: 100%;
+    height: 100%;
 }
 
 /*

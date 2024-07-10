@@ -16,9 +16,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
-# Create Directory for static files
-
+# Create Directory for static and media files
 RUN mkdir -p app/staticfiles
+RUN mkdir -p app/mediafiles
 
 WORKDIR /app
 # Create a non-privileged user that the app will run under.

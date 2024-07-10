@@ -1,8 +1,14 @@
 import openai
+import requests
+from io import BytesIO
+from PIL import Image
 from celery import app
 from openai import OpenAI
 from celery import shared_task
 from .models import User, Member, Blog
+from django.core.files.base import ContentFile
+
+
 
 client = OpenAI()
 
@@ -11,10 +17,27 @@ def write_blog(username=None, title='', addition_info=''):
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
     blog = Blog.objects.get(author=member)
-    outline = writeBlogOutline(title=title)
-
     # BUILD BLOG
     try:
+        # Generate Image
+        image_url = generateBlogImage(title=title)
+
+        # Read in image
+        image_data = requests.get(image_url).content
+        image = Image.open(BytesIO(image_data))
+        image = image.resize((800, 800))
+
+        # Convert to WEBP
+        webp_image = BytesIO()
+        image.save(webp_image, "webp")
+        webp_image.seek(0)
+
+
+        # Save image
+        blog.image.save(f"{username}_blog_header_image.webp", ContentFile(webp_image.read()), save=True)
+
+        # Generate Blog
+        outline = writeBlogOutline(title=title)
         meta_keywords = writeMetaKeywords(outline=outline)
         meta_description = writeMetaDescription(outline=outline)
 
@@ -35,6 +58,7 @@ def write_blog(username=None, title='', addition_info=''):
 
     except openai.APIError as e:
         member.blogs_remaining += 1
+        blog.image.delete()
         blog.delete()
         print("openai.APIError encountered when trying to generate blog for ", username, flush=True)
     return True
@@ -44,7 +68,7 @@ def write_blog(username=None, title='', addition_info=''):
 def generateBlogImage(title=''):
     response = client.images.generate(
         model="dall-e-3",
-        prompt=f"{title}",
+        prompt=f"Generate a header image for a blog titled: {title}. Do not include text in the image.",
         size="1024x1024",
         quality="standard",
     )

@@ -12,6 +12,7 @@ services:
     volumes:
       - ./:/app
       - static_volume:/app/web/staticfiles
+      - media_volume:/app/web/mediafiles
     depends_on:
       - redis
 
@@ -28,6 +29,7 @@ services:
       dockerfile: ./docker/prod/Dockerfile
     volumes:
       - ./:/app
+      - media_volume:/app/web/mediafiles
     env_file:
       - .env
     command: celery -A mysite worker --loglevel=INFO --concurrency=4
@@ -44,6 +46,7 @@ services:
       - 80:80
     volumes:
       - static_volume:/app/web/staticfiles
+      - media_volume:/app/web/mediafiles
       - certs:/etc/nginx/certs
       - html:/usr/share/nginx/html
       - vhost:/etc/nginx/vhost.d
@@ -66,6 +69,7 @@ services:
 
 volumes:
   static_volume:
+  media_volume:
   certs:
   html:
   vhost:

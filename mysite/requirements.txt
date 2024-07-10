@@ -25,6 +25,7 @@ idna==3.7
 kombu==5.3.7
 openai==1.32.1
 packaging==24.1
+pillow==10.4.0
 prometheus_client==0.20.0
 prompt_toolkit==3.0.46
 pydantic==2.7.3

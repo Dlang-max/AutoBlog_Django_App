@@ -78,9 +78,8 @@ def member_info(request):
             user.is_member = True
             user.save()
             return redirect('/home')
-        
-    form = MemberInfoForm()
-    return render(request, "autoblog/memberInfo.html", {"form" : form})
+
+    return render(request, "autoblog/memberInfo.html")
 
 
 # HANDLE BLOG LOGIC
@@ -156,12 +155,18 @@ def save_blog(request):
             if form.is_valid():
                 update_blog_in_db(form=form, blog=blog)
             else:
+                blog.image.delete()
                 blog.delete()
         except Blog.DoesNotExist:
             pass
     return redirect('/memberDash')
 
 # POST BLOG
+# BREAK DOWN INTO INDIVIDUAL HELPER METHODS
+# ADD AS ASYNC TASK
+# HANDLE ERRORS BETTER
+
+# What if blog uploads but not image?
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
 def post_blog(request):
@@ -175,9 +180,13 @@ def post_blog(request):
             blog = Blog.objects.get(author=member)
             update_blog_in_db(form=form, blog=blog)
         else:
+            blog.image.delete()
             blog.delete()
+            return redirect("member_dashboard")
+
         
         member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
+        member_wordpress_media_url = member.wordpress_url + "/wp-json/wp/v2/media"
         member_wordpress_username = member.wordpress_username
         member_wordpress_application_password = member.wordpress_application_password
 
@@ -186,34 +195,39 @@ def post_blog(request):
         token = base64.b64encode(credentials.encode())
         header = {"Authorization":"Basic " + token.decode("utf-8")}
 
-        # Get a User's Blog
-        try:
-            blog = Blog.objects.get(author=member)
-        except Blog.DoesNotExist:
-            return redirect("member_dashboard")
-
-
         # Format a User's Blog
         blog_content = format_blog(blog=blog)
-
-        meta = {
-            "description" : blog.meta_description,
-            "keywords" : blog.meta_keywords,
-            "filter" : "raw"
-        }
-
-        post = {
-            "title" : blog.title,
-            "content" : blog_content,
-            "status" : "publish",
-            "meta" : meta,
-        }
-
         try:
-            response = requests.post(member_wordpress_post_url, headers=header, json=post)
+
+            # Post Blog Conent to WordPress
+            post = {
+                "title" : blog.title,
+                "content" : blog_content,
+                "status" : "publish",
+            }
+            post_response = requests.post(member_wordpress_post_url, headers=header, json=post)
+            post_id = post_response.json().get("id")
+            member_wordpress_current_post_url = member_wordpress_post_url + '/' + str(post_id)
+
+            # Get and Post Blog's header image to WordPress
+    
+            media = {
+                'file': ('header_image.webp', blog.image, 'image/webp'),
+                'status': 'publish'
+            }
+
+            media_response = requests.post(member_wordpress_media_url, headers=header, files=media)
+            media_id = media_response.json().get('id')
+            featured_payload = {
+                'featured_media': media_id
+            }
+
+            # Update Blog's featured image
+            update_post_response = requests.post(member_wordpress_current_post_url, headers=header, json=featured_payload)
         except requests.exceptions.ConnectionError:
             return redirect("member_dashboard")
         
+        blog.image.delete()
         blog.delete()
 
     return redirect("member_dashboard")
@@ -227,6 +241,7 @@ def delete_blog(request):
         member = Member.objects.get(user=user)
         try:
             blog = Blog.objects.get(author=member)
+            blog.image.delete()
             blog.delete()
         except Blog.DoesNotExist:
             pass
@@ -254,7 +269,7 @@ def format_subheading(subheading):
     return subheading_html
 
 def format_section(section):
-    section_html = f"<p>{section}</p>"
+    section_html = f"<p> &emsp; {section}</p>"
     return section_html
 
 def format_subheading_and_section(subheading, section):

@@ -36,6 +36,7 @@ class Blog(models.Model):
     meta_keywords = models.CharField(max_length=100, default="")
     meta_description = models.CharField(max_length=200, default="")
 
+    image = models.ImageField(upload_to="blogimages")
     title = models.CharField(max_length=200)
 
     subheading_1 = models.CharField(max_length=200, default="")
