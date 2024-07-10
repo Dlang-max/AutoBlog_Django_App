@@ -15,8 +15,6 @@ def write_blog(username=None, title='', addition_info=''):
 
     # BUILD BLOG
     try:
-
-
         meta_keywords = writeMetaKeywords(outline=outline)
         meta_description = writeMetaDescription(outline=outline)
 
@@ -37,7 +35,7 @@ def write_blog(username=None, title='', addition_info=''):
 
     except openai.APIError as e:
         member.blogs_remaining += 1
-        member.save()
+        blog.delete()
         print("openai.APIError encountered when trying to generate blog for ", username, flush=True)
     return True
 
@@ -67,7 +65,7 @@ def writeBlogOutline(title=''):
 def writeHeading(section='', outline=''):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog outlines for a living. You have a friendly tone of voice. You have a conversational writting style. Using this blog outline: {outline}, write the {section} subheading for this blog. Make sure this subheading is SEO optimized."}]
+        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog subheadings for a living. You have a friendly tone of voice. You have a conversational writting style. Using this blog outline: {outline}, write the {section} subheading for this blog. Make sure this subheading is SEO optimized and keep this subheading to at most 10 words. EXCLUDE any numbers of dashses from this subheading."}]
     )
     outline = completion.choices[0].message.content
     return outline
@@ -75,7 +73,7 @@ def writeHeading(section='', outline=''):
 def writeSection(section='', subheading='', outline=''):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog outlines for a living. You have a friendly tone of voice. You have a conversational writting style. Using this blog outline: {outline} and the subheading {subheading}, write the {section} content section for this blog. Do NOT include the name of this subheading in this section. Keep this section between 150 and 200 words. Also use language that an 8th grader can understand. Make sure it is SEO optimized."}]
+        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog paragraphs for a living. You have a friendly tone of voice. You have a conversational writting style. Using this blog outline: {outline} and the subheading {subheading}, write the {section} content section for this blog. Do NOT include the name of this subheading in this section. Keep this section between 100 and 150 words. Also use language that an 8th grader can understand. Make sure it is SEO optimized."}]
     )
     outline = completion.choices[0].message.content
     return outline
