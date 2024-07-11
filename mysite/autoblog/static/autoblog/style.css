@@ -232,8 +232,10 @@ section {
 }
 
 #blog-header-image {
-    width: 100%;
-    height: 100%;
+    overflow-x: hidden;
+    width: 600px;
+    height: 600px;
+    border-radius: 5px;
 }
 
 /*
@@ -478,6 +480,12 @@ section {
         font-family: var(--font);
         color: var(--button-hover-blue);
         cursor: pointer;
+    }
+
+    #blog-header-image {
+        overflow-x: hidden;
+        width: 300px;
+        height: 300px;
     }
 
     /*

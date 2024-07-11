@@ -25,7 +25,7 @@ def write_blog(username=None, title='', addition_info=''):
         # Read in image
         image_data = requests.get(image_url).content
         image = Image.open(BytesIO(image_data))
-        image = image.resize((800, 800))
+        image = image.resize((600, 600))
 
         # Convert to WEBP
         webp_image = BytesIO()
