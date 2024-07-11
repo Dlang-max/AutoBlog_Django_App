@@ -43,8 +43,8 @@ urlpatterns = [
     path('pay/create-checkout-session/', stripe_views.create_checkout_session, name='checkout'),
     path('success/', stripe_views.success, name='success'),
     path('cancel/', stripe_views.cancel, name='cancel'),
-    path('pay/cancel-subscription/', stripe_views.handle_suscription_cancelled, name='cancel-subscription'),
-    path('pay/upgrade-subscription/', stripe_views.handle_suscription_update, name='upgrade-subscription'),
+    path('pay/cancel-subscription/', stripe_views.handle_subscription_cancelled, name='cancel-subscription'),
+    path('pay/upgrade-subscription/', stripe_views.handle_subscription_update, name='upgrade-subscription'),
     path('webhook/', stripe_views.stripe_webhook, name='webhook'),
 
 ]

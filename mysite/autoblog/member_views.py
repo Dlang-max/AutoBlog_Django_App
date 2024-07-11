@@ -49,7 +49,7 @@ def member_info(request):
     Handles HTTP requests and responses for the /memberInfo endpoint
 
     Args:
-        request (HttpRequest): The HTTP request sent to the /memberIndo endpoint. Can 
+        request (HttpRequest): The HTTP request sent to the /memberInfo endpoint. Can 
         either be a POST or GET request.
     Returns:
         HttpResponse: The HTTP response sent back to the client. This response will either
@@ -199,7 +199,7 @@ def post_blog(request):
         blog_content = format_blog(blog=blog)
         try:
 
-            # Post Blog Conent to WordPress
+            # Post Blog Content to WordPress
             post = {
                 "title" : blog.title,
                 "content" : blog_content,

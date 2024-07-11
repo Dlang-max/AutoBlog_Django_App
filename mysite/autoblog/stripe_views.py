@@ -64,7 +64,7 @@ def create_checkout_session(request):
 # UPDATE SUBSCRIPTION
 # MEMBER INFO UPDATE HANDLED IN WEBHOOK
 @login_required(login_url='login/')
-def handle_suscription_update(request):
+def handle_subscription_update(request):
     if request.method == 'POST':
         option = request.POST['payment']
         if option in plan_to_price_id:
@@ -72,11 +72,11 @@ def handle_suscription_update(request):
                 member = Member.objects.get(user=request.user)
                 stripe_customer_id = member.stripe_customer_id
                 stripe_subscription_id = member.stripe_subscription_id
-                member_subsription_info = stripe.Subscription.list(customer=stripe_customer_id)
+                member_subscription_info = stripe.Subscription.list(customer=stripe_customer_id)
                 
                 stripe.Subscription.modify(
                     stripe_subscription_id,
-                    items=[{"id": member_subsription_info['data'][0]['items']['data'][0]['id'], "price": plan_to_price_id[option]}],
+                    items=[{"id": member_subscription_info['data'][0]['items']['data'][0]['id'], "price": plan_to_price_id[option]}],
                 )
             except stripe.InvalidRequestError:
                 pass
@@ -86,7 +86,7 @@ def handle_suscription_update(request):
 # CANCEL SUBSCRIPTION
 # MEMBER INFO UPDATE HANDLED IN WEBHOOK
 @login_required(login_url='login/')
-def handle_suscription_cancelled(request):
+def handle_subscription_cancelled(request):
     if request.method == 'POST':
         member = Member.objects.get(user=request.user)
         try:
