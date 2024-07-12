@@ -8,7 +8,7 @@ from django.core.mail import EmailMessage
 from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm
 from .models import Member, Blog
 from .decorators import member_required
-from .tasks import write_blog
+from .tasks import generate_blog_and_header_image
 
 def home(request):
     """
@@ -115,7 +115,7 @@ def generate_blog(request):
             username = request.user.username
             title = form.cleaned_data["title"]
             additional_info = form.cleaned_data["additional_info"]
-            task = write_blog.delay(username=username, title=title, addition_info=additional_info)
+            task = generate_blog_and_header_image.delay(username=username, title=title, addition_info=additional_info)
 
             member.blogs_remaining -= 1
             member.save()
