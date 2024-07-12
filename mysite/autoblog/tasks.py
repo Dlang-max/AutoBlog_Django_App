@@ -79,7 +79,8 @@ def generate_blog_image(username='', title='', blog=None):
 def generate_image(title=''):
     response = client.images.generate(
         model="dall-e-3",
-        prompt=f"Generate a header image for a blog titled: {title}. Do not include text in the image.",
+        prompt=f"Generate a header image for a blog titled: {title}. Do not include 
+        text in the image.",
         size="1024x1024",
         quality="standard",
     )
@@ -90,23 +91,43 @@ def generate_image(title=''):
 def write_blog_outline(title=''):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog outlines for a living. You have a friendly tone of voice. You have a conversational writing style. Create a long form content outline in english for the blog post titled {title}. The content outline should include a minimum of 5 subheadings and headings. The outline should be extensive and should cover the entire topic. Create detailed subheadings that are engaging. Do not write the blog post. Please only write the outline of the blog post. Please do not number the headings. Please add newline space between headings and subheadings. Do not self reference. Do not explain what you are doing"}]
-    )
+        messages=[{'role':'user', "content": f"Please ignore all previous instructions.
+                   You are an expert copywriter who creates blog outlines for a living.
+                   You have a friendly tone of voice. You have a conversational writing
+                   style. Create a long form content outline in english for the blog
+                   post titled {title}. The content outline should include a minimum of
+                   5 subheadings and headings. The outline should be extensive and should
+                   cover the entire topic. Create detailed subheadings that are engaging.
+                   Do not write the blog post. Please only write the outline of the blog 
+                   post. Please do not number the headings. Please add newline space 
+                   between headings and subheadings. Do not self reference. Do not 
+                   explain what you are doing"}])
     outline = completion.choices[0].message.content
     return outline
 
 def write_subheading(section='', outline=''):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog subheadings for a living. You have a friendly tone of voice. You have a conversational writing style. Using this blog outline: {outline}, write the {section} subheading for this blog. Make sure this subheading is SEO optimized and keep this subheading to at most 10 words. EXCLUDE any numbers of dashes from this subheading."}]
-    )
+        messages=[{'role':'user', "content": f"Please ignore all previous instructions.
+                    You are an expert copywriter who creates blog subheadings for a
+                    living. You have a friendly tone of voice. You have a conversational
+                    writing style. Using this blog outline: {outline}, write the
+                    {section} subheading for this blog. Make sure this subheading is SEO
+                    optimized and keep this subheading to at most 10 words. EXCLUDE any
+                    numbers of dashes from this subheading."}])
     generated_subheading = completion.choices[0].message.content
     return generated_subheading
 
 def write_section(section='', subheading='', outline=''):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. You are an expert copywriter who creates blog paragraphs for a living. You have a friendly tone of voice. You have a conversational writing style. Using this blog outline: {outline} and the subheading {subheading}, write the {section} content section for this blog. Do NOT include the name of this subheading in this section. Keep this section between 100 and 150 words. Also use language that an 8th grader can understand. Make sure it is SEO optimized."}]
-    )
+        messages=[{'role':'user', "content": f"Please ignore all previous instructions.
+                    You are an expert copywriter who creates blog paragraphs for a 
+                    living. You have a friendly tone of voice. You have a conversational
+                    writing style. Using this blog outline: {outline} and the subheading 
+                    {subheading}, write the {section} content section for this blog. Do 
+                    NOT include the name of this subheading in this section. Keep this 
+                    section between 100 and 150 words. Also use language that an 8th 
+                    grader can understand. Make sure it is SEO optimized."}])
     generated_section = completion.choices[0].message.content
     return generated_section  
