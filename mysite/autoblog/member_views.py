@@ -35,7 +35,7 @@ def contact(request):
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
             EmailMessage(subject + " : " + name, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
-            return redirect('member_dashboard')
+            return redirect("member_dashboard")
     
     return render(request, "autoblog/contact.html")
 
@@ -61,19 +61,17 @@ def member_info(request):
             wordpress_username = form.cleaned_data["wordpress_username"]
             wordpress_application_password = form.cleaned_data["wordpress_application_password"]
 
-            try:
-                member = Member.objects.get(user=user)
-                member.wordpress_url = wordpress_url
-                member.wordpress_username = wordpress_username
-                member.wordpress_application_password = wordpress_application_password
-            except Member.DoesNotExist:
-                member = Member.objects.create(user=user, wordpress_url=wordpress_url, 
-                                wordpress_username=wordpress_username, 
-                                wordpress_application_password=wordpress_application_password)
+            # Update a Member's Information
+            member, created = Member.objects.get_or_create(user=user)
+
+            if created:
+                user.is_member = True
+
+            member.wordpress_url = wordpress_url
+            member.wordpress_username = wordpress_username
+            member.wordpress_application_password = wordpress_application_password
             member.save()
-            user.is_member = True
-            user.save()
-            return redirect('/home')
+            return redirect("member_dashboard")
 
     return render(request, "autoblog/memberInfo.html")
 

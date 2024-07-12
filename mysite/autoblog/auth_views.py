@@ -15,18 +15,18 @@ def register(request):
 
     Returns:
         HttpResponse: The HTTP response sent back to the client. This response will 
-        either render the RegisterForm for the user or redirect them to the /home
+        either render the RegisterForm for the user or redirect them to the generate_blog
         endpoint after successfully registering.
     """ 
     if(request.user.is_authenticated):
-        return redirect('/home')
+        return redirect("generate_blog")
 
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return redirect('/home')
+            return redirect("generate_blog")
         
     return render(request, "autoblog/register.html")
 
@@ -41,7 +41,7 @@ def login(request):
     
     Returns:
         HttpResponse: The HTTP response sent back to the client. This will either render 
-        the User login form or login the user and redirect them to /home endpoint if a 
+        the User login form or login the user and redirect them to generate_blog endpoint if a 
         user is successfully authenticated
     """
     if request.method == "POST":
@@ -56,7 +56,7 @@ def login(request):
 
             if user is not None:
                 auth_login(request=request, user=user)
-                return redirect('/home')
+                return redirect("generate_blog")
             else:
                 return render(request, "autoblog/login.html")
     return render(request, "autoblog/login.html")
@@ -74,4 +74,4 @@ def logout(request):
         Will logout the current user.
     """
     auth_logout(request)
-    return redirect('/home')
+    return redirect("home")
