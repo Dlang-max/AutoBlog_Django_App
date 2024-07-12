@@ -9,6 +9,7 @@ from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm
 from .models import Member, Blog
 from .decorators import member_required
 from .tasks import generate_blog_and_header_image
+from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
 
 def home(request):
     """
@@ -195,36 +196,22 @@ def post_blog(request):
         token = base64.b64encode(credentials.encode())
         header = {"Authorization":"Basic " + token.decode("utf-8")}
 
-        # Format a User's Blog
-        blog_content = format_blog(blog=blog)
         try:
-
             # Post Blog Content to WordPress
-            post = {
-                "title" : blog.title,
-                "content" : blog_content,
-                "status" : "publish",
-            }
-            post_response = requests.post(member_wordpress_post_url, headers=header, json=post)
-            post_id = post_response.json().get("id")
+            post_id = post_blog_to_wordpress(member_wordpress_post_url=member_wordpress_post_url, header=header, blog=blog)
             member_wordpress_current_post_url = member_wordpress_post_url + '/' + str(post_id)
 
             # Get and Post Blog's header image to WordPress
-    
-            media = {
-                'file': ('header_image.webp', blog.image, 'image/webp'),
-                'status': 'publish'
-            }
-
-            media_response = requests.post(member_wordpress_media_url, headers=header, files=media)
-            media_id = media_response.json().get('id')
-            featured_payload = {
-                'featured_media': media_id
-            }
+            media_id = post_image_to_wordpress(member_wordpress_media_url=member_wordpress_media_url, header=header, blog=blog)
 
             # Update Blog's featured image
-            update_post_response = requests.post(member_wordpress_current_post_url, headers=header, json=featured_payload)
-        except requests.exceptions.ConnectionError:
+            update_blogs_featured_image(member_wordpress_current_post_url=member_wordpress_current_post_url, header=header, media_id=media_id)
+            
+        except BlogUploadError as e:
+            return redirect("member_dashboard")
+        except ImageUploadError as e:
+            return redirect("member_dashboard")
+        except ChangeFeaturedImageError as e:
             return redirect("member_dashboard")
         
         blog.image.delete()
@@ -250,6 +237,59 @@ def delete_blog(request):
 
 # HELPER METHODS
 #############################################################################
+def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
+    blog_content = format_blog(blog=blog)
+
+    try:
+        # Post Blog Content to WordPress
+        post = {
+            "title" : blog.title,
+            "content" : blog_content,
+            "status" : "publish",
+        }
+        post_response = requests.post(member_wordpress_post_url, headers=header, json=post)
+        post_id = post_response.json().get("id")
+    except requests.exceptions.ConnectionError:
+        raise BlogUploadError("Error uploading blog to WordPress")
+    return post_id
+
+
+def post_image_to_wordpress(member_wordpress_media_url='', header='', blog=None):
+    try:
+        media = {
+            'file': ('header_image.webp', blog.image, 'image/webp'),
+            'status': 'publish'
+        }
+        media_response = requests.post(member_wordpress_media_url, headers=header, files=media)
+        media_id = media_response.json().get('id')
+    except requests.exceptions.ConnectionError:
+        raise ImageUploadError("Error uploading image to WordPress")
+    return media_id
+
+
+def update_blogs_featured_image(member_wordpress_current_post_url='', header='', media_id=''):
+    try:
+        featured_payload = {
+            'featured_media': media_id
+        }
+        # Update Blog's featured image
+        requests.post(member_wordpress_current_post_url, headers=header, json=featured_payload)
+    except requests.exceptions.ConnectionError:
+        raise ChangeFeaturedImageError("Error changing blog's featured image")
+
+
+def delete_blog_from_wordpress(member_wordpress_post_url='', header='', post_id=''):
+    current_url = member_wordpress_post_url + f"/{post_id}"
+
+    try:
+        requests.delete(current_url, headers=header)
+    except requests.exceptions.ConnectionError:
+        raise DeletingBlogError("Error deleting blog")
+
+
+
+
+
 
 def format_blog(blog):
     content = ""
@@ -275,7 +315,6 @@ def format_section(section):
 def format_subheading_and_section(subheading, section):
     subheading_and_section_html = f"<section style=\"display: flex; flex-direction: column; align-items: center;\">{subheading} {section}</section> "
     return subheading_and_section_html
-
 
 def update_blog_in_db(form, blog):
     # Access blog content from POST request

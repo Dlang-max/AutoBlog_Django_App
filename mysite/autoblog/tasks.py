@@ -5,13 +5,12 @@ from PIL import Image
 from celery import app
 from openai import OpenAI
 from celery import shared_task
-from .errors import BlogGenerationError
 from .models import User, Member, Blog
+from .errors import BlogGenerationError
 from django.core.files.base import ContentFile
 
-
-
 client = OpenAI()
+
 @shared_task
 def generate_blog_and_header_image(username=None, title='', addition_info=''):
     user = User.objects.get(username=username)
@@ -34,7 +33,7 @@ def generate_blog_and_header_image(username=None, title='', addition_info=''):
 
 
 # HELPER METHODS:
-##################################################################################################
+#########################################################################################
 def generate_blog(title='', blog=None):
     try:
         outline = write_blog_outline(title=title)
@@ -75,7 +74,7 @@ def generate_blog_image(username='', title='', blog=None):
         raise BlogGenerationError("Error generating blog image")
 
 # CALLS TO OPENAI API:
-##################################################################################################
+#########################################################################################
 def generate_image(title=''):
     response = client.images.generate(
         model="dall-e-3",
