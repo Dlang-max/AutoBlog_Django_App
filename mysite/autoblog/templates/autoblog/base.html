@@ -23,8 +23,11 @@
     <div id="nav-container">
         <nav id="navbar">
             <ul id="nav-links">
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">About</a></li>
+                {% if not user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">About</a></li>
+                {% endif %}
+                
                 {% if user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'generate_blog' %}">Write</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'member_dashboard' %}">Dashboard</a></li>

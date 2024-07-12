@@ -30,12 +30,7 @@ class Member(models.Model):
     
 class Blog(models.Model):
     author = models.OneToOneField(Member, on_delete=models.CASCADE, primary_key=True)
-    date = models.DateField(auto_now_add=True)
     
-    # BLOG
-    meta_keywords = models.CharField(max_length=100, default="")
-    meta_description = models.CharField(max_length=200, default="")
-
     image = models.ImageField(upload_to="blogimages")
     title = models.CharField(max_length=200)
 

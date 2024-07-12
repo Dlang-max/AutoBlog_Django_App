@@ -49,8 +49,6 @@ def login(request):
         # FIGURE OUT WHY FORM IS NOT VALIDATING
         # takes in request and request.POST not just request.POST
         form = LoginForm(request=request, data=request.POST)
-        
-
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]

@@ -29,19 +29,14 @@ def contact(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-
             host = os.environ.get("EMAIL_HOST_USER")
-            
             name = form.cleaned_data["name"]
             email = form.cleaned_data["email"]
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
-            
             EmailMessage(subject + " : " + name, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
-
             return redirect('member_dashboard')
     
-
     return render(request, "autoblog/contact.html")
 
 @login_required(login_url="/login")
@@ -105,7 +100,6 @@ def generate_blog(request):
     except Blog.DoesNotExist:
         pass
 
-
     if request.method == "POST":
         form = GenerateBlogForm(request.POST)
         if form.is_valid():
@@ -123,7 +117,6 @@ def generate_blog(request):
             return redirect("/memberDash")
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
-
 
 
 @login_required(login_url="/login")
@@ -164,10 +157,7 @@ def save_blog(request):
 
 # POST BLOG
 # BREAK DOWN INTO INDIVIDUAL HELPER METHODS
-# ADD AS ASYNC TASK
-# HANDLE ERRORS BETTER
-
-# What if blog uploads but not image?
+# ADD AS ASYNC TASK????
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
 def post_blog(request):
@@ -181,11 +171,12 @@ def post_blog(request):
             blog = Blog.objects.get(author=member)
             update_blog_in_db(form=form, blog=blog)
         else:
+            # You break I delete
             blog.image.delete()
             blog.delete()
             return redirect("member_dashboard")
 
-        
+        # Get member's WordPress information
         member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
         member_wordpress_media_url = member.wordpress_url + "/wp-json/wp/v2/media"
         member_wordpress_username = member.wordpress_username
@@ -253,7 +244,6 @@ def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
         raise BlogUploadError("Error uploading blog to WordPress")
     return post_id
 
-
 def post_image_to_wordpress(member_wordpress_media_url='', header='', blog=None):
     try:
         media = {
@@ -266,7 +256,6 @@ def post_image_to_wordpress(member_wordpress_media_url='', header='', blog=None)
         raise ImageUploadError("Error uploading image to WordPress")
     return media_id
 
-
 def update_blogs_featured_image(member_wordpress_current_post_url='', header='', media_id=''):
     try:
         featured_payload = {
@@ -277,18 +266,12 @@ def update_blogs_featured_image(member_wordpress_current_post_url='', header='',
     except requests.exceptions.ConnectionError:
         raise ChangeFeaturedImageError("Error changing blog's featured image")
 
-
 def delete_blog_from_wordpress(member_wordpress_post_url='', header='', post_id=''):
     current_url = member_wordpress_post_url + f"/{post_id}"
-
     try:
         requests.delete(current_url, headers=header)
     except requests.exceptions.ConnectionError:
         raise DeletingBlogError("Error deleting blog")
-
-
-
-
 
 
 def format_blog(blog):
