@@ -6,11 +6,26 @@
     <div class="blog-container">
 
         {% if blog.task_id %}
-            <div>
-                <h2>Generating Blog</h2>
-                <img src="/media/websiteImages/writing.gif" alt="Wizard typing at computer">
+            <div class="generating-content">
+                <h1 id="generating-header">Generating Blog! This will take 30 seconds!</h1>
+                <h2 id="typed-output"></h2>
             </div>
             <input type="hidden" name="task_id" id="task_id" value="{{ blog.task_id }}">
+            <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  new Typed('#typed-output', {
+                    strings: ["Writing Blog..."],
+                    typeSpeed: 70,
+                    backSpeed: 70,
+                    backDelay: 1000,
+                    startDelay: 500,
+                    loop: true,
+                    showCursor: false,
+                  });
+                });
+              </script>
+              
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
             <script>
                 var task_id = document.getElementById("task_id").value
@@ -29,7 +44,7 @@
 
                         setTimeout( function() {
                             getStatus(task_id);
-                        }, 1000);
+                        }, 10000);
                     })
                 }
             </script>

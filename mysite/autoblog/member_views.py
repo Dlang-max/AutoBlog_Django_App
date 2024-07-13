@@ -108,8 +108,7 @@ def generate_blog(request):
 
             username = request.user.username
             title = form.cleaned_data["title"]
-            additional_info = form.cleaned_data["additional_info"]
-            task = generate_blog_and_header_image.delay(username=username, title=title, addition_info=additional_info)
+            task = generate_blog_and_header_image.delay(username=username, title=title)
 
             blog = Blog.objects.create(author=member)
             blog.task_id = task.id

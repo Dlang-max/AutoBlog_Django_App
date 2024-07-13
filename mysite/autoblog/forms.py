@@ -21,9 +21,8 @@ class MemberInfoForm(ModelForm):
         
 class GenerateBlogForm(Form):
     title = forms.CharField(max_length=200)
-    additional_info = forms.CharField(max_length=200)
     class Meta:
-        fields = ["title", "info"]
+        fields = ["title"]
 
 class BlogForm(Form):
     title = forms.CharField(max_length=200)

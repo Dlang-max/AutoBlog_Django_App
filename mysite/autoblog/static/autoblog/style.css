@@ -238,6 +238,25 @@ section {
     border-radius: 5px;
 }
 
+.generating-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#generating-header{
+    padding-top: 20px;
+    text-align: center;
+    font-family: var(--font);
+
+}
+
+#typed-output {
+    font-family: "Major Mono Display", monospace;
+    font-size: xx-large;
+}
+
 /*
 * Stripe Payments
 */
