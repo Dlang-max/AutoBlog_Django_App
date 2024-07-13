@@ -31,6 +31,7 @@ class Member(models.Model):
 class Blog(models.Model):
     author = models.OneToOneField(Member, on_delete=models.CASCADE, primary_key=True)
     
+    task_id = models.CharField(max_length=200, default="")
     image = models.ImageField(upload_to="blogimages")
     title = models.CharField(max_length=200)
 

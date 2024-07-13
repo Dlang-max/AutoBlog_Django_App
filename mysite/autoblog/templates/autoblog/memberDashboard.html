@@ -4,6 +4,15 @@
 
 {% block content %}
     <div class="blog-container">
+
+        {% if blog.task_id != "" %}
+            <div><h3>Generating</h3></div>
+            <script>
+                
+            </script>
+        {% endif %}
+
+
         {% if blog.subheading_1 %}
             <main>
                 <article style="font-family: Arial;">

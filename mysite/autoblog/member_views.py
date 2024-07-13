@@ -4,11 +4,14 @@ import requests
 import json
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
+from celery.result import AsyncResult
 from django.core.mail import EmailMessage
 from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm
 from .models import Member, Blog
+from django.views.decorators.csrf import csrf_exempt
 from .decorators import member_required
 from .tasks import generate_blog_and_header_image
+from django.http import JsonResponse
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
 
 def home(request):
@@ -102,19 +105,40 @@ def generate_blog(request):
         form = GenerateBlogForm(request.POST)
         if form.is_valid():
             # Create and Save an empty Blog
-            blog = Blog.objects.create(author=member)
-            blog.save()
 
             username = request.user.username
             title = form.cleaned_data["title"]
             additional_info = form.cleaned_data["additional_info"]
             task = generate_blog_and_header_image.delay(username=username, title=title, addition_info=additional_info)
 
+            blog = Blog.objects.create(author=member)
+            blog.task_id = task.id
+            blog.save()
+
             member.blogs_remaining -= 1
             member.save()
             return redirect("/memberDash")
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
+
+
+
+
+
+@csrf_exempt
+def poll_task_status(request, task_id):
+    task_result = AsyncResult(task_id)
+
+    result = {
+        "task_status" : task_result.status
+    }
+
+    return JsonResponse(result, status=200)
+
+
+
+
+
 
 
 @login_required(login_url="/login")

@@ -46,6 +46,8 @@ def generate_blog(title='', blog=None):
 
             setattr(blog, f"subheading_{i}", blog_subheading)
             setattr(blog, f"section_{i}", blog_section) 
+        
+        blog.task_id = ""
         blog.save()
     except openai.APIError as e:
         raise BlogGenerationError("Error generating blog")
