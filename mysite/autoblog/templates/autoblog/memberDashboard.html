@@ -5,10 +5,33 @@
 {% block content %}
     <div class="blog-container">
 
-        {% if blog.task_id != "" %}
-            <div><h3>Generating</h3></div>
+        {% if blog.task_id %}
+            <div>
+                <h2>Generating Blog</h2>
+                <img src="/media/websiteImages/writing.gif" alt="Wizard typing at computer">
+            </div>
+            <input type="hidden" name="task_id" id="task_id" value="{{ blog.task_id }}">
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
             <script>
-                
+                var task_id = document.getElementById("task_id").value
+                getStatus(task_id);
+
+
+                function getStatus(task_id) {
+                    $.ajax({
+                        url: `/taskStatus/${task_id}/`,
+                        method: 'GET'
+                    }).done(res => {
+                        const task_status = res.task_status;
+                        if (task_status === "SUCCESS" || task_status === "Failure") {
+                            location.reload()
+                        }
+
+                        setTimeout( function() {
+                            getStatus(task_id);
+                        }, 1000);
+                    })
+                }
             </script>
         {% endif %}
 
