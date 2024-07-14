@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 <body>
-    <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center">
-        <h2 style="margin: 10px;">YourBloggingAssistant</h2>
-        <h4 style="margin: 10px;">Please Verify Your Email</h4>
-        <p>Follow this link to verify your email: </p><a href="http://localhost:1337/verifyEmail/{{ key }}/">http://localhost:1337/verifyEmail/{{ key }}/</a>
+    <div>
+        <h2 style="color: black;">YourBloggingAssistant</h2>
+        <h4 style=" color: black;">Please Verify Your Email</h4>
+        <p>Follow this link to verify your account: <a href="http://localhost:1337/verifyEmail/{{ key }}/">http://localhost:1337/verifyEmail/{{ key }}/</a></p>
     </div>
 </body>
 </html>

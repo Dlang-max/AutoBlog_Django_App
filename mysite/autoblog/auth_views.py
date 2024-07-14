@@ -59,7 +59,7 @@ def verify_email(request, key):
         user.save()
     except User.DoesNotExist:
         return redirect('login')
-    return redirect('generate_blog')
+    return redirect('login')
     
 
 

@@ -237,7 +237,6 @@ section {
     height: 600px;
     border-radius: 5px;
 }
-
 .generating-content {
     display: flex;
     flex-direction: column;
