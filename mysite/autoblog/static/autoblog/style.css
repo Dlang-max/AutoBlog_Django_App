@@ -21,6 +21,59 @@ body::after {
     height: 80px;
 }
 
+/*
+* Hero Section
+*/
+
+.home-container {
+    text-align: center;
+    font-family: var(--font);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-title {
+    font-size: 5em;
+}
+
+#home-typed-output {
+    height: 30px;
+    font-size: 2em;
+    margin-bottom: 60px;
+}
+
+.home-link-container {
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 50px;
+    background-color: var(--button-blue);
+    transition: 500ms;
+}
+
+.home-link-container:hover {
+    background-color: var(--button-hover-blue);
+    cursor: pointer;
+}
+
+.home-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+}
+
+
 
 
 /*

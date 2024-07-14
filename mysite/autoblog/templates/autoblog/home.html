@@ -3,5 +3,26 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-
+<div class="home-container">
+    <div class="hero-container">
+        <h1 class="hero-title">Level Up Your Website Today</h1>
+        <h2 id="home-typed-output"></h2>
+        <a class="home-link" href="{% url 'register' %}">
+            <div class="home-link-container">Get Started</div>
+        </a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      new Typed('#home-typed-output', {
+        strings: ["Generate SEO optimized blogs.", "Post these blogs to WordPress."],
+        typeSpeed: 50,
+        backSpeed: 50,
+        backDelay: 1000,
+        startDelay: 500,
+        loop: true,
+        showCursor: false,
+      });
+    });
+</script>
 {% endblock %}
