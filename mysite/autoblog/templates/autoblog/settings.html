@@ -10,7 +10,8 @@
                 {% if member.blogs_remaining > 0 %}
                     <h4 class="settings-header">Blogs Remaining: {{ member.blogs_remaining }}</h4>
                 {% else %}
-                    <h4 class="settings-header">Blogs Remaining: None <a href="{% url 'pay' %}">Purchase More</a></h4>
+                    <h4 class="settings-header">Blogs Remaining: None</h4>
+                    <a class="settings-link" href="{% url 'pay' %}">Purchase More</a>
                 {% endif %}
             </div>
         </div>
