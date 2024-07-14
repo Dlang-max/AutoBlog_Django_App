@@ -28,3 +28,15 @@ function navResizeMobile() {
         navContainer.style.display = "none"
     }
 }
+
+function resizeSettingsInfo(id) {
+    var info = document.getElementById(id);
+    
+    if (info.style.height === "0px" || info.style.height === "") {
+        info.style.height = "100%";
+        info.style.display = "block";
+    } else {
+        info.style.height = "0px";
+        info.style.display = "none";
+    }
+}

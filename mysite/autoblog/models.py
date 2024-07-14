@@ -8,12 +8,12 @@ class User(AbstractUser):
 
 class Member(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    wordpress_url = models.URLField(max_length=200)
-    wordpress_username = models.CharField(max_length=100)
-    wordpress_application_password = models.CharField(max_length=200)
+    wordpress_url = models.URLField(max_length=200, default="")
+    wordpress_username = models.CharField(max_length=100, default="")
+    wordpress_application_password = models.CharField(max_length=200, default="")
     
-    stripe_customer_id = models.CharField(max_length=50)
-    stripe_subscription_id = models.CharField(max_length=50)
+    stripe_customer_id = models.CharField(max_length=50, default="")
+    stripe_subscription_id = models.CharField(max_length=50, default="")
 
 
     membership_levels = {

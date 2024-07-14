@@ -257,6 +257,78 @@ section {
 }
 
 /*
+* Settings
+*/
+
+#blog-info:hover {
+    cursor: default;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-container {
+    padding: 10px;
+    margin: 20px;
+    width: 80%;
+    border-radius: 20px;
+    font-family: var(--font);
+    color: var(--font-color);
+    font-size: larger;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+}
+
+.settings-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 0px;
+    height: 30px;
+    border: 1px solid gray
+}
+
+.settings-header-container:hover {
+    cursor: pointer;
+}
+
+.settings-header {
+    margin: 10px;
+}
+
+.info {
+    margin-left: 10px;
+}
+
+.settings-link {
+    justify-self: flex-end;
+    font-family: var(--font);
+    color: var(--button-blue);
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+.settings-link:hover {
+    cursor: pointer;
+    color: var(--button-hover-blue);
+}
+
+.settings-drop-down {
+    height: 0px;
+    display: none;
+}
+
+
+
+/*
 * Verification
 */
 .verification-container {

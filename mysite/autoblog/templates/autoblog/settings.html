@@ -1,0 +1,51 @@
+{% extends "autoblog/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="settings-container">
+        <div class="info-container">
+            <div class="settings-header-container" id="blog-info">
+                {% if member.blogs_remaining > 0 %}
+                    <h4 class="settings-header">Blogs Remaining: {{ member.blogs_remaining }}</h4>
+                {% else %}
+                    <h4 class="settings-header">Blogs Remaining: None <a href="{% url 'pay' %}">Purchase More</a></h4>
+                {% endif %}
+            </div>
+        </div>
+        <div class="info-container">
+            <div class="settings-header-container" onclick="resizeSettingsInfo('member-info')">
+                <h4 class="settings-header">Member Information</h4>
+            </div>
+            <div class="settings-drop-down" id="member-info">
+                <div class="info">Username: {{ user.username }}</div>
+                <div class="info">Email: {{ user.email }}</div>
+            </div>
+        </div>
+        <div class="info-container">
+            <div class="settings-header-container" onclick="resizeSettingsInfo('website-info')">
+                <h4 class="settings-header">Website Information</h4>
+                <a class="settings-link" href="{% url 'member_info' %}">Update</a>
+            </div>
+            <div class="settings-drop-down" id="website-info">
+                <div class="info">Website URL: {{ member.wordpress_url }}</div>
+                <div class="info">Website Username: {{ member.wordpress_username }}</div>
+                <div class="info">Website Password: {{ member.wordpress_application_password }}</div>
+            </div>
+        </div>
+        <div class="info-container">
+            <div class="settings-header-container" onclick="resizeSettingsInfo('subscription-info')">
+                <h4 class="settings-header">Subscription Information</h4>
+                <a class="settings-link" href="{% url 'pay' %}">Update</a>
+            </div>
+            <div class="settings-drop-down" id="subscription-info">
+                <div class="info">Subscription Level: {{ member.membership_level }}</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% load static %}
+<script src="{% static 'autoblog/script.js' %}"></script>
+{% endblock %}

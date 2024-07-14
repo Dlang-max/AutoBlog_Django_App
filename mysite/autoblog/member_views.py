@@ -7,12 +7,22 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from celery.result import AsyncResult
 from django.core.mail import EmailMessage
 from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm
-from .models import Member, Blog
+from .models import Member, Blog, User
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import member_required
 from .tasks import generate_blog_and_header_image
 from django.http import JsonResponse
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
+@login_required(login_url='/login')
+def settings(request):
+    user = request.user
+    member, created = Member.objects.get_or_create(user=user)
+
+    if created:
+        user.is_member = True
+        user.save()
+
+    return render(request, "autoblog/settings.html", {"member" : member})
 
 def home(request):
     """
