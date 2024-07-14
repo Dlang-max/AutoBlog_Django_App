@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
+    key = models.CharField(max_length=200, default="")
+    is_verified = models.BooleanField(default=False)
     is_member = models.BooleanField(default=False)
 
 class Member(models.Model):

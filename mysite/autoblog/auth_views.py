@@ -1,8 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMessage
 from .forms import RegisterForm, LoginForm
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from .models import User
+import secrets
+import os
 
 def register(request):
     """
@@ -24,11 +30,37 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
+            email = form.cleaned_data["email"]
+            key = secrets.token_hex(64)
+
             user = form.save()
-            auth_login(request, user)
-            return redirect("generate_blog")
+            user.key = key
+            user.save()
+
+            send_verification_email(email=email, key=key)
+            return redirect("login")
         
     return render(request, "autoblog/register.html")
+
+def send_verification_email(email='', key=''):
+    host = os.environ.get("EMAIL_HOST_USER")
+    subject = "Verification Email"
+    html_message = render_to_string("autoblog/verifyEmail.html", {"key" : key})
+
+    message = EmailMessage(subject=subject, body=html_message, from_email=host, to=[email])
+    message.content_subtype = "html"
+    message.send()
+
+@csrf_exempt
+def verify_email(request, key):
+    try:
+        user = User.objects.get(key=key)
+        user.is_verified = True
+        user.save()
+    except User.DoesNotExist:
+        return redirect('login')
+    return redirect('generate_blog')
+    
 
 
 def login(request):
@@ -54,7 +86,7 @@ def login(request):
             password = form.cleaned_data["password"]
             user = authenticate(request=request, username=username, password=password)
 
-            if user is not None:
+            if user is not None and user.is_verified:
                 auth_login(request=request, user=user)
                 return redirect("generate_blog")
             else:
