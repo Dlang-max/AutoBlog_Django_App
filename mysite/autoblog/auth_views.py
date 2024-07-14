@@ -38,7 +38,7 @@ def register(request):
             user.save()
 
             send_verification_email(email=email, key=key)
-            return redirect("login")
+            return redirect("verification")
         
     return render(request, "autoblog/register.html")
 
@@ -50,6 +50,9 @@ def send_verification_email(email='', key=''):
     message = EmailMessage(subject=subject, body=html_message, from_email=host, to=[email])
     message.content_subtype = "html"
     message.send()
+
+def verification(request):
+    return render(request, "autoblog/verification.html")
 
 @csrf_exempt
 def verify_email(request, key):

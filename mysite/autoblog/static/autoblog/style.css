@@ -257,6 +257,18 @@ section {
 }
 
 /*
+* Verification
+*/
+.verification-container {
+    font-family: var(--font);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/*
 * Stripe Payments
 */
 .stripe-form {
