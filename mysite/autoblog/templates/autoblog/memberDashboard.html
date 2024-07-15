@@ -30,8 +30,7 @@
             <script>
                 var task_id = document.getElementById("task_id").value
                 getStatus(task_id);
-
-
+                
                 function getStatus(task_id) {
                     $.ajax({
                         url: `/taskStatus/${task_id}/`,
