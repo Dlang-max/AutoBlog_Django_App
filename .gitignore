@@ -1,4 +1,4 @@
-.env
+.env*
 .dockerignore
 db.sqlite3
 env
