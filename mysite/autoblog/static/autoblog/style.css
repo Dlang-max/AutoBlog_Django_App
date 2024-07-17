@@ -22,6 +22,72 @@ body::after {
 }
 
 /*
+* Messages
+*/
+
+ul::-webkit-details-marker {
+    margin: 0;
+    padding: 0; 
+    display: none;
+}
+
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    justify-self: center;
+    align-self: center;
+}
+
+.message {
+    font-family: var(--font);
+    font-size: large;
+    border-radius: 5px;
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.message.error:hover {
+    transition: 500ms;
+    background-color: rgb(151, 3, 3);
+    cursor: pointer;
+}
+
+.message.error {
+    background-color: rgb(225, 87, 87);
+}
+
+.message.success {
+    background-color: rgb(114, 185, 114);
+}
+
+.errorlist {
+    text-align: center;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.messages {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    padding: 0;
+}
+
+
+/*
 * Hero Section
 */
 
@@ -148,6 +214,7 @@ body::after {
 
 .auth-input {
     font-family: var(--font);
+    font-size: large;
     padding: 10px;
     border: 1px solid black;
     border-radius: 5px;

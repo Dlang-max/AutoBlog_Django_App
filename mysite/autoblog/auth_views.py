@@ -5,6 +5,7 @@ from django.core.mail import EmailMessage
 from .forms import RegisterForm, LoginForm
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 from django.http import HttpResponse
 from .models import User
 import secrets
@@ -39,7 +40,11 @@ def register(request):
 
             send_verification_email(email=email, key=key)
             return redirect("verification")
-        
+        else:
+            form_errors_dict = form.errors.get_json_data(escape_html=True)
+            error_key_list = list(form_errors_dict)
+            error = form_errors_dict[str(error_key_list[0])][0]["message"]
+            messages.add_message(request, messages.ERROR, error) 
     return render(request, "autoblog/register.html")
 
 def send_verification_email(email='', key=''):

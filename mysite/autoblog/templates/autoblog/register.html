@@ -7,10 +7,10 @@
     {% csrf_token %}
     <h2 class="introduction">Create your account</h2>
     <div class="input-container">
-        <input class="auth-input" type="text" name="username" placeholder="Username">
-        <input class="auth-input" type="email" name="email" placeholder="Email">
-        <input class="auth-input" type="password" name="password1" placeholder="Password">
-        <input class="auth-input" type="password" name="password2" placeholder="Confirm Password">
+        <input class="auth-input" type="text" name="username" placeholder="Username" required>
+        <input class="auth-input" type="email" name="email" placeholder="Email" required>
+        <input class="auth-input" type="password" name="password1" placeholder="Password" required>
+        <input class="auth-input" type="password" name="password2" placeholder="Confirm Password" required>
     </div>
     <button id="register-button" class="submit-button" type="submit">Register</button>
     <p id="redirect-sign-in">Already a User? <a href="{% url 'login' %}">Sign In</a></p>

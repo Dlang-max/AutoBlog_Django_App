@@ -40,3 +40,9 @@ function resizeSettingsInfo(id) {
         info.style.display = "none";
     }
 }
+
+function removeMessage() {
+    var message = document.getElementsByClassName("message")[0];
+
+    message.style.display = "none";
+}
