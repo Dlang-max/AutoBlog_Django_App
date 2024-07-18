@@ -39,10 +39,11 @@ def generate_blog(title='', blog=None):
         outline = write_blog_outline(title=title)
         blog.title = title
         sections = ["first", "second", "third", "fourth", "concluding"]
-
+        content = ""
         for i, section in enumerate(sections, start=1):
-            blog_subheading = write_subheading(section=section, outline=outline)
-            blog_section = write_section(section=section, outline=outline)
+            blog_subheading = write_subheading(section=section, outline=outline, blog=content)
+            blog_section = write_section(section=section, subheading=blog_subheading, outline=outline, blog=content)
+            content += f"{section} subheading: {blog_subheading} {section} section: {blog_section}"
 
             setattr(blog, f"subheading_{i}", blog_subheading)
             setattr(blog, f"section_{i}", blog_section) 
@@ -91,7 +92,7 @@ def generate_image(title=''):
 
 def write_blog_outline(title=''):
     completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{'role':'user', "content": f"Please ignore all previous instructions. \
                    You are an expert copywriter who creates blog outlines for a living. \
                    You have a friendly tone of voice. You have a conversational writing \
@@ -106,29 +107,31 @@ def write_blog_outline(title=''):
     outline = completion.choices[0].message.content
     return outline
 
-def write_subheading(section='', outline=''):
+def write_subheading(section='', outline='', blog=''):
     completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{'role':'user', "content": f"Please ignore all previous instructions. \
                     You are an expert copywriter who creates blog subheadings for a \
                     living. You have a friendly tone of voice. You have a conversational \
-                    writing style. Using this blog outline: {outline}, write the \
-                    {section} subheading for this blog. Make sure this subheading is SEO \
-                    optimized and keep this subheading to at most 10 words. EXCLUDE any \
-                    numbers of dashes from this subheading."}])
+                    writing style. Using this blog outline: {outline} and the current \
+                    content of the blog: {blog}, write the {section} subheading for this \
+                    blog. Make sure this subheading is SEO optimized and keep this \
+                    subheading to at most 10 words. EXCLUDE any numbers of dashes \
+                    from this subheading."}])
     generated_subheading = completion.choices[0].message.content
     return generated_subheading
 
-def write_section(section='', subheading='', outline=''):
+def write_section(section='', subheading='', outline='', blog=''):
     completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{'role':'user', "content": f"Please ignore all previous instructions. \
                     You are an expert copywriter who creates blog paragraphs for a \
                     living. You have a friendly tone of voice. You have a conversational \
                     writing style. Using this blog outline: {outline} and the subheading \
-                    {subheading}, write the {section} content section for this blog. Do \
-                    NOT include the name of this subheading in this section. Keep this \
-                    section between 100 and 150 words. Also use language that an 8th \
-                    grader can understand. Make sure it is SEO optimized."}])
+                    {subheading} and the current content of the blog: {blog} write the \
+                    {section} content section for this blog. Do NOT include the name of \
+                    this subheading in this section. Keep this section between 100 and \
+                    150 words. Also use language that an 8th grader can understand. \
+                    Make sure it is SEO optimized."}])
     generated_section = completion.choices[0].message.content
     return generated_section  
