@@ -199,8 +199,11 @@ def post_blog(request):
         form = BlogForm(request.POST)
 
         if form.is_valid():
-            blog = Blog.objects.get(author=member)
-            update_blog_in_db(form=form, blog=blog)
+            try:
+                blog = Blog.objects.get(author=member)
+                update_blog_in_db(form=form, blog=blog)
+            except Blog.DoesNotExist:
+                return redirect("member_dashboard")
         else:
             # You break I delete
             blog.image.delete()
