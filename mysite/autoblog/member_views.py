@@ -130,10 +130,6 @@ def generate_blog(request):
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
 
-
-
-
-
 @csrf_exempt
 def poll_task_status(request, task_id):
     task_result = AsyncResult(task_id)
@@ -143,12 +139,6 @@ def poll_task_status(request, task_id):
     }
 
     return JsonResponse(result, status=200)
-
-
-
-
-
-
 
 @login_required(login_url="/login")
 def member_dashboard(request):
