@@ -5,7 +5,7 @@ asgiref==3.8.1
 async-timeout==4.0.3
 billiard==4.2.0
 celery==5.4.0
-certifi==2024.6.2
+certifi==2024.07.04
 charset-normalizer==3.3.2
 click==8.1.7
 click-didyoumean==0.3.1
@@ -42,6 +42,6 @@ tornado==6.4.1
 tqdm==4.66.4
 typing_extensions==4.12.2
 tzdata==2024.1
-urllib3==2.2.1
+urllib3==2.2.2
 vine==5.1.0
 wcwidth==0.2.13
