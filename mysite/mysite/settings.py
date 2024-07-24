@@ -28,6 +28,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = True
+# SECURE_HSTS_SECONDS = 3600
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://localhost:1337', 'https://yourbloggingassistant.com']
 ALLOWED_HOSTS = ['localhost', 'yourbloggingassistant.com']
