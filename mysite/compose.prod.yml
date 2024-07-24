@@ -38,7 +38,7 @@ services:
 
   nginx-proxy:
     container_name: nginx-proxy
-    build: nginx
+    build: ./nginx
     image: 194139654926.dkr.ecr.us-east-2.amazonaws.com/autoblog-ec2:nginx-proxy
     restart: always
     ports:
