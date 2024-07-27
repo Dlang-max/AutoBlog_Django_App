@@ -1,15 +1,18 @@
-{% extends "autoblog/base.html" %}
+{% extends "autoblog/authBase.html" %}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<form class="auth-form" method="POST">
-    <h2 class="introduction">Welcome Back</h2>
-    {% csrf_token %}
-    <div class="input-container">
-        <input class="auth-input" type="text" name="username" placeholder="Username">
-        <input class="auth-input" type="password" name="password" placeholder="Password">
-    </div>
-    <button id="register-button" class="submit-button" type="submit">Login</button>
-</form>
+<div class="form-container">
+    <form class="auth-form" method="POST">
+        <h4 class="introduction">Welcome Back!</h4>
+        {% csrf_token %}
+        <div class="input-container">
+            <input class="auth-input" type="text" name="username" placeholder="Username">
+            <input class="auth-input" type="password" name="password" placeholder="Password">
+        </div>
+        <button id="register-button" class="submit-button" type="submit">Sign in</button>
+        <p id="redirect-sign-in">Don't have an account? <a href="{% url 'register' %}">Sign up now</a></p>
+    </form>
+</div>
 {% endblock %}

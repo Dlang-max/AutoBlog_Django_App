@@ -1,4 +1,4 @@
-{% extends "autoblog/base.html" %}
+{% extends "autoblog/homeBase.html" %}
 
 {% block title %}Home{% endblock %}
 
@@ -11,18 +11,4 @@
             <div class="home-link-container">Get Started</div>
         </a>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      new Typed('#home-typed-output', {
-        strings: ["Generate SEO optimized blogs.", "Post these blogs to WordPress."],
-        typeSpeed: 50,
-        backSpeed: 50,
-        backDelay: 1000,
-        startDelay: 500,
-        loop: true,
-        showCursor: false,
-      });
-    });
-</script>
 {% endblock %}
