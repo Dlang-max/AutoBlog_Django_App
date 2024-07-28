@@ -428,15 +428,14 @@ main {
 }
 
 article {
-    background-color:rgb(250, 250, 252);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5); /* all-around shadow */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-left: 10%;
-    padding-right: 10%;
-    padding-bottom: 0px;
-    margin-bottom: 5px;
-    border-radius: 5px;
+    padding: var(--padding-s);
+    padding-top: var(--padding-l);
+    margin-bottom: var(--margin-s);
+    border-radius: var(--radius-medium);
 }
 
 h2 {
@@ -582,7 +581,6 @@ resize: none; */
 /*
 * Settings
 */
-
 #blog-info:hover {
     cursor: default;
 }
@@ -595,14 +593,13 @@ resize: none; */
 }
 
 .settings-container {
-    padding: 10px;
-    margin: 20px;
-    width: 80%;
-    border-radius: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5); /* all-around shadow */
+    padding: var(--padding-xs);
+    margin: var(--margin-xs);
+    border-radius: var(--radius-medium);
     font-family: var(--font);
-    color: var(--font-color);
+    color: var(--secondary-color);
     font-size: larger;
-    background-color: black;
     display: flex;
     flex-direction: column;
     justify-self: center;
@@ -613,29 +610,28 @@ resize: none; */
     justify-content: space-between;
     align-items: center;
     border-radius: 5px;
-    padding: 10px;
+    padding: var(--padding-xs);
     margin-bottom: 0px;
     height: 30px;
-    border: 1px solid gray
 }
 
-.settings-header-container:hover {
-    cursor: pointer;
-}
 
 .settings-header {
     margin: 10px;
 }
 
 .info {
-    margin-left: 10px;
+    padding: var(--padding-xxs);
+    font-size: large;
+    margin-left: var(--margin-s);
 }
 
 .settings-link {
+    font-size: large;
     justify-self: flex-end;
     font-family: var(--font);
     color: var(--button-blue);
-    margin-left: 5px;
+    margin-left:var(--margin-xxs);
     text-decoration: none;
 }
 
@@ -644,12 +640,13 @@ resize: none; */
     color: var(--button-hover-blue);
 }
 
-.settings-drop-down {
+
+.separator {
     height: 0px;
-    display: none;
+    border: 1px solid var(--secondary-color);
+    margin-left: var(--margin-xxs);
+    margin-right: var(--margin-xxs);
 }
-
-
 
 /*
 * Verification
@@ -677,7 +674,9 @@ resize: none; */
 
 .payment-card-container {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 90%;
 }
 
 .payment-card-form {
@@ -687,40 +686,90 @@ resize: none; */
     
 }
 
-.payment-card {
+#payment-contact-form {
+    flex-direction: column;
+    align-items: center;
+}
+
+.payment-contact {
     display: flex;
+    justify-content: center;
+    width: 100%;
+    text-decoration: none;
+}
+
+.payment-card {
+    /* display: flex;
     flex-direction: column;
     justify-content:  space-evenly;
-    align-items: center;
-    border: 1px solid black;
+    align-items: center; */
+    text-align: left;
+    border: 1px solid rgb(131, 130, 130);
     border-radius: 10px;
-    width: 400px;
-    height: 500px;
-    margin: 10px;
-    transition: 850ms; 
-    
-    background-color:rgb(250, 250, 252);
+    width: 18rem;
+    max-width: 18rem;
+    margin: var(--margin-xs);
+    color: var(--primary-color);
+    background-color: var(--secondary-color);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    padding: var(--padding-s);
+
 }
 
 .payment-card:hover {
-    transition: 850ms;
-    transform: scale(1.01);
+    background-color: rgba(0, 0, 0, .9)
+}
+
+.payment-plan {
+    width: auto;
+    text-align: left;
+    margin-left: var(--margin-s);
+    align-items: flex-start;
+}
+
+.price {
+    text-align: center;
+}
+
+.number {
+    font-weight: bolder;
+    font-size: 2rem;
+}
+
+span strong {
+    font-weight: lighter;
 }
 
 .payment-button {
     font-family: var(--font);
-    width: 50%;
-    height: 30px;
+    font-size: large;
+    width: 70%;
+    height: 40px;
     border: none;
-    border-radius: 5px;
-    color: white;
+    border-radius: var(--radius-small);
+    color: var(--primary-color);
     background-color: var(--button-blue);
+    margin-top: var(--margin-s);
 }
 
 .payment-button:hover {
-    background-color: var(--button-hover-blue);
+    color: var(--button-blue);
     cursor: pointer;
-    transition: 500ms;
+    background-color: transparent;
+    border: 1px solid var(--button-blue);
+}
+
+.features {
+    padding: var(--padding-s);
+    list-style: none;
+}
+
+.feature-list-item {
+    padding: var(--padding-xxs);
+}
+
+.feature-info {
+    font-size: large;
 }
 
 .cancel-button {
@@ -728,7 +777,13 @@ resize: none; */
 }
 
 .cancel-button:hover {
-    background-color: var(--button-hover-red);
+    border: 1px solid rgb(183, 4, 4);
+    background-color: transparent;
+    color: red;
+}
+
+.payment-contact {
+    justify-self: center;
 }
 
 /*
@@ -853,10 +908,6 @@ resize: none; */
         font-size: large;
     }
 
-    article {
-        padding: 3%;
-    }
-
     #blog-form {
         margin-bottom: 40px;
     }
@@ -880,6 +931,7 @@ resize: none; */
     .payment-card-container {
         display: flex;
         flex-direction: column;
+        align-content: center;
     }
 
     .payment-card-container {
@@ -890,10 +942,8 @@ resize: none; */
     }
 
     .payment-card {
-        width: 85%;
-        height: 300px;
-        margin: 0px;
-        margin-bottom: 15px;
+        width: 90vw;
+        margin-bottom: var(--margin-s);
     }
 
     .payment-card:hover{

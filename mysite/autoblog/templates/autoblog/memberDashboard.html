@@ -87,6 +87,10 @@
                         <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' %}" value="Delete">
                     </form>
                 {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' %}" value="Delete">
+                    </form>
                     <div id="member-info-link"><h3><a href="{% url 'member_info' %}">Link</a> your WordPress Site!</h3></div>
                 {% endif %}
             </main>

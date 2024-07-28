@@ -4,29 +4,56 @@
 
 {% block content %}
 <div class="stripe-form">
-    <div class="payment-card-container">
-        <div id="good-card" class="payment-card">
-            <h2>Good</h2>
-            <p>$10.00/Month</p>
-            <p>1 Blog per Month</p>
 
+    <div class="payment-card-container">
+
+        <div id="good-card" class="payment-card">
+            <h2 class="payment-plan">Starter Plan</h2>
+            <div class="price">                
+                <span class="number">
+                    $24.99
+                </span>
+                <span>
+                    <strong>per month</strong>
+                </span>
+            </div>
             <form class="payment-card-form" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Good"/>
                 {% if member.membership_level == "none" %}
-                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Subscribe</button>
                 {% elif member.membership_level == "Good" %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
                 {% elif member.membership_level == "Better" or member.membership_level == "Best" %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
                 {% endif %}
             </form>
+            <ul class="features">
+                <li class="feature-list-item">
+                    <span class="feature-info">Create 4 blogs per month</span>
+                </li>
+                <li class="feature-list-item">
+                    <span class="feature-info">Post blogs to your WordPress site</span>
+                </li>
+                <li class="feature-list-item">
+                    <span class="feature-info">Send blogs to your email</span>
+                </li>
+            </ul>
         </div>
 
+
+
+
         <div id="better-card" class="payment-card">
-            <h2>Better</h2>
-            <p>$20.00/Month</p>
-            <p>2 Blogs per Month</p>
+            <h2 class="payment-plan">Pro Plan</h2>
+            <div class="price">                
+                <span class="number">
+                    $49.99
+                </span>
+                <span>
+                    <strong>per month</strong>
+                </span>
+            </div>
             <form class="payment-card-form" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Better"/>
@@ -40,12 +67,32 @@
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
                 {% endif %}
             </form>
+            <ul class="features">
+                <li class="feature-list-item">
+                    <span class="feature-info">Create 8 blogs per month</span>
+                </li>
+                <li>
+                    <span class="feature-info"></span>
+                </li>
+                <li>
+                    <span class="feature-info"></span>
+                </li>
+            </ul>
         </div>
 
+
+
+
         <div id="best-card" class="payment-card">
-            <h2>Best</h2>
-            <p>$30.00/Month</p>
-            <p>4 Blogs per Month</p>
+            <h2 class="payment-plan">Premium Plan</h2>
+            <div class="price">                
+                <span class="number">
+                    $99.99
+                </span>
+                <span>
+                    <strong>per month</strong>
+                </span>
+            </div>
             <form class="payment-card-form" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Best"/>
@@ -56,6 +103,27 @@
                 {% elif member.membership_level == "Best" %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
                 {% endif %}
+            </form>
+            <ul class="features">
+                <li class="feature-list-item">
+                    <span class="feature-info">Create 16 blogs per month</span>
+                </li>
+                <li>
+                    <span class="feature-info"></span>
+                </li>
+                <li>
+                    <span class="feature-info"></span>
+                </li>
+            </ul>
+        </div>
+
+        <div id="best-card" class="payment-card">
+            <h2 class="payment-plan">Custom</h2>
+            <form id="payment-contact-form" class="payment-card-form">
+                <span class="feature-info">Want a custom plan?</span>
+                <a class="payment-contact" href="{% url 'contact' %}">
+                    <button class="payment-button" >Contact Us</button>
+                </a>
             </form>
         </div>
     </div>

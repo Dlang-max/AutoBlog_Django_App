@@ -21,23 +21,19 @@
     <div class="navbar">
         <header class="navbar-container">
             <a class="navbar-logo" href="{% url 'home' %}"><div class="logo">Logo</div></a>
-            {% if not user.is_authenticated %}
-                <nav role="navigation" class="navbar-menu">
-                    <a class="navbar-link" href="">About</a>
-                    <a class="navbar-link" href="">Examples</a>
-                    <a class="navbar-link" href="">Pricing</a>
-                </nav>
-                <nav class="navbar-action">
+            <nav role="navigation" class="navbar-menu">
+                <a class="navbar-link" href="">About</a>
+                <a class="navbar-link" href="">Examples</a>
+                <a class="navbar-link" href="">Pricing</a>
+            </nav>
+            <nav class="navbar-action">
+                {% if not user.is_authenticated %}
                     <a class="navbar-link"  href="{% url 'login' %}">Log in</a>
                     <a id="navbar-register" class="navbar-link" href="{% url 'register' %}">Sign Up</a>
-                </nav>
-            {% else %}
-                <nav role="navigation" class="navbar-menu">
-                    <a class="navbar-link" href="{% url 'generate_blog' %}">Write</a>
-                    <a class="navbar-link" href="{% url 'settings' %}">Account</a>
-                    <a class="navbar-link" href="{% url 'logout' %}">Logout</a>
-                </nav>
-            {% endif %}
+                {% else %}
+                    <a id="navbar-register" class="navbar-link" href="{% url 'generate_blog' %}">Create</a>
+                {% endif %}
+            </nav>
             <div id="hamburger-container" class="hamburger-container">
                 <span class="line top"></span>
                 <span class="line middle"></span>

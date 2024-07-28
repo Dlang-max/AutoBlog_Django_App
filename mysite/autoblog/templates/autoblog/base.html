@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Advanced Automated Blog Writing">
+    <meta name="keywords" content="AI, Automation, AutoBlogging, AutoBlogger, AI Blogs, Digital Marketing">
+    <meta name="author" content="Daniel Lang">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/autoblog/logo.png" sizes=32x32 type=image/png>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'> 
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'autoblog/style.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <div class="navbar">
+        <header class="navbar-container">
+            <a class="navbar-logo" href="{% url 'home' %}"><div class="logo">Logo</div></a>
+            <nav role="navigation" class="navbar-menu">
+                <a class="navbar-link" href="{% url 'generate_blog' %}">Write</a>
+                <a class="navbar-link" href="{% url 'settings' %}">Account</a>
+            </nav>
+            <nav class="navbar-menu">
+                <a class="navbar-link" href="{% url 'logout' %}">Logout</a>
+            </nav>
+            <div id="hamburger-container" class="hamburger-container">
+                <span class="line top"></span>
+                <span class="line middle"></span>
+                <span class="line bottom"></span>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $('#hamburger-container').click(function(){
+                        $(this).find('.line').toggleClass('open');
+                        $("#overlay").toggleClass('open');
+                    });
+                });
+            </script>
+        </header>
+        <div id="overlay" class="overlay">
+            <nav role="navigation" class="mobile-navbar-menu">
+                <a class="mobile-navbar-link" href="{% url 'generate_blog' %}">Write</a>
+                <a class="mobile-navbar-link" href="{% url 'settings' %}">Account</a>
+                <a class="mobile-navbar-link" href="{% url 'logout' %}">Logout</a>
+            </nav>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="message-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }} message"{% endif %} onclick="removeMessage()">{{ message|escape  }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="footer">
+        <p class="footer-text">© 2024 Your Blogging Assistant LLC</p>
+        <div class="footer-links">
+            <a class="footer-link" href="{% url 'home' %}">Home</a>
+            <a class="footer-link" href="{% url 'contact' %}">Contact</a>
+        </div>
+    </footer>
+    {% load static %}
+    <script src="{% static 'autoblog/script.js' %}"></script>
+</body>
+</html>
