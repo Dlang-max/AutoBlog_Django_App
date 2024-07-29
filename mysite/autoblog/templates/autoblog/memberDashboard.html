@@ -65,13 +65,52 @@
                         <div class="upload-image-container">
                             <form class="image-upload-form" method="POST">
                                 {% csrf_token %}
-                                <label for="custom-blog-image-upload" class="file-upload-button">
+                                <label for="custom-blog-image-upload" id="file-upload-button" class="file-upload-button">
                                     {% load static %}
-                                    <img src="{% static '/autoblog/plus.svg' %}" alt="plus sign" width="20" height="20">
+                                    <img src="{% static '/autoblog/upload.svg' %}" alt="upload icon" width="40" height="40">
+                                    <span><strong>Upload custom image</strong></span>
                                 </label>
-                                <input id="custom-blog-image-upload" type="file" name="file" accept="image/*" required>
-                                <input id="upload-blog-image" class="submit-button upload-blog-image-button" type="submit" formaction="{% url 'upload_blog_image' %}" value="Upload Image">
+                                <input id="custom-blog-image-upload" type="file" name="file" accept="image/*" onchange="loadFile(event)" multiple required>
+                                <div id="uploaded-image-container" class="uploaded-image-container" style="display: none;">
+                                    <img alt="image preview" id="uploaded-image" width="30" height="30">
+                                    <img src="{% static '/autoblog/trash.svg' %}" alt="trash can" id="trash-can" onclick="deleteUploadedImage()" width="30" height="30">
+                                </div>
+                                <input id="upload-blog-image" class="submit-button upload-blog-image-button" type="submit" formaction="{% url 'upload_blog_image' %}" value="Upload Image" style="display: none;">
                             </form>
+                            <script>
+                                function deleteUploadedImage() {
+                                    var uploadedImage = document.getElementById("custom-blog-image-upload");
+                                    uploadedImage.value = "";
+
+                                    var image = document.getElementById("uploaded-image");
+                                    image.src = "";
+
+                                    var uploadImageButton = document.getElementById("file-upload-button");
+                                    uploadImageButton.style.display = 'flex';
+
+                                    var uploadImageButton = document.getElementById("uploaded-image-container");
+                                    uploadImageButton.style.display = 'none';
+
+                                    var uploadImageSubmitButton = document.getElementById('upload-blog-image');
+                                    uploadImageSubmitButton.style.display = 'none';
+                                }
+
+                                function loadFile(event) {
+                                    var image = document.getElementById("uploaded-image");
+                                    image.src = URL.createObjectURL(event.target.files[0]);
+
+                                    var uploadImageButton = document.getElementById("file-upload-button");
+                                    uploadImageButton.style.display = 'none';
+
+                                    var uploadImageButton = document.getElementById("uploaded-image-container");
+                                    uploadImageButton.style.display = 'flex';
+
+                                    var uploadImageSubmitButton = document.getElementById('upload-blog-image');
+                                    uploadImageSubmitButton.style.display = 'flex';
+
+                                };
+                            </script>
+                            
                         </div>
                     {% endif %}
 
