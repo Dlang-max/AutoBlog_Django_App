@@ -578,6 +578,50 @@ resize: none; */
     cursor: pointer;
 }
 
+.image-delete-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-small);
+}
+
+.delete-blog-image-button {
+    transition: 500ms;
+    background-color: var(--button-red);
+}
+
+.delete-blog-image-button:hover {
+    background-color: var(--button-hover-red);
+}
+
+.image-upload-form {
+    display: flex;
+    
+    align-items: center;
+    padding: var(--padding-xs);
+}
+
+.file-upload-button {
+    padding: var(--padding-xxs);
+    border: 1px solid black;
+    border-radius: var(--radius-small);
+}
+
+#upload-blog-image {
+    width: 90%;
+    max-width: 10rem;
+    margin: var(--margin-xs);
+}
+
+#custom-blog-image-upload {
+    display: none;
+}
+
+
+.file-upload-button:hover {
+    cursor: pointer;
+}
+
 /*
 * Settings
 */
@@ -699,10 +743,6 @@ resize: none; */
 }
 
 .payment-card {
-    /* display: flex;
-    flex-direction: column;
-    justify-content:  space-evenly;
-    align-items: center; */
     text-align: left;
     border: 1px solid rgb(131, 130, 130);
     border-radius: 10px;

@@ -13,6 +13,8 @@ from .decorators import member_required
 from .tasks import generate_blog_and_header_image
 from django.http import JsonResponse
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
+from django.http import HttpResponse
+
 @login_required(login_url='/login')
 def settings(request):
     user = request.user
@@ -233,6 +235,23 @@ def post_blog(request):
         blog.delete()
 
     return redirect("member_dashboard")
+
+# DELETE BLOG IMAGE
+@login_required(login_url='/login')
+@user_passes_test(member_required, login_url='member_info')
+def delete_blog_image(request):
+    if request.method == "POST":
+        user = request.user
+        member = Member.objects.get(user=user)
+
+    try:
+        blog = Blog.objects.get(author=member)
+        blog.image.delete()
+    except Blog.DoesNotExist:
+        pass
+
+    return redirect('member_dashboard')
+
 
 # DELETE BLOG
 @login_required(login_url='/login')

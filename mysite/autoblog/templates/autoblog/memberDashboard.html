@@ -53,7 +53,28 @@
         {% if blog.subheading_1 %}
             <main>
                 <article style="font-family: Arial;">
-                    <img id="blog-header-image" src="{{ blog.image.url }}" alt="Blog Header Image">
+                    {% if blog.image %}
+                        <img id="blog-header-image" src="{{ blog.image.url }}" alt="Blog Header Image">
+                        <div class="image-delete-container">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input id="delete-blog-image" class="submit-button delete-blog-image-button" type="submit" formaction="{% url 'delete_blog_image' %}" value="Delete Image">
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="upload-image-container">
+                            <form class="image-upload-form" method="POST">
+                                {% csrf_token %}
+                                <label for="custom-blog-image-upload" class="file-upload-button">
+                                    {% load static %}
+                                    <img src="{% static '/autoblog/plus.svg' %}" alt="plus sign" width="20" height="20">
+                                </label>
+                                <input id="custom-blog-image-upload" type="file" name="file" accept="image/*" required>
+                                <input id="upload-blog-image" class="submit-button upload-blog-image-button" type="submit" formaction="{% url 'upload_blog_image' %}" value="Upload Image">
+                            </form>
+                        </div>
+                    {% endif %}
+
                     <h2 id="title" contentEditable="true">{{ blog.title }}</h2>
                     <section>
                         <h3 id="subheading_1" contentEditable="true">{{ blog.subheading_1 }}</h3>

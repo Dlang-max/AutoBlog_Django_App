@@ -41,6 +41,9 @@ urlpatterns = [
     path('saveBlog/', member_views.save_blog, name='save_blog'),
     path('postBlog/', member_views.post_blog, name='post_blog'),
     path('deleteBlog/', member_views.delete_blog, name='delete_blog'),
+    path('uploadBlogImage/', member_views.delete_blog_image, name='upload_blog_image'),
+    path('deleteBlogImage/', member_views.delete_blog_image, name='delete_blog_image'),
+
 
 
     path('pay/', stripe_views.pay, name='pay'),

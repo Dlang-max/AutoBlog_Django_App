@@ -58,7 +58,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Better"/>
                 {% if member.membership_level == "none" %}
-                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Subscribe</button>
                 {% elif member.membership_level == "Good" %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Upgrade</button>
                 {% elif member.membership_level == "Better" %}
@@ -97,7 +97,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Best"/>
                 {% if member.membership_level == "none" %}
-                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Buy</button>
+                    <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Subscribe</button>
                 {% elif member.membership_level == "Good" or member.membership_level == "Better"%}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Upgrade</button>
                 {% elif member.membership_level == "Best" %}
