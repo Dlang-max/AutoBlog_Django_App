@@ -129,19 +129,6 @@ def stripe_webhook(request):
  
     return HttpResponse(status=200)
 
-
-def success(request):
-    return render(request, "autoblog/success.html")
-
-def cancel(request):
-    return render(request, "autoblog/cancel.html")
-
-
-
-
-
-
-
 # HELPER METHODS
 # Implement Error Handling
 #############################################################################
