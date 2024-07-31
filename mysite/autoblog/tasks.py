@@ -12,14 +12,15 @@ from django.core.files.base import ContentFile
 client = OpenAI()
 
 @shared_task
-def generate_blog_and_header_image(username=None, title=''):
+def generate_blog_and_header_image(username=None, title='', generate_image="False"):
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
     blog = Blog.objects.get(author=member)
 
     try:
         # Generate Blog's Image
-        generate_blog_image(username=username, title=title, blog=blog)
+        if generate_image == "True":
+            generate_blog_image(username=username, title=title, blog=blog)
 
         # Generate Blog
         generate_blog(title=title, blog=blog)

@@ -2,18 +2,21 @@ import os
 import base64
 import requests
 import json
+from io import BytesIO
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from celery.result import AsyncResult
 from django.core.mail import EmailMessage
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm
 from .models import Member, Blog, User
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import member_required
 from .tasks import generate_blog_and_header_image
 from django.http import JsonResponse
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
-from django.http import HttpResponse
+from django.core.files.base import ContentFile
+from PIL import Image
+
 
 @login_required(login_url='/login')
 def settings(request):
@@ -98,11 +101,8 @@ def member_info(request):
 def generate_blog(request):
     user = request.user
 
-    try:
-        member = Member.objects.get(user=user)
-    except Member.DoesNotExist:
-        member = Member.objects.create(user=user)
-        member.save()
+    member, created = Member.objects.get_or_create(user=user)
+    if created:
         user.is_member = True
         user.save()
     
@@ -115,13 +115,17 @@ def generate_blog(request):
 
     if request.method == "POST":
         form = GenerateBlogForm(request.POST)
-        if form.is_valid():
-            # Create and Save an empty Blog
 
+        # Form can either have blog or no blog
+        print(request.POST, flush=True)
+
+        if form.is_valid():
             username = request.user.username
             title = form.cleaned_data["title"]
-            task = generate_blog_and_header_image.delay(username=username, title=title)
+            generate_image = request.POST.get("generate_ai_image", 'False')
+            print(generate_image, flush=True)
 
+            task = generate_blog_and_header_image.delay(username=username, title=title, generate_image=generate_image)
             blog = Blog.objects.create(author=member)
             blog.task_id = task.id
             blog.save()
@@ -202,7 +206,7 @@ def post_blog(request):
             blog.delete()
             return redirect("member_dashboard")
 
-        # Get member's WordPress information
+        # Get member's WordPre  ss information
         member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
         member_wordpress_media_url = member.wordpress_url + "/wp-json/wp/v2/media"
         member_wordpress_username = member.wordpress_username
@@ -219,10 +223,11 @@ def post_blog(request):
             member_wordpress_current_post_url = member_wordpress_post_url + '/' + str(post_id)
 
             # Get and Post Blog's header image to WordPress
-            media_id = post_image_to_wordpress(member_wordpress_media_url=member_wordpress_media_url, header=header, blog=blog)
+            if blog.image:
+                media_id = post_image_to_wordpress(member_wordpress_media_url=member_wordpress_media_url, header=header, blog=blog)
 
-            # Update Blog's featured image
-            update_blogs_featured_image(member_wordpress_current_post_url=member_wordpress_current_post_url, header=header, media_id=media_id)
+                # Update Blog's featured image
+                update_blogs_featured_image(member_wordpress_current_post_url=member_wordpress_current_post_url, header=header, media_id=media_id)
             
         except BlogUploadError as e:
             return redirect("member_dashboard")
@@ -251,6 +256,33 @@ def delete_blog_image(request):
         pass
 
     return redirect('member_dashboard')
+
+# UPLOAD CUSTOM BLOG IMAGE
+@login_required(login_url='/login')
+@user_passes_test(member_required, login_url='member_info')
+def upload_blog_image(request):
+    if request.method == "POST":
+        form = CustomBlogImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            member = Member.objects.get(user=user)
+
+            image = form.cleaned_data["image"]
+            image = Image.open(image)
+            webp_image = BytesIO()
+            image.save(webp_image, "webp")
+            webp_image.seek(0)
+
+
+            try:
+                blog = Blog.objects.get(author=member)
+                blog.image.save(f"{user.username}_blog_header_image.webp", ContentFile(webp_image.read()), save=True)
+
+            except Blog.DoesNotExist:
+                pass    
+
+    return redirect('member_dashboard')
+
 
 
 # DELETE BLOG

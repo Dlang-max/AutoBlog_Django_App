@@ -19,9 +19,11 @@ class MemberInfoForm(ModelForm):
         fields = ["wordpress_url", "wordpress_username", "wordpress_application_password"]
         
 class GenerateBlogForm(Form):
+    generate_ai_image = forms.CharField()
     title = forms.CharField(max_length=200)
-    class Meta:
-        fields = ["title"]
+
+    fields = ["title", "generate_ai_image"]
+
 
 class BlogForm(Form):
     title = forms.CharField(max_length=200)
@@ -51,6 +53,10 @@ class ContactForm(Form):
     email = forms.EmailField()
     subject = forms.CharField(max_length=100)
     message = forms.CharField(widget=forms.Textarea)
+
+class CustomBlogImageForm(Form):
+    image = forms.ImageField()
+
 
 
 

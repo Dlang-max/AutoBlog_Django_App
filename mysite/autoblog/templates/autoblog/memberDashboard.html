@@ -63,14 +63,14 @@
                         </div>
                     {% else %}
                         <div class="upload-image-container">
-                            <form class="image-upload-form" method="POST">
+                            <form class="image-upload-form" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <label for="custom-blog-image-upload" id="file-upload-button" class="file-upload-button">
+                                <label for="id_image" id="file-upload-button" class="file-upload-button">
                                     {% load static %}
                                     <img src="{% static '/autoblog/upload.svg' %}" alt="upload icon" width="40" height="40">
                                     <span><strong>Upload custom image</strong></span>
                                 </label>
-                                <input id="custom-blog-image-upload" type="file" name="file" accept="image/*" onchange="loadFile(event)" multiple required>
+                                <input aria-invalid="true" id="id_image" type="file" name="image" accept="image/*" onchange="loadFile(event)" multiple required>
                                 <div id="uploaded-image-container" class="uploaded-image-container" style="display: none;">
                                     <img alt="image preview" id="uploaded-image" width="30" height="30">
                                     <img src="{% static '/autoblog/trash.svg' %}" alt="trash can" id="trash-can" onclick="deleteUploadedImage()" width="30" height="30">
@@ -79,7 +79,7 @@
                             </form>
                             <script>
                                 function deleteUploadedImage() {
-                                    var uploadedImage = document.getElementById("custom-blog-image-upload");
+                                    var uploadedImage = document.getElementById("id_image");
                                     uploadedImage.value = "";
 
                                     var image = document.getElementById("uploaded-image");
@@ -96,8 +96,30 @@
                                 }
 
                                 function loadFile(event) {
-                                    var image = document.getElementById("uploaded-image");
-                                    image.src = URL.createObjectURL(event.target.files[0]);
+                                    const MAX_SIZE = 5 * 1024 * 1024;
+                                    var imageInput = document.getElementById("uploaded-image");
+                                    var image = event.target.files[0]
+                                    if(image) {
+                                        let newImage = new Image();
+                                        newImage.src = URL.createObjectURL(image);
+                                        
+                                        newImage.onload = function () {
+                                            let width = newImage.width;
+                                            let height = newImage.height;
+
+                                            console.log(width);
+                                            console.log(height);
+                                            
+                                            if(width * height > MAX_SIZE) {
+                                                alert("Uploaded image is too large. Try resizing it or convert it to webp format.");
+                                                deleteUploadedImage();
+                                            } else {    
+                                                imageInput.src = newImage.src
+                                            }
+                                        };
+                                    }
+                        
+                                
 
                                     var uploadImageButton = document.getElementById("file-upload-button");
                                     uploadImageButton.style.display = 'none';
