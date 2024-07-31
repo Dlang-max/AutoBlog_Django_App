@@ -50,8 +50,8 @@ def create_checkout_session(request):
                 ],
                 customer=customer,
                 mode='subscription',
-                success_url=domain + '/success/',
-                cancel_url=domain + "/cancel/",
+                success_url=domain + "/memberDash/",
+                cancel_url=domain + "/memberDash/",
             )
 
             member.stripe_customer_id = customer.id
