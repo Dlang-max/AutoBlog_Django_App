@@ -16,6 +16,8 @@ from django.http import JsonResponse
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
 from django.core.files.base import ContentFile
 from PIL import Image
+from autoblog.convert_blog_to_docx import *
+
 
 
 @login_required(login_url='/login')
@@ -115,10 +117,6 @@ def generate_blog(request):
 
     if request.method == "POST":
         form = GenerateBlogForm(request.POST)
-
-        # Form can either have blog or no blog
-        print(request.POST, flush=True)
-
         if form.is_valid():
             username = request.user.username
             title = form.cleaned_data["title"]
@@ -181,6 +179,52 @@ def save_blog(request):
         except Blog.DoesNotExist:
             pass
     return redirect('/memberDash')
+
+@login_required(login_url="/login")
+@user_passes_test(member_required, login_url='member_info')
+def email_blog(request):
+    user = request.user
+    member = Member.objects.get(user=user)
+
+    try:
+        # SAVE CURRENT VERSION OF BLOG
+
+
+
+        blog = Blog.objects.get(author=member)
+
+        document = Document()
+
+        if blog.image:
+            image = Image.open(blog.image)
+            byte_io = BytesIO()
+            image.save(byte_io, format="JPEG")
+            add_image(document, byte_io)
+
+        add_title(document, blog.title)
+
+        for i in range(1, 6):
+            subheading = getattr(blog, f"subheading_{i}")
+            add_subheading(document, subheading)
+            section = getattr(blog, f"section_{i}")
+            add_paragraph(document, section)
+
+        buffer = BytesIO()
+        document.save(buffer)
+        buffer.seek(0)
+
+        if member.docx_blog:
+            member.docx_blog.delete()
+
+        member.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
+
+    except Blog.DoesNotExist:
+        return redirect("member_dashboard")
+    
+    return redirect("member_dashboard")
+
+
+
 
 # POST BLOG
 # BREAK DOWN INTO INDIVIDUAL HELPER METHODS

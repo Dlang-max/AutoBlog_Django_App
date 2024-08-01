@@ -27,6 +27,8 @@ class Member(models.Model):
     has_paid = models.BooleanField(default=False)
     blogs_remaining = models.IntegerField(default=1)
 
+    docx_blog = models.FileField(upload_to="blogDocx")
+
     def __str__(self):
         return self.user.username
     
