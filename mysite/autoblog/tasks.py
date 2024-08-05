@@ -12,10 +12,10 @@ from django.core.files.base import ContentFile
 client = OpenAI()
 
 @shared_task
-def generate_blog_and_header_image(username=None, title='', generate_image="False"):
+def generate_blog_and_header_image(id='', username='', title='', generate_image="False"):
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
-    blog = Blog.objects.get(author=member)
+    blog = Blog.objects.get(id=id)
 
     try:
         # Generate Blog's Image
@@ -38,7 +38,6 @@ def generate_blog_and_header_image(username=None, title='', generate_image="Fals
 def generate_blog(title='', blog=None):
     try:
         outline = write_blog_outline(title=title)
-        blog.title = title
         sections = ["first", "second", "third", "fourth", "concluding"]
         content = ""
         for i, section in enumerate(sections, start=1):

@@ -38,12 +38,12 @@ urlpatterns = [
     path('taskStatus/<str:task_id>/', member_views.poll_task_status, name='task_status'),
 
 
-    path('saveBlog/', member_views.save_blog, name='save_blog'),
-    path('postBlog/', member_views.post_blog, name='post_blog'),
-    path('emailBlog/', member_views.email_blog, name='email_blog'),
-    path('deleteBlog/', member_views.delete_blog, name='delete_blog'),
-    path('uploadBlogImage/', member_views.upload_blog_image, name='upload_blog_image'),
-    path('deleteBlogImage/', member_views.delete_blog_image, name='delete_blog_image'),
+    path('saveBlog/<str:blog_id>', member_views.save_blog, name='save_blog'),
+    path('postBlog/<str:blog_id>', member_views.post_blog, name='post_blog'),
+    path('emailBlog/<str:blog_id>', member_views.email_blog, name='email_blog'),
+    path('deleteBlog/<str:blog_id>', member_views.delete_blog, name='delete_blog'),
+    path('uploadBlogImage/<str:blog_id>', member_views.upload_blog_image, name='upload_blog_image'),
+    path('deleteBlogImage/<str:blog_id>', member_views.delete_blog_image, name='delete_blog_image'),
 
 
 
@@ -52,6 +52,14 @@ urlpatterns = [
     path('pay/cancel-subscription/', stripe_views.handle_subscription_cancelled, name='cancel-subscription'),
     path('pay/upgrade-subscription/', stripe_views.handle_subscription_update, name='upgrade-subscription'),
     path('webhook/', stripe_views.stripe_webhook, name='webhook'),
+
+    path('dashboard/', member_views.dashboard, name='dashboard'),
+    path('getBlogInfo/<str:blog_id>', member_views.get_blog_info, name='get_blog_info'),
+    path('displayBlog/<str:blog_id>', member_views.display_blog, name='display_blog'),
+    path('displayBlogQueue/', member_views.display_blog_queue, name='display_blog_queue'),
+
+
+
 
 ]
 

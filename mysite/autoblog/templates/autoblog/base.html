@@ -22,7 +22,7 @@
         <header class="navbar-container">
             <a class="navbar-logo" href="{% url 'home' %}"><div class="logo">Logo</div></a>
             <nav role="navigation" class="navbar-menu">
-                <a class="navbar-link" href="{% url 'generate_blog' %}">Write</a>
+                <a class="navbar-link" href="{% url 'dashboard' %}">Dashboard</a>
                 <a class="navbar-link" href="{% url 'settings' %}">Account</a>
             </nav>
             <nav class="navbar-menu">
@@ -44,7 +44,7 @@
         </header>
         <div id="overlay" class="overlay">
             <nav role="navigation" class="mobile-navbar-menu">
-                <a class="mobile-navbar-link" href="{% url 'generate_blog' %}">Write</a>
+                <a class="mobile-navbar-link" href="{% url 'dashboard' %}">Dashboard</a>
                 <a class="mobile-navbar-link" href="{% url 'settings' %}">Account</a>
                 <a class="mobile-navbar-link" href="{% url 'logout' %}">Logout</a>
             </nav>

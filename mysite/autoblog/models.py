@@ -1,3 +1,5 @@
+import secrets
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -13,8 +15,7 @@ class Member(models.Model):
     wordpress_application_password = models.CharField(max_length=200, default="")
     
     stripe_customer_id = models.CharField(max_length=50, default="")
-    stripe_subscription_id = models.CharField(max_length=50, default="")
-
+    stripe_subscription_id = models.CharField(max_length=50, default="")  
 
     membership_levels = {
         'none' : 'none',
@@ -27,17 +28,24 @@ class Member(models.Model):
     has_paid = models.BooleanField(default=False)
     blogs_remaining = models.IntegerField(default=1)
 
-    docx_blog = models.FileField(upload_to="blogDocx")
-
     def __str__(self):
         return self.user.username
     
 class Blog(models.Model):
-    author = models.OneToOneField(Member, on_delete=models.CASCADE, primary_key=True)
-    
+    id = models.CharField(default=secrets.token_hex(20), max_length=20, primary_key=True)
+
+    automated_blog = models.BooleanField(default=False)
+    published = models.BooleanField(default=False)
+    docx_blog = models.FileField(upload_to="blogDocx")
+
     task_id = models.CharField(max_length=200, default="")
+    author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="blogs")
+    publish = models.BooleanField(default=False)
+    publish_date = models.DateField(auto_now_add=True)
+
     image = models.ImageField(upload_to="blogImages")
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, default="")
+    topic = models.CharField(max_length=200, default="")
 
     subheading_1 = models.CharField(max_length=200, default="")
     section_1 = models.TextField(default="")

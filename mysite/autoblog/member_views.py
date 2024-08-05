@@ -17,6 +17,8 @@ from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError,
 from django.core.files.base import ContentFile
 from PIL import Image
 from autoblog.convert_blog_to_docx import *
+import secrets
+
 
 
 
@@ -30,6 +32,70 @@ def settings(request):
         user.save()
 
     return render(request, "autoblog/settings.html", {"member" : member})
+
+@login_required(login_url='/login')
+def dashboard(request):
+    return render(request, "autoblog/dashboard.html")
+
+@login_required(login_url='/login')
+def display_blog(request, blog_id):
+    try:
+        user = request.user
+        member = Member.objects.get(user=user)
+        blog = Blog.objects.get(id=blog_id)
+
+    except Member.DoesNotExist:
+        return redirect('dashboard')
+    except Blog.DoesNotExist:
+        return redirect('dashboard')
+    
+    form = BlogForm()
+    return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form})
+
+
+@login_required(login_url='/login')
+def display_blog_queue(request):
+    try:
+        user = request.user
+        member = Member.objects.get(user=user)
+        blogs = Blog.objects.filter(author=member)
+
+    except Member.DoesNotExist:
+        return redirect('dashboard')
+    except Blog.DoesNotExist:
+        return redirect('dashboard')
+    
+    return render(request, "autoblog/blogQueue.html", {"blogs" : blogs})
+
+@login_required(login_url='/login')
+def get_blog_info(request, blog_id):
+    try:
+        user = request.user
+        member = Member.objects.get(user=user)
+        blog = Blog.objects.get(id=blog_id)
+    except Member.DoesNotExist:
+        return redirect("dashboard")
+    
+    except Blog.DoesNotExist:
+        return redirect("dashboard")
+
+
+    # get elements of blog
+    blog_info = {}
+    blog_info['title'] = blog.title
+
+
+    for i in range(1, 6):
+        subheading = getattr(blog, f"subheading_{i}")
+        blog_info[f"subheading_{i}"] = subheading
+
+        section = getattr(blog, f"section_{i}")
+        blog_info[f"section_{i}"] = section
+
+    # return elements
+    return JsonResponse(blog_info)
+
+
 
 def home(request):
     """
@@ -55,7 +121,7 @@ def contact(request):
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
             EmailMessage(subject + " : " + name, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
-            return redirect("member_dashboard")
+            return redirect("dashboard")
     
     return render(request, "autoblog/contact.html")
 
@@ -91,7 +157,7 @@ def member_info(request):
             member.wordpress_username = wordpress_username
             member.wordpress_application_password = wordpress_application_password
             member.save()
-            return redirect("member_dashboard")
+            return redirect("dashboard")
 
     return render(request, "autoblog/memberInfo.html")
 
@@ -107,13 +173,6 @@ def generate_blog(request):
     if created:
         user.is_member = True
         user.save()
-    
-    try:
-        blog = Blog.objects.get(author=member)
-        if blog:
-            return redirect('/memberDash')
-    except Blog.DoesNotExist:
-        pass
 
     if request.method == "POST":
         form = GenerateBlogForm(request.POST)
@@ -121,16 +180,16 @@ def generate_blog(request):
             username = request.user.username
             title = form.cleaned_data["title"]
             generate_image = request.POST.get("generate_ai_image", 'False')
-            print(generate_image, flush=True)
 
-            task = generate_blog_and_header_image.delay(username=username, title=title, generate_image=generate_image)
-            blog = Blog.objects.create(author=member)
+            blog = Blog.objects.create(id=secrets.token_hex(20), author=member)
+            blog.title = title
+            task = generate_blog_and_header_image.delay(id=blog.id, username=username, title=title, generate_image=generate_image)
             blog.task_id = task.id
             blog.save()
 
             member.blogs_remaining -= 1
             member.save()
-            return redirect("/memberDash")
+            return redirect("dashboard")
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
 
@@ -164,13 +223,13 @@ def member_dashboard(request):
 # SAVE BLOG
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
-def save_blog(request):
+def save_blog(request, blog_id):
     if request.method == 'POST':
         user = request.user
-        member = Member.objects.get(user=user)
         try:
-            blog = Blog.objects.get(author=member)
+            blog = Blog.objects.get(id=blog_id)
             form = BlogForm(request.POST)
+            print(request.POST, flush=True)
             if form.is_valid():
                 update_blog_in_db(form=form, blog=blog)
             else:
@@ -178,20 +237,16 @@ def save_blog(request):
                 blog.delete()
         except Blog.DoesNotExist:
             pass
-    return redirect('/memberDash')
+    return redirect("display_blog", blog_id=blog.id)
 
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
-def email_blog(request):
+def email_blog(request, blog_id):
     user = request.user
     member = Member.objects.get(user=user)
 
     try:
-        # SAVE CURRENT VERSION OF BLOG
-
-
-
-        blog = Blog.objects.get(author=member)
+        blog = Blog.objects.get(id=blog_id)
 
         document = Document()
 
@@ -219,9 +274,9 @@ def email_blog(request):
         member.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
 
     except Blog.DoesNotExist:
-        return redirect("member_dashboard")
+        return redirect("dashboard")
     
-    return redirect("member_dashboard")
+    return redirect("dashboard")
 
 
 
@@ -231,7 +286,7 @@ def email_blog(request):
 # ADD AS ASYNC TASK????
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
-def post_blog(request):
+def post_blog(request, blog_id):
     if request.method == 'POST':
         user = request.user
         member = Member.objects.get(user=user)
@@ -240,15 +295,15 @@ def post_blog(request):
 
         if form.is_valid():
             try:
-                blog = Blog.objects.get(author=member)
+                blog = Blog.objects.get(id=blog_id)
                 update_blog_in_db(form=form, blog=blog)
             except Blog.DoesNotExist:
-                return redirect("member_dashboard")
+                return redirect("dashboard")
         else:
             # You break I delete
             blog.image.delete()
             blog.delete()
-            return redirect("member_dashboard")
+            return redirect("dashboard")
 
         # Get member's WordPre  ss information
         member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
@@ -283,28 +338,13 @@ def post_blog(request):
         blog.image.delete()
         blog.delete()
 
-    return redirect("member_dashboard")
+    return redirect("dashboard")
 
-# DELETE BLOG IMAGE
-@login_required(login_url='/login')
-@user_passes_test(member_required, login_url='member_info')
-def delete_blog_image(request):
-    if request.method == "POST":
-        user = request.user
-        member = Member.objects.get(user=user)
-
-    try:
-        blog = Blog.objects.get(author=member)
-        blog.image.delete()
-    except Blog.DoesNotExist:
-        pass
-
-    return redirect('member_dashboard')
 
 # UPLOAD CUSTOM BLOG IMAGE
 @login_required(login_url='/login')
 @user_passes_test(member_required, login_url='member_info')
-def upload_blog_image(request):
+def upload_blog_image(request, blog_id):
     if request.method == "POST":
         form = CustomBlogImageForm(request.POST, request.FILES)
         if form.is_valid():
@@ -319,31 +359,45 @@ def upload_blog_image(request):
 
 
             try:
-                blog = Blog.objects.get(author=member)
+                blog = Blog.objects.get(id=blog_id)
                 blog.image.save(f"{user.username}_blog_header_image.webp", ContentFile(webp_image.read()), save=True)
 
             except Blog.DoesNotExist:
                 pass    
 
-    return redirect('member_dashboard')
+    return redirect('display_blog', blog_id=blog.id)
 
+# DELETE BLOG IMAGE
+@login_required(login_url='/login')
+@user_passes_test(member_required, login_url='member_info')
+def delete_blog_image(request, blog_id):
+    if request.method == "POST":
+        user = request.user
+        member = Member.objects.get(user=user)
 
+    try:
+        blog = Blog.objects.get(id=blog_id)
+        blog.image.delete()
+    except Blog.DoesNotExist:
+        pass
+
+    return redirect('display_blog', blog_id=blog.id)
 
 # DELETE BLOG
 @login_required(login_url='/login')
 @user_passes_test(member_required, login_url='member_info')
-def delete_blog(request):
+def delete_blog(request, blog_id):
     if request.method == 'POST':
         user = request.user
         member = Member.objects.get(user=user)
         try:
-            blog = Blog.objects.get(author=member)
+            blog = Blog.objects.get(id=blog_id)
             blog.image.delete()
             blog.delete()
         except Blog.DoesNotExist:
             pass
 
-    return redirect('/memberDash')
+    return redirect("dashboard")
 
 # HELPER METHODS
 #############################################################################
