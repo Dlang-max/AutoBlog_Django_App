@@ -1,16 +1,204 @@
 {% extends "autoblog/base.html" %}
 
-{% block title %}Bulk Generation Dashboard{% endblock %}
+{% block title %}Batch Generation Dashboard{% endblock %}
 
 {% block content %}
-<table class="bulk-generation-table">
-<tr>
-    <th>Title</th>
-    <th>Topic</th>
-    <th>Generate Image</th>
-    <th>Publish Date</th>
-    <th>Status</th>
-</tr>
+<div class="batch-blog-container">
+    
 
-</table>
+    <div id="batch-generation-table" class="batch-generation-table">
+
+        <!-- Head -->
+        <div class="batch-generation-head">
+            <div id="batch-title" class="batch-generation-header">
+                <h5 class="header-title">Titles</h5>
+            </div>
+
+            <div id="batch-topic" class="batch-generation-header">
+                <h5 class="header-title">Topics</h5>
+            </div>
+
+            <div id="batch-image" class="batch-generation-header">
+                <h5 class="header-title">Generate Image</h5>
+                <input type="checkbox" id="master-batch-image-checkbox" class="master-batch-image-checkbox" onclick="toggleCheckboxes()">
+            </div>
+            <div id="batch-date" class="batch-generation-header">
+                <h5 class="header-title">Publish Date</h5>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div id="batch-generation-body" class="batch-generation-body">
+            <div class="batch-generation-row">
+                <div class="batch-title batch-generation-input">
+                    <div class="batch-text-input" contenteditable="">
+                    </div>
+                </div>
+    
+                <div class="batch-topic batch-generation-input">
+                    <div class="batch-text-input" contenteditable="">
+                    </div>
+                </div>
+    
+                <div class="batch-image batch-generation-input">
+                    <input type="checkbox" class="batch-image-checkbox">
+                </div>
+    
+                <div class="batch-date batch-generation-input">
+                    <input type="date">
+                </div>
+            </div>    
+        </div>
+    </div>
+
+
+    <button type="button" onclick="addRow(-1, '', '')">Add Row</button>
+
+
+    <script>
+        document.querySelectorAll(".batch-text-input").forEach(addInputListeners);
+
+        function addRow(index, titleText, topicText) {
+            const  TABLE = document.getElementById("batch-generation-body");
+
+            if(TABLE.children.length === getBlogsRemaining()) {
+                return;
+            }
+
+            var newRow = `
+                <div class="batch-generation-row">
+                    <div class="batch-title batch-generation-input">
+                        <div class="batch-text-input" contenteditable="">
+                            ${titleText}
+                        </div>
+                    </div>
+        
+                    <div class="batch-topic batch-generation-input">
+                        <div class="batch-text-input" contenteditable="">
+                            ${topicText}
+                        </div>
+                    </div>
+        
+                    <div class="batch-image batch-generation-input">
+                        <input type="checkbox" class="batch-image-checkbox">
+                    </div>
+        
+                    <div class="batch-date batch-generation-input">
+                        <input type="date">
+                    </div>
+                </div>`;
+
+            TABLE.innerHTML += newRow;
+
+            
+
+            document.querySelectorAll(".batch-text-input").forEach(addInputListeners);
+        }
+
+
+
+
+        // Adds event listeners to div inputs
+        function addInputListeners(div) {
+            div.addEventListener('keydown',  (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    handleEnterKey(event.target);
+                }
+            });
+            
+            div.addEventListener('paste', async function(e) {
+                e.preventDefault();
+                event.stopImmediatePropagation();
+                const pasteText = await navigator.clipboard.readText();
+                var lines = pasteText.split('\n');
+                
+                handlePaste(lines, e.target);
+
+            });
+        }
+
+        // Toggles Checkboxes in the table
+        function toggleCheckboxes() {
+            const MASTER_IMAGE_CHECKBOX = document.getElementById("master-batch-image-checkbox");
+            const MASTER_IMAGE_CHECKBOX_CHECKED = MASTER_IMAGE_CHECKBOX.checked;
+
+            const IMAGE_CHECKBOXES = document.querySelectorAll(".batch-image-checkbox");
+
+            IMAGE_CHECKBOXES.forEach(checkbox => {
+                checkbox.checked = MASTER_IMAGE_CHECKBOX_CHECKED;
+            });
+        }
+
+        // Moves between rows or adds rows when ENTER is pressed 
+        function handleEnterKey(inputDiv) {
+            const TABLE = document.getElementById("batch-generation-body");
+
+            var currentCol = inputDiv.parentElement;
+            var currentRow = currentCol.parentElement;
+            
+            var currentColIndex = 0;
+            if (currentRow.children[1] === currentCol) {
+                var currentColIndex = 1;
+            }
+
+            var nextRow = currentRow.nextElementSibling;
+
+            if (nextRow) {
+                nextRow.children[currentColIndex].querySelector('div').focus();
+            } else {
+                addRow(-1, "", "");
+                var newRow = TABLE.children[TABLE.children.length - 1];
+                newRow.children[currentColIndex].querySelector('div').focus();
+            }
+        }
+
+
+        function handlePaste(lines, inputDiv) {
+            inputDiv.innerText = lines[0].trim();
+
+            const TABLE = document.getElementById("batch-generation-body");
+
+            var currentCol = inputDiv.parentElement;
+            var currentRow = currentCol.parentElement;
+            
+            var currentColIndex = 0;
+            if (currentRow.children[1] === currentCol) {
+                var currentColIndex = 1;
+            }
+
+            var nextRow = currentRow.nextElementSibling;
+
+            let i = 1;
+            while (i < lines.length) {
+                if (nextRow) {
+                    if(nextRow.children[currentColIndex] &&
+                    nextRow.children[currentColIndex].children[0] &&
+                    nextRow.children[currentColIndex].children[0].innerText === "") {
+
+                        var inputDiv = nextRow.children[currentColIndex].children[0];
+                        inputDiv.innerText = lines[i].trim();
+                        i++;
+                    }
+                    nextRow = nextRow.nextElementSibling;
+                } else {
+                    if (currentColIndex === 0) {
+                        addRow(-1, lines[i].trim(), "");
+                    } else {
+                        addRow(-1, "", lines[i].trim());
+                    }
+
+                    nextRow = TABLE.children[TABLE.children.length - 1].nextElementSibling;
+                    i++;
+                }
+            }
+        }
+
+        function getBlogsRemaining() {
+            return Number("{{ member.blogs_remaining }}");
+        }
+
+    </script>
+</div>
 {% endblock %}

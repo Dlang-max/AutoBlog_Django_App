@@ -1,6 +1,6 @@
 {% extends "autoblog/base.html" %}
 
-{% block title %}Bulk Generation Dashboard{% endblock %}
+{% block title %}Publish Queue{% endblock %}
 
 {% block content %}
 <div class="queue-blog-container">
@@ -40,11 +40,9 @@
             <script>
                 const rows = document.querySelectorAll('.blog-queue-table tbody tr');
     
-                rows.forEach((row, index) => {
-                    console.log(index);
-    
+                rows.forEach((row, index) => {    
                     if (index % 2 === 0) {
-                        row.classList.add("queue-row-gray");
+                        row.classList.add("row-gray");
                     }
                 });
             </script>         

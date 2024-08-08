@@ -18,9 +18,50 @@ from django.core.files.base import ContentFile
 from PIL import Image
 from autoblog.convert_blog_to_docx import *
 import secrets
+from datetime import datetime
+
+
+from django.template.defaulttags import register
+
+@register.filter
+def get_range(value):
+    return range(value)
+
+
+@login_required(login_url='/login')
+def automate_blog_generation(request):
+    
+    if request.method == "POST":
+        user = request.user
+        username = user.username
+        
+        member, created = Member.objects.get_or_create(user=user)
+        if created:
+            user.is_member = True
+            user.save()
+
+        current_blog_publish_date = datetime.now().date()
+        ratio = 30 // member.blogs_remaining
+
+        for i in range(member.blogs_remaining):
+            blog = Blog.objects.create(id=secrets.token_hex(20), author=member)
+            blog.title = title
+            task = generate_blog_and_header_image.delay(id=blog.id, username=username, title=title, generate_image=generate_image)
+            blog.task_id = task.id
+            blog.save()
 
 
 
+
+@login_required(login_url='/login')
+def generate_blog_batch(request):
+    user = request.user
+    member, created = Member.objects.get_or_create(user=user)
+    if created:
+        user.is_member = True
+        user.save()
+
+    return render(request, "autoblog/bulkDashboard.html", {"member" : member})
 
 @login_required(login_url='/login')
 def settings(request):

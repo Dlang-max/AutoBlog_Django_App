@@ -61,3 +61,10 @@ class Blog(models.Model):
 
     subheading_5 = models.CharField(max_length=200, default="")
     section_5 = models.TextField(default="")
+
+class BlogSkeleton(models.Model):
+    author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="blog_skeleton")
+
+    title = models.TextField(max_length=200, default="")
+    topic = models.TextField(max_length=200, default="")
+    generate_image = models.BooleanField(default=False)
