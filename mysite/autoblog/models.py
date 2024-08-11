@@ -10,6 +10,9 @@ class User(AbstractUser):
 
 class Member(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+
+    company_type = models.CharField(max_length=100, default="")
+
     wordpress_url = models.URLField(max_length=200, default="")
     wordpress_username = models.CharField(max_length=100, default="")
     wordpress_application_password = models.CharField(max_length=200, default="")
@@ -41,7 +44,7 @@ class Blog(models.Model):
     task_id = models.CharField(max_length=200, default="")
     author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="blogs")
     publish = models.BooleanField(default=False)
-    publish_date = models.DateField(auto_now_add=True)
+    publish_date = models.DateField(null=True)
 
     image = models.ImageField(upload_to="blogImages")
     title = models.CharField(max_length=200, default="")
@@ -63,8 +66,10 @@ class Blog(models.Model):
     section_5 = models.TextField(default="")
 
 class BlogSkeleton(models.Model):
+    id = models.CharField(default=secrets.token_hex(20), max_length=20, primary_key=True)
     author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="blog_skeleton")
 
     title = models.TextField(max_length=200, default="")
     topic = models.TextField(max_length=200, default="")
     generate_image = models.BooleanField(default=False)
+    publish_date = models.DateField(null=True)

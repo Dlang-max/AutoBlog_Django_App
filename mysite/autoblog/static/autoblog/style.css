@@ -541,7 +541,7 @@ ul::-webkit-details-marker {
 }
 
 .batch-generation-table {
-    width: 95%;
+    width: 70%;
 }
 
 .batch-generation-head {
@@ -593,6 +593,8 @@ ul::-webkit-details-marker {
 }
 
 .batch-text-input {
+    font-size: smaller;
+
     width: 95%;
     max-width: 95%;
 
@@ -1265,6 +1267,11 @@ span strong {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+    }
+
+    
+    .batch-generation-table {
+        width: 90%;
     }
 
     /*

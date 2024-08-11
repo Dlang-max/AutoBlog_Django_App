@@ -1,5 +1,5 @@
 from .models import User
-from .models import Member, Blog
+from .models import Member, Blog, BlogSkeleton
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
@@ -19,4 +19,5 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Member)
 admin.site.register(Blog)
+admin.site.register(BlogSkeleton)
 

@@ -29,25 +29,36 @@
 
         <!-- Body -->
         <div id="batch-generation-body" class="batch-generation-body">
-            <div class="batch-generation-row">
-                <div class="batch-title batch-generation-input">
-                    <div class="batch-text-input" contenteditable="">
+
+            {% for blog_skeleton in blog_skeletons %}
+                <div class="batch-generation-row">
+                    <div class="batch-title batch-generation-input">
+                        <div class="batch-text-input" contenteditable="">
+                            {{ blog_skeleton.title }}
+                        </div>
                     </div>
-                </div>
-    
-                <div class="batch-topic batch-generation-input">
-                    <div class="batch-text-input" contenteditable="">
+        
+                    <div class="batch-topic batch-generation-input">
+                        <div class="batch-text-input" contenteditable="">
+                            {{ blog_skeleton.topic }}
+                        </div>
                     </div>
-                </div>
-    
-                <div class="batch-image batch-generation-input">
-                    <input type="checkbox" class="batch-image-checkbox">
-                </div>
-    
-                <div class="batch-date batch-generation-input">
-                    <input type="date">
-                </div>
-            </div>    
+        
+                    <div class="batch-image batch-generation-input">
+                        {% if blog_skeleton.generate_image %}
+                            <input type="checkbox" class="batch-image-checkbox" checked>
+                        {% else %}
+                            <input type="checkbox" class="batch-image-checkbox">
+                        {% endif %}
+                    </div>
+        
+                    <div class="batch-date batch-generation-input">
+                        <input type="date" name="publish_date" value="{{ blog_skeleton.publish_date }}">
+                        <input type="hidden" name="id" value="{{ blog_skeleton.id }}">
+                    </div>
+                </div>  
+
+            {% endfor %}
         </div>
     </div>
 
@@ -55,7 +66,58 @@
     <button type="button" onclick="addRow(-1, '', '')">Add Row</button>
 
 
+
+
+
+
+    <form id="generate-titles-form" action="{% url 'generate_blog_titles' %}" method="POST">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <button type="submit" id="generate-titles-button">Generate Titles</button>
+    </form>
+
+
+
+
+
+
+
+
     <script>
+
+        // Add event listener to generate batch titles
+        document.getElementById("generate-titles-form").addEventListener("submit", (event) => {
+            const FORM =  document.getElementById("generate-titles-form");
+            const TABLE = document.getElementById("batch-generation-body");
+
+            const TOTAL_FORMS = document.getElementById("id_form-TOTAL_FORMS");
+            TOTAL_FORMS.value = TABLE.children.length;
+
+            for(let i = 0; i < TABLE.children.length; i++) {
+                
+                var id = TABLE.children[i].children[3].children[1].value;
+
+                var title = TABLE.children[i].children[0].children[0].innerText;
+                var topic = TABLE.children[i].children[1].children[0].innerText;
+                var image = TABLE.children[i].children[2].children[0].checked + "";
+                var publishDate = TABLE.children[i].children[3].children[0].value;
+
+                FORM.innerHTML += `<input name='form-${i}-id' value='${id}'>`;
+                FORM.innerHTML += `<input name='form-${i}-title' value='${title}'>`;
+                FORM.innerHTML += `<input name='form-${i}-topic' value='${topic}'>`;
+                FORM.innerHTML += `<input name='form-${i}-generate_image' value='${image}'>`;
+                FORM.innerHTML += `<input name='form-${i}-publish_date' value='${publishDate}'>`;;
+            }
+        });
+
+
+
+
+
+
+
+
+
         document.querySelectorAll(".batch-text-input").forEach(addInputListeners);
 
         function addRow(index, titleText, topicText) {
@@ -84,8 +146,10 @@
                     </div>
         
                     <div class="batch-date batch-generation-input">
-                        <input type="date">
+                        <input type="date" name="publish_date">
+                        <input type="hidden" name="id">
                     </div>
+
                 </div>`;
 
             TABLE.innerHTML += newRow;
