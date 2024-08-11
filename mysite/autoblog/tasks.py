@@ -6,7 +6,7 @@ from PIL import Image
 from celery import app
 from openai import OpenAI
 from celery import shared_task
-from .models import User, Member, Blog, BlogSkeleton
+from .models import User, Member, Blog
 from .errors import BlogGenerationError
 from django.core.files.base import ContentFile
 
@@ -32,48 +32,6 @@ def generate_blog_and_header_image(id='', username='', title='', generate_image=
         blog.delete()
         return False
     return True
-
-
-@shared_task
-def generate_blog_titles_task(username='', values=''):
-
-    ids = values["ids"]
-    titles = values["titles"]
-    topics = values["topics"]
-    generate_images = values["generate_images"]
-    publish_dates = values["publish_dates"]
-
-    user = User.objects.get(username=username)
-    member = Member.objects.get(user=user)
-    blog_skeletons = BlogSkeleton.objects.filter(author=member)
-
-    for i in range(len(ids)):
-        try:
-            blog_skeleton = blog_skeletons.get(id=ids[i])
-        except BlogSkeleton.DoesNotExist:
-            blog_skeleton = BlogSkeleton.objects.create(author=member, id=secrets.token_hex(20), title=titles[i], topic=topics[i], generate_image=True if generate_images[i] == "true" else False, publish_date=publish_dates[i])
-
-        try:
-
-            print(blog_skeleton.topic, flush=True)
-
-            if blog_skeleton.topic == "" and blog_skeleton.title == "":
-                blog_skeleton.topic = generate_blog_topic(company_type=member.company_type)
-                blog_skeleton.save()
-
-            if blog_skeleton.title == "":
-                blog_skeleton.title = generate_blog_title(topic=blog_skeleton.topic)
-                blog_skeleton.save()
-
-        except openai.APIError as e:
-            raise BlogGenerationError("Error generating blog titles and topics")
-        
-    return True
-
-
-
-
-
 
 # HELPER METHODS:
 #########################################################################################
@@ -176,25 +134,4 @@ def write_section(section='', subheading='', outline='', blog=''):
                     150 words. Also use language that an 8th grader can understand. \
                     Make sure it is SEO optimized."}])
     generated_section = completion.choices[0].message.content
-    return generated_section  
-
-def generate_blog_topic(company_type=''):
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. \
-                    You are an expert copywriter who creates blog topics for a \
-                    living. Create a catchy blog topic for a {company_type} company. \
-                    Just return this topic. DO NOT put it in quotation marks"}])
-    topic = completion.choices[0].message.content
-    return topic  
-
-def generate_blog_title(topic=''):
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{'role':'user', "content": f"Please ignore all previous instructions. \
-                    You are an expert copywriter who creates blog titles for a \
-                    living. Create a catchy blog title for the topic {topic}. \
-                    Just return this title. DO NOT put it in quotation marks. \
-                    This title is meant for a 5 section blog."}])
-    title = completion.choices[0].message.content
-    return title  
+    return generated_section 

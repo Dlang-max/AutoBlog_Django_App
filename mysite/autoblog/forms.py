@@ -58,11 +58,4 @@ class CustomBlogImageForm(Form):
     image = forms.ImageField()
 
 
-class BlogSkeletonForm(Form):
-    id = forms.CharField(required=False, max_length=20)
-    title = forms.CharField(required=False)
-    topic = forms.CharField(required=False)
-    generate_image = forms.CharField()
-    publish_date = forms.DateField(required=False)
-
 

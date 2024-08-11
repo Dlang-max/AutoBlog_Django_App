@@ -9,7 +9,7 @@ from celery.result import AsyncResult
 from django.core.mail import EmailMessage
 from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, BlogSkeletonForm
 from django.forms import formset_factory 
-from .models import Member, Blog, User, BlogSkeleton
+from .models import Member, Blog, User
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import member_required
 from .tasks import generate_blog_and_header_image, generate_blog_titles_task
@@ -19,110 +19,11 @@ from django.core.files.base import ContentFile
 from PIL import Image
 from autoblog.convert_blog_to_docx import *
 import secrets
-from datetime import datetime
-
-
 from django.template.defaulttags import register
 
 @register.filter
 def get_range(value):
     return range(value)
-
-
-# @login_required(login_url='/login')
-# def automate_blog_generation(request):
-    
-#     if request.method == "POST":
-#         user = request.user
-#         username = user.username
-        
-#         member, created = Member.objects.get_or_create(user=user)
-#         if created:
-#             user.is_member = True
-#             user.save()
-
-#         current_blog_publish_date = datetime.now().date()
-#         ratio = 30 // member.blogs_remaining
-
-#         for i in range(member.blogs_remaining):
-#             blog = Blog.objects.create(id=secrets.token_hex(20), author=member)
-#             blog.title = title
-#             task = generate_blog_and_header_image.delay(id=blog.id, username=username, title=title, generate_image=generate_image)
-#             blog.task_id = task.id
-#             blog.save()
-
-
-
-
-
-
-
-
-
-
-
-
-@login_required(login_url='/login')
-def generate_blog_titles(request):
-    if request.method == "POST":
-        
-        user = request.user
-        member, created = Member.objects.get_or_create(user=user)
-        if created:
-            user.is_member = True
-            user.save()
-
-        BlogSkeletonFormSet = formset_factory(BlogSkeletonForm, extra=0)
-        formset = BlogSkeletonFormSet(request.POST)
-
-
-        print(formset.is_valid(), flush=True)
-
-        if formset.is_valid():
-            values = {"ids" : [], "titles" : [], "topics" : [], "generate_images" : [], "publish_dates" : []}
-            for form in formset:
-                values["ids"].append(form.cleaned_data["id"])
-                values["titles"].append(form.cleaned_data["title"])
-                values["topics"].append(form.cleaned_data["topic"])
-                values["generate_images"].append(form.cleaned_data["generate_image"])
-                values["publish_dates"].append(form.cleaned_data["publish_date"])
-
-            task = generate_blog_titles_task.delay(username=user.username, values=values)
-    return redirect("generate_blog_batch")            
-
-
-
-
-        
-
-    
-
-
-
-
-
-
-
-
-
-
-@login_required(login_url='/login')
-def generate_blog_batch(request):
-    user = request.user
-    member, created = Member.objects.get_or_create(user=user)
-    if created:
-        user.is_member = True
-        user.save()
-
-    BlogSkeletonFormSet =  formset_factory(BlogSkeletonForm, extra=0)
-    formset = BlogSkeletonFormSet()
-
-    try:
-        blog_skeletons = BlogSkeleton.objects.filter(author=member)
-    except BlogSkeleton.DoesNotExist:
-        pass
-
-    return render(request, "autoblog/bulkDashboard.html", {"member" : member, "formset" : formset, "blog_skeletons" : blog_skeletons})
 
 @login_required(login_url='/login')
 def settings(request):

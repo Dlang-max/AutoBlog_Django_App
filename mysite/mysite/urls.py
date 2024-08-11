@@ -57,8 +57,6 @@ urlpatterns = [
     path('getBlogInfo/<str:blog_id>', member_views.get_blog_info, name='get_blog_info'),
     path('displayBlog/<str:blog_id>', member_views.display_blog, name='display_blog'),
     path('displayBlogQueue/', member_views.display_blog_queue, name='display_blog_queue'),
-    path('generateBlogBatch/', member_views.generate_blog_batch, name='generate_blog_batch'),
-    path('generateBlogBatchTitles/', member_views.generate_blog_titles, name='generate_blog_titles'),
 
 
 
