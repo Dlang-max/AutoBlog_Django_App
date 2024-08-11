@@ -7,12 +7,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from celery.result import AsyncResult
 from django.core.mail import EmailMessage
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, BlogSkeletonForm
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm
 from django.forms import formset_factory 
 from .models import Member, Blog, User
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import member_required
-from .tasks import generate_blog_and_header_image, generate_blog_titles_task
+from .tasks import generate_blog_and_header_image
 from django.http import JsonResponse
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
 from django.core.files.base import ContentFile

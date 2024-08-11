@@ -11,19 +11,11 @@
                 <img src="{% static '/autoblog/blog.svg' %}" alt="blog opened on computer screen" width="25" height="25">
                 <span>Create a Blog</span>
             </a>
-            <a class="dashboard-item-container batch-blog-container" href="{% url 'generate_blog_batch' %}">
-                <img src="{% static '/autoblog/stack.svg' %}" alt="stack of pictures" width="25" height="25">
-                <span>Create a Batch of Blogs</span>
+            <a class="dashboard-item-container queue-blog-container" href="{% url 'display_blog_queue' %}">
+                <img src="{% static '/autoblog/queue.svg' %}" alt="queue with horizontal lines representing elements in queue" width="25" height="25">
+                <span>View Blogs Queued For Publishing</span>
             </a>
         </div>
-        <a class="dashboard-item-container queue-blog-container" href="{% url 'display_blog_queue' %}">
-            <img src="{% static '/autoblog/queue.svg' %}" alt="queue with horizontal lines representing elements in queue" width="25" height="25">
-            <span>View Blogs Queued For Publishing</span>
-        </a>
-        <a class="dashboard-item-container history-blog-container" href="{% url 'generate_blog' %}">
-            <img src="{% static '/autoblog/history.svg' %}" alt="clock with hour hand at 4 and minute hand at 12" width="25" height="25">
-            <span>View Blog History</span>
-        </a>
     </div>
 </div>
 
