@@ -483,6 +483,9 @@ def update_blog_in_db(form, blog):
 
     blog.save()
 
+
+
+
 def update_blog_docx_file(user, blog):
     document = Document()
 
@@ -512,6 +515,8 @@ def update_blog_docx_file(user, blog):
     blog.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
 
 
+
+
 def upload_blog_to_google_drive(user, member, blog):
     manager = GoogleDriveManager()
 
@@ -527,10 +532,6 @@ def upload_blog_to_google_drive(user, member, blog):
 
     # Upload Blog to Google Drive
     blog_folder_id = blog.google_drive_blog_folder_id
-
-    print(blog_folder_id != "", flush=True)
-    print(blog_folder_id == None, flush=True)
-
     if blog_folder_id != "" and manager.folder_exists(blog_folder_id):
         manager.delete_folder(blog_folder_id)
 
@@ -544,11 +545,6 @@ def upload_blog_to_google_drive(user, member, blog):
         manager.create_docx_file(parent_folder_id=blog.google_drive_blog_folder_id, file_name="blog", file_path=blog.docx_blog.path)
 
     return blog_folder_id
-
-
-
-
-
 
 
 def send_google_drive_link_email(email='', key=''):
