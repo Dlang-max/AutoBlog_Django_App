@@ -9,7 +9,6 @@
             <tr>
                 <th class="queue-table-header">Image</th>
                 <th class="queue-table-header">Title</th>
-                <th class="queue-table-header">Publish Date</th>
                 <th class="queue-table-header"></th>
             </tr>
         </thead>
@@ -27,11 +26,7 @@
                     <td>
                         <!-- Title -->
                         <p class="queue-meta-info">{{ blog.title }}</p>
-                    </td>
-                    <td>
-                        <!-- Publish Date -->
-                        <p class="queue-publish-date">{{ blog.publish_date }}</p>
-                    </td>  
+                    </td> 
                     <td class="queue-table-data">
                         <a class="queue-link" href="{% url 'display_blog' blog.id %}">edit</a>
                     </td>

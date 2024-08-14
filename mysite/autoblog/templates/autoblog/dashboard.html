@@ -8,17 +8,58 @@
         {% load static %}
         <div class="creation-container">
             <a class="dashboard-item-container single-blog-container" href="{% url 'generate_blog' %}">
-                <img src="{% static '/autoblog/blog.svg' %}" alt="blog opened on computer screen" width="25" height="25">
-                <span>Create a Blog</span>
-            </a>
-            <a class="dashboard-item-container queue-blog-container" href="{% url 'display_blog_queue' %}">
-                <img src="{% static '/autoblog/queue.svg' %}" alt="queue with horizontal lines representing elements in queue" width="25" height="25">
-                <span>View Blogs Queued For Publishing</span>
+                <div class="blog-icon-text-container">
+                    <div class="blog-icon-container">
+                        <img src="{% static '/autoblog/blog.svg' %}" alt="blog opened on computer screen" width="40" height="40">
+                    </div>
+                    <span>Create Blog</span>
+                </div>
+                <p>Create blogs with the press of a button</p>
             </a>
         </div>
     </div>
 </div>
-
-
-</table>
+{% if blogs %}
+<div class="queue-blog-container">
+    <table class="blog-queue-table">
+        <thead>
+            <tr>
+                <th class="queue-table-header">Image</th>
+                <th class="queue-table-header">Title</th>
+                <th class="queue-table-header"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for blog in blogs %}
+                <tr>            
+                    <td>
+                        <!-- Image -->
+                        {% if blog.image %}
+                            <img class="queue-image" src="{{ blog.image.url }}" alt="blog header image preview">
+                        {% else %}
+                            <div class="blank-image-placeholder"></div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Title -->
+                        <p class="queue-meta-info">{{ blog.title }}</p>
+                    </td> 
+                    <td class="queue-table-data">
+                        <a class="queue-link" href="{% url 'display_blog' blog.id %}">edit</a>
+                    </td>
+                </tr>   
+            {% endfor %}
+            <script>
+                const rows = document.querySelectorAll('.blog-queue-table tbody tr');
+    
+                rows.forEach((row, index) => {    
+                    if (index % 2 === 0) {
+                        row.classList.add("row-gray");
+                    }
+                });
+            </script>         
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock %}

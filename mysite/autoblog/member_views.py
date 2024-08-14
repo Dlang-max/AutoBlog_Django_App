@@ -1,25 +1,26 @@
 import os
 import base64
-import requests
-import json
-from io import BytesIO
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
-from celery.result import AsyncResult
-from django.core.mail import EmailMessage
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm
-from django.forms import formset_factory 
-from .models import Member, Blog, User
-from django.views.decorators.csrf import csrf_exempt
-from .decorators import member_required
-from .tasks import generate_blog_and_header_image
-from django.http import JsonResponse
-from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
-from django.core.files.base import ContentFile
-from PIL import Image
-from autoblog.convert_blog_to_docx import *
 import secrets
+import requests
+from PIL import Image
+from io import BytesIO
+from .models import Member, Blog
+from django.http import JsonResponse
+from celery.result import AsyncResult
+from .decorators import member_required
+from django.core.mail import EmailMessage
+from autoblog.convert_blog_to_docx import *
+from django.shortcuts import render, redirect
+from django.core.files.base import ContentFile
 from django.template.defaulttags import register
+from .tasks import generate_blog_and_header_image
+from autoblog.upload_blog_to_google_drive import GoogleDriveManager
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm
+from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError, GoogleDriveError
 
 @register.filter
 def get_range(value):
@@ -38,7 +39,19 @@ def settings(request):
 
 @login_required(login_url='/login')
 def dashboard(request):
-    return render(request, "autoblog/dashboard.html")
+
+    user = request.user
+    member, created = Member.objects.get_or_create(user=user)
+
+    if created:
+        user.is_member = True
+        user.save()
+    try:
+        blogs = Blog.objects.filter(author=member)
+    except Blog.DoesNotExist:
+        blogs = []
+
+    return render(request, "autoblog/dashboard.html", {"blogs" : blogs})
 
 @login_required(login_url='/login')
 def display_blog(request, blog_id):
@@ -123,7 +136,7 @@ def contact(request):
             email = form.cleaned_data["email"]
             subject = form.cleaned_data["subject"]
             message = form.cleaned_data["message"]
-            EmailMessage(subject + " : " + name, message, "host@yourbloggingassistant.com",[host], reply_to=[email]).send()
+            EmailMessage(subject + " : " + name, message, "host@yourbloggingassistant.com", [host], reply_to=[email]).send()
             return redirect("dashboard")
     
     return render(request, "autoblog/contact.html")
@@ -139,9 +152,7 @@ def member_info(request):
     Returns:
         HttpResponse: The HTTP response sent back to the client. This response will either
         rerender the MemberInfoForm or redirect the user to the /home endpoint.
-
     """
-    
     if request.method == "POST":
         form = MemberInfoForm(request.POST)
         if form.is_valid():
@@ -171,7 +182,6 @@ def member_info(request):
 @login_required(login_url="/login")
 def generate_blog(request):
     user = request.user
-
     member, created = Member.objects.get_or_create(user=user)
     if created:
         user.is_member = True
@@ -192,14 +202,13 @@ def generate_blog(request):
 
             member.blogs_remaining -= 1
             member.save()
-            return redirect("dashboard")
+            return redirect("display_blog", blog_id=blog.id)
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
 
 @csrf_exempt
 def poll_task_status(request, task_id):
     task_result = AsyncResult(task_id)
-
     result = {
         "task_status" : task_result.status
     }
@@ -228,11 +237,9 @@ def member_dashboard(request):
 @user_passes_test(member_required, login_url='member_info')
 def save_blog(request, blog_id):
     if request.method == 'POST':
-        user = request.user
         try:
             blog = Blog.objects.get(id=blog_id)
             form = BlogForm(request.POST)
-            print(request.POST, flush=True)
             if form.is_valid():
                 update_blog_in_db(form=form, blog=blog)
             else:
@@ -242,47 +249,42 @@ def save_blog(request, blog_id):
             pass
     return redirect("display_blog", blog_id=blog.id)
 
+
+
+
+# FIX THIS
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
 def email_blog(request, blog_id):
     user = request.user
-    member = Member.objects.get(user=user)
 
-    try:
-        blog = Blog.objects.get(id=blog_id)
+    if request.method == "POST":
+        try:
+            member = Member.objects.get(user=user)
 
-        document = Document()
+            # SAVE BLOG TO DB
+            blog = Blog.objects.get(id=blog_id)
+            form = BlogForm(request.POST)
+            if form.is_valid():
+                update_blog_in_db(form=form, blog=blog)
 
-        if blog.image:
-            image = Image.open(blog.image)
-            byte_io = BytesIO()
-            image.save(byte_io, format="JPEG")
-            add_image(document, byte_io)
+            # UPDATE BLOG .DOCX FILE
+            update_blog_docx_file(user, blog)
 
-        add_title(document, blog.title)
+            # UPLOAD .DOCX FILE TO GOOGLE DRIVE
+            try:
+               blog_folder_id = upload_blog_to_google_drive(user, member, blog)
+            except GoogleDriveError:
+                print("Error uploading blog to Google Drive")
 
-        for i in range(1, 6):
-            subheading = getattr(blog, f"subheading_{i}")
-            add_subheading(document, subheading)
-            section = getattr(blog, f"section_{i}")
-            add_paragraph(document, section)
+            # EMAIL MEMBER WITH LINK TO BLOG FOLDER
+            send_google_drive_link_email(email=user.email, key=blog_folder_id)
 
-        buffer = BytesIO()
-        document.save(buffer)
-        buffer.seek(0)
-
-        if member.docx_blog:
-            member.docx_blog.delete()
-
-        member.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
-
-    except Blog.DoesNotExist:
+        except Blog.DoesNotExist:
+            return redirect("dashboard")
+        
         return redirect("dashboard")
-    
     return redirect("dashboard")
-
-
-
 
 # POST BLOG
 # BREAK DOWN INTO INDIVIDUAL HELPER METHODS
@@ -332,11 +334,11 @@ def post_blog(request, blog_id):
                 update_blogs_featured_image(member_wordpress_current_post_url=member_wordpress_current_post_url, header=header, media_id=media_id)
             
         except BlogUploadError as e:
-            return redirect("member_dashboard")
+            return redirect("dashboard")
         except ImageUploadError as e:
-            return redirect("member_dashboard")
+            return redirect("dashboard")
         except ChangeFeaturedImageError as e:
-            return redirect("member_dashboard")
+            return redirect("dashboard")
         
         blog.image.delete()
         blog.delete()
@@ -352,7 +354,6 @@ def upload_blog_image(request, blog_id):
         form = CustomBlogImageForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            member = Member.objects.get(user=user)
 
             image = form.cleaned_data["image"]
             image = Image.open(image)
@@ -360,11 +361,9 @@ def upload_blog_image(request, blog_id):
             image.save(webp_image, "webp")
             webp_image.seek(0)
 
-
             try:
                 blog = Blog.objects.get(id=blog_id)
                 blog.image.save(f"{user.username}_blog_header_image.webp", ContentFile(webp_image.read()), save=True)
-
             except Blog.DoesNotExist:
                 pass    
 
@@ -375,14 +374,11 @@ def upload_blog_image(request, blog_id):
 @user_passes_test(member_required, login_url='member_info')
 def delete_blog_image(request, blog_id):
     if request.method == "POST":
-        user = request.user
-        member = Member.objects.get(user=user)
-
-    try:
-        blog = Blog.objects.get(id=blog_id)
-        blog.image.delete()
-    except Blog.DoesNotExist:
-        pass
+        try:
+            blog = Blog.objects.get(id=blog_id)
+            blog.image.delete()
+        except Blog.DoesNotExist:
+            pass
 
     return redirect('display_blog', blog_id=blog.id)
 
@@ -391,8 +387,6 @@ def delete_blog_image(request, blog_id):
 @user_passes_test(member_required, login_url='member_info')
 def delete_blog(request, blog_id):
     if request.method == 'POST':
-        user = request.user
-        member = Member.objects.get(user=user)
         try:
             blog = Blog.objects.get(id=blog_id)
             blog.image.delete()
@@ -488,3 +482,80 @@ def update_blog_in_db(form, blog):
         setattr(blog, f"section_{i}", section)     
 
     blog.save()
+
+def update_blog_docx_file(user, blog):
+    document = Document()
+
+    # Add image to docx file
+    if blog.image:
+        image = Image.open(blog.image)
+        image = image.convert("RGB")
+        byte_io = BytesIO()
+        image.save(byte_io, format="JPEG")
+        add_image(document, byte_io)
+
+    # Add blog content to docx file
+    add_title(document, blog.title)
+    for i in range(1, 6):
+        subheading = getattr(blog, f"subheading_{i}")
+        add_subheading(document, subheading)
+        section = getattr(blog, f"section_{i}")
+        add_paragraph(document, section)
+
+    buffer = BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+
+    if blog.docx_blog:
+        blog.docx_blog.delete()
+
+    blog.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
+
+
+def upload_blog_to_google_drive(user, member, blog):
+    manager = GoogleDriveManager()
+
+    # Upload Client Folder to Google Drive 
+    member_folder_id = member.google_drive_folder_id
+    if member_folder_id == '' or not manager.folder_exists(member_folder_id):
+        member_folder_id = manager.create_folder(folder_name=user.email)
+
+        if member_folder_id:
+            member.google_drive_folder_id = member_folder_id
+            manager.share_folder(folder_id=member.google_drive_folder_id, user_email=user.email)
+            member.save()
+
+    # Upload Blog to Google Drive
+    blog_folder_id = blog.google_drive_blog_folder_id
+
+    print(blog_folder_id != "", flush=True)
+    print(blog_folder_id == None, flush=True)
+
+    if blog_folder_id != "" and manager.folder_exists(blog_folder_id):
+        manager.delete_folder(blog_folder_id)
+
+    blog_folder_id = manager.create_folder(folder_name=blog.title, parent_folder_id=member.google_drive_folder_id)
+    if blog_folder_id:
+        blog.google_drive_blog_folder_id = blog_folder_id
+        blog.save()
+
+        if blog.image:
+            manager.create_image_file(parent_folder_id=blog.google_drive_blog_folder_id, file_name="image", file_path=blog.image.path)
+        manager.create_docx_file(parent_folder_id=blog.google_drive_blog_folder_id, file_name="blog", file_path=blog.docx_blog.path)
+
+    return blog_folder_id
+
+
+
+
+
+
+
+def send_google_drive_link_email(email='', key=''):
+    host = os.environ.get("EMAIL_HOST_USER")
+    subject = "Google Docs Blog"
+    html_message = render_to_string("autoblog/googleDriveLink.html", {"key" : key})
+
+    message = EmailMessage(subject=subject, body=html_message, from_email=host, to=[email])
+    message.content_subtype = "html"
+    message.send()

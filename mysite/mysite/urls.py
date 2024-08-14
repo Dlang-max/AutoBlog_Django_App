@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from autoblog import auth_views, member_views, stripe_views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -59,6 +59,7 @@ urlpatterns = [
     path('displayBlogQueue/', member_views.display_blog_queue, name='display_blog_queue'),
 
 
+    path('accounts/', include('allauth.urls')),
 
 
 
