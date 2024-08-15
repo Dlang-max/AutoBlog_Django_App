@@ -5,8 +5,8 @@ services:
       dockerfile: ./docker/prod/Dockerfile
     env_file:
       - .env
-    expose:
-      - 8000
+    ports:
+      - "8000:8000"
     volumes:
       - ./:/app
       - static_volume:/app/web/staticfiles

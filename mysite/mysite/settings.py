@@ -180,7 +180,6 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
-            'redirect_uri' : "http://localhost:1337/accounts/google/login/callback/",
         }
     }
 }
