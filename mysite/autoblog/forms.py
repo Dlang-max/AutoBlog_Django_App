@@ -19,7 +19,7 @@ class MemberInfoForm(ModelForm):
         fields = ["wordpress_url", "wordpress_username", "wordpress_application_password"]
         
 class GenerateBlogForm(Form):
-    generate_ai_image = forms.CharField()
+    generate_ai_image = forms.CharField(max_length=100)
     title = forms.CharField(max_length=200)
 
     fields = ["title", "generate_ai_image"]
@@ -56,6 +56,18 @@ class ContactForm(Form):
 
 class CustomBlogImageForm(Form):
     image = forms.ImageField()
+
+
+
+class GenerateBlogBatchForm(Form):
+    CHOICES = [
+        ('1', 'Titles'),
+        ('2', 'Topics'),
+    ]
+
+    generate_ai_images = forms.CharField(max_length=100)
+    title_or_topic = forms.ChoiceField(choices=CHOICES)
+    titles_or_topics = forms.CharField(widget=forms.Textarea)
 
 
 

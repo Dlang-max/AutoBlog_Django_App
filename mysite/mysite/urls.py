@@ -56,7 +56,11 @@ urlpatterns = [
     path('dashboard/', member_views.dashboard, name='dashboard'),
     path('getBlogInfo/<str:blog_id>', member_views.get_blog_info, name='get_blog_info'),
     path('displayBlog/<str:blog_id>', member_views.display_blog, name='display_blog'),
-    path('displayBlogQueue/', member_views.display_blog_queue, name='display_blog_queue'),
+    path('generateBlogBatch/', member_views.generate_blog_batch, name='generate_blog_batch'),
+
+
+
+    path('toggleAutomatedMode/', member_views.toggle_automated_mode, name='toggle_automated_mode'),
 
 
     path('accounts/', include('allauth.urls')),

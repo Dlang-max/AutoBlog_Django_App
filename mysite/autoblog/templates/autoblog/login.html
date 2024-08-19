@@ -14,17 +14,16 @@
         </div>
         <button id="register-button" class="submit-button" type="submit">Sign in</button>
         <p id="redirect-sign-in">Don't have an account? <a href="{% url 'register' %}">Sign up now</a></p>
-    </form>
-</div>
-
-
-<div class="google-btn">
-    <a href="{% provider_login_url 'google' %}">
-        <div class="google-icon-wrapper">
-            <img class="google-icon"
-                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
+        <div class="google-login-container">
+            <form method="POST" class="google-login-form">
+                {% csrf_token %}
+                <button type="submit" class="google-login-btn" formaction="{% url 'google_login' %}">
+                    {% load static %}
+                    <img src="{% static '/autoblog/google.svg' %}" class="google-icon" alt="Google Icon" width="30" height="30">
+                    <p class="google-login-text">Login with Google</p>
+                </button>
+            </form>
         </div>
-        <p class="btn-text"><b>Sign in with Google</b></p>
-    </a>
+    </form>
 </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 import openai
-import secrets
 import requests
 from io import BytesIO
 from PIL import Image
@@ -7,8 +6,12 @@ from celery import app
 from openai import OpenAI
 from celery import shared_task
 from .models import User, Member, Blog
+from datetime import timedelta
 from .errors import BlogGenerationError
+from django.utils.timezone import now
 from django.core.files.base import ContentFile
+from django.db.models import F, ExpressionWrapper, FloatField
+
 
 client = OpenAI()
 
@@ -28,10 +31,74 @@ def generate_blog_and_header_image(id='', username='', title='', generate_image=
 
     except BlogGenerationError as e:
         member.blogs_remaining += 1
+        member.save()
+
         blog.image.delete()
         blog.delete()
+
         return False
     return True
+
+@shared_task
+def generate_blog_from_title_or_topic(id='', username='', title_or_topic='', titles_or_topics='', generate_images="False"):
+    user = User.objects.get(username=username)
+    member = Member.objects.get(user=user)
+    blog = Blog.objects.get(id=id)
+
+    try:
+        title = titles_or_topics
+        if title_or_topic == "Topic":
+            title = generate_blog_title(topic=titles_or_topics)
+            blog.title = title
+            blog.save()
+        else:
+            blog.title = title
+            blog.save()
+
+        # Generate Blog's Image
+        if generate_images == "True":
+            generate_blog_image(username=username, title=title, blog=blog)
+
+        # Generate Blog
+        generate_blog(title=title, blog=blog)
+
+    except BlogGenerationError as e:
+        member.blogs_remaining += 1
+        member.save()
+
+        blog.image.delete()
+        blog.delete()
+
+        return False
+    return True
+
+@shared_task
+# post blogs for users that need them posted
+def automated_blog_posting():
+
+    members = Member.objects.filter(
+        on_automated_plan=True, 
+        automated_mode_on=True, 
+        wordpress_linked=True
+    ).annotate(
+        days_since_last_pub=ExpressionWrapper(
+            (now() - F("last_publish_date")) / timedelta(days=1), 
+            output_field=FloatField()
+        )
+    ).filter(
+        days_since_last_pub__gte=F("publish_date_ratio")
+    )
+
+    for member in members:
+        # If member has generated blogs
+
+        # If member has blog skeletons
+
+        # If member has nothing
+        pass
+
+    return True
+
 
 # HELPER METHODS:
 #########################################################################################
@@ -74,6 +141,7 @@ def generate_blog_image(username='', title='', blog=None):
         # Save image
         blog.image.save(f"{username}_blog_header_image.webp", ContentFile(webp_image.read()), save=True)
     except openai.APIError as e:
+        print(e, flush=True)
         raise BlogGenerationError("Error generating blog image")
 
 # CALLS TO OPENAI API:
@@ -89,6 +157,20 @@ def generate_image(title=''):
 
     image_url = response.data[0].url
     return image_url
+
+
+def generate_blog_title(topic=''):
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{'role':'user', "content": f"Please ignore all previous instructions. \
+                You are an expert copywriter who creates blog titles for a living. \
+                You have a friendly tone of voice. You have a conversational writing \
+                style. Create an engaging and SEO optimized title for a blog covering \
+                the topic: {topic}. Please only write the title of the blog DO NOT \
+                put the title in quotation marks. Write these titles for a five \
+                section blog."}])
+    title = completion.choices[0].message.content
+    return title
 
 def write_blog_outline(title=''):
     completion = client.chat.completions.create(

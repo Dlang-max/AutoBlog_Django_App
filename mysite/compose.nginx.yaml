@@ -30,7 +30,20 @@ services:
       - media_volume:/app/web/mediafiles
     env_file:
       - .env
-    command: celery -A mysite worker --loglevel=INFO --concurrency=4
+    command: celery -A mysite worker --loglevel=INFO --concurrency=10
+    depends_on:
+      - redis
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
+    volumes:
+      - ./:/app
+      - media_volume:/app/web/mediafiles
+    env_file:
+      - .env
+    command: celery -A mysite beat --loglevel=INFO
     depends_on:
       - redis
 

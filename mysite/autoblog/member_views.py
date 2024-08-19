@@ -4,7 +4,7 @@ import secrets
 import requests
 from PIL import Image
 from io import BytesIO
-from .models import Member, Blog
+from .models import Member, Blog, BlogSkeleton
 from django.http import JsonResponse
 from celery.result import AsyncResult
 from .decorators import member_required
@@ -13,18 +13,13 @@ from autoblog.convert_blog_to_docx import *
 from django.shortcuts import render, redirect
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
-from .tasks import generate_blog_and_header_image
+from .tasks import generate_blog_and_header_image, generate_blog_from_title_or_topic
 from autoblog.upload_blog_to_google_drive import GoogleDriveManager
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
-
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, GenerateBlogBatchForm
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError, GoogleDriveError
-
-@register.filter
-def get_range(value):
-    return range(value)
 
 @login_required(login_url='/login')
 def settings(request):
@@ -38,6 +33,25 @@ def settings(request):
     return render(request, "autoblog/settings.html", {"member" : member})
 
 @login_required(login_url='/login')
+@user_passes_test(member_required, login_url='member_info')
+def toggle_automated_mode(request):
+    if request.method == "POST":
+        user = request.user
+        try:
+            member = Member.objects.get(user=user)
+
+            if not member.on_automated_plan:
+                return redirect("dashboard")
+            
+            member.automated_mode_on = not member.automated_mode_on
+            member.save()
+        except Member.DoesNotExist:
+            pass
+
+    return redirect("dashboard")
+
+
+@login_required(login_url='/login')
 def dashboard(request):
 
     user = request.user
@@ -48,10 +62,13 @@ def dashboard(request):
         user.save()
     try:
         blogs = Blog.objects.filter(author=member)
+        blog_skeletons = BlogSkeleton.objects.filter(author=member)
     except Blog.DoesNotExist:
         blogs = []
+    except BlogSkeleton.DoesNotExist:
+        blog_skeletons = []
 
-    return render(request, "autoblog/dashboard.html", {"blogs" : blogs})
+    return render(request, "autoblog/dashboard.html", {"blogs" : blogs, "blog_skeletons" : blog_skeletons, "member" : member})
 
 @login_required(login_url='/login')
 def display_blog(request, blog_id):
@@ -68,20 +85,6 @@ def display_blog(request, blog_id):
     form = BlogForm()
     return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form})
 
-
-@login_required(login_url='/login')
-def display_blog_queue(request):
-    try:
-        user = request.user
-        member = Member.objects.get(user=user)
-        blogs = Blog.objects.filter(author=member)
-
-    except Member.DoesNotExist:
-        return redirect('dashboard')
-    except Blog.DoesNotExist:
-        return redirect('dashboard')
-    
-    return render(request, "autoblog/blogQueue.html", {"blogs" : blogs})
 
 @login_required(login_url='/login')
 def get_blog_info(request, blog_id):
@@ -206,6 +209,60 @@ def generate_blog(request):
         
     return render(request, "autoblog/generateBlog.html", {"member": member})
 
+
+# GENERATE BLOG BATCH
+@login_required(login_url="/login")
+def generate_blog_batch(request):
+    if request.method == "POST":
+        user = request.user
+        member, created = Member.objects.get_or_create(user=user)
+        if created:
+            user.is_member = True
+            user.save()
+
+        # Check if form is valid
+        form = GenerateBlogBatchForm(request.POST)
+        if form.is_valid():
+            username = user.username
+            generate_images = request.POST.get("generate_ai_images", 'False')
+
+            title_or_topic = form.cleaned_data["title_or_topic"]
+            title_or_topic = "Title" if title_or_topic == '1' else "Topic"
+
+            titles_or_topics = form.cleaned_data["titles_or_topics"]
+
+            lines = titles_or_topics.split('\n')
+            
+            # Generate blogs with celery task
+            for line in lines[-100:]:
+                if not line.strip():
+                    continue
+                elif member.blogs_remaining > 0:
+                    # create blog
+                    blog = Blog.objects.create(id=secrets.token_hex(20), author=member)
+                    task = generate_blog_from_title_or_topic.delay(id=blog.id, username=username, title_or_topic=title_or_topic, titles_or_topics=line, generate_images=generate_images)
+                    blog.task_id = task.id
+                    blog.save()
+
+                    member.blogs_remaining -= 1
+                    member.save()
+                else:
+                    # create blog skeleton
+                    blog_skeleton = BlogSkeleton.objects.create(author=member)
+                    blog_skeleton.generate_ai_image = True if generate_images == "True" else False
+
+                    if title_or_topic == "Title":
+                        blog_skeleton.title = line
+                    else:
+                        blog_skeleton.topic = line
+                    blog_skeleton.save()
+
+        return redirect("dashboard")
+
+
+    return render(request, "autoblog/generateBatch.html")
+
+
 @csrf_exempt
 def poll_task_status(request, task_id):
     task_result = AsyncResult(task_id)
@@ -250,9 +307,6 @@ def save_blog(request, blog_id):
     return redirect("display_blog", blog_id=blog.id)
 
 
-
-
-# FIX THIS
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
 def email_blog(request, blog_id):
