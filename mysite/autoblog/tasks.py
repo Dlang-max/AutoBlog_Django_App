@@ -6,7 +6,7 @@ import base64
 from celery import app
 from openai import OpenAI
 from celery import shared_task
-from .models import User, Member, Blog, BlogSkeleton, BlogHistory
+from .models import User, Member, Blog, BlogSkeleton, BlogHistory, AutomatedBlogging
 from datetime import timedelta
 from .errors import BlogGenerationError
 from django.utils.timezone import now
@@ -78,6 +78,14 @@ def generate_blog_from_title_or_topic(id='', username='', title_or_topic='', tit
 
 @shared_task
 def automated_blog_posting():
+
+    if AutomatedBlogging.objects.last().running:
+        return False
+
+    autoblog = AutomatedBlogging.objects.last()
+    autoblog.running = True
+    autoblog.save()
+
     members = Member.objects.filter(
         on_automated_plan=True, 
         automated_mode_on=True, 
@@ -95,28 +103,36 @@ def automated_blog_posting():
     blog_skeletons = BlogSkeleton.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)))
 
     for member in members:
+        print(member.user.username, flush=True)
         member_blogs = blogs.filter(author=member)
         member_blog_skeletons = blog_skeletons.filter(author=member)
 
         # If member has generated blogs
         try:
             if member_blogs.count() > 0:
-                blog = member_blogs.last()
+                blog = member_blogs.first()
                 post_blog(blog=blog)
+                print("Posting Blog: ", blog.title, flush=True)
             
             # If member has blog skeletons
-            elif member_blog_skeletons.count() > 0:
-                blog_skeleton = member_blog_skeletons.last()
+            elif member_blog_skeletons.count() > 0 and member.blogs_remaining > 0:
+                blog_skeleton = member_blog_skeletons.first()
                 generate_and_post_blog_to_wordpress(member=member, blog_skeleton=blog_skeleton)
+                print("Generating and Posting Blog: ", blog_skeleton.title, flush=True)
 
             # If member has nothing
             elif member.blogs_remaining > 0:
                 generate_and_post_blog_to_wordpress(member=member)
+                print("Generating Blog From Scratch", flush=True)
 
             member.last_publish_date = now()
             member.save()
         except BlogUploadError:
             continue
+
+    
+    autoblog.running = False
+    autoblog.save()
 
     return True
 
@@ -172,18 +188,30 @@ def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):
     try:
         if not blog_skeleton:
             title = generate_blog_title(topic=member.company_type)
+            blog.title = title
             generate_blog(title=title, blog=blog)
             generate_blog_image(username=member.user.username, title=title, blog=blog)
-            member.blogs_remaining -= 1
-
         else:
-            generate_blog(title=blog_skeleton.title, blog=blog)
+            title = blog_skeleton.title
+            blog.title = title
+            generate_blog(title=title, blog=blog)
             if blog_skeleton.generate_ai_image:
                 generate_blog_image(username=member.user.username, title=blog_skeleton.title, blog=blog)
+            blog_skeleton.delete()
 
+
+
+        member.blogs_remaining -= 1
+        member.save()
+
+        blog.save()
     except openai.APIError:
+        member.blogs_remaining += 1
+        member.save()
         blog.delete()
     except BlogGenerationError:
+        member.blogs_remaining += 1
+        member.save()
         blog.delete()
     
     # Post Blog

@@ -86,3 +86,6 @@ class BlogHistory(models.Model):
 
     title = models.CharField(max_length=200, default="")
     wordpress_post_id = models.CharField(max_length=100,default="")
+
+class AutomatedBlogging(models.Model):
+    running = models.BooleanField(default=False)
