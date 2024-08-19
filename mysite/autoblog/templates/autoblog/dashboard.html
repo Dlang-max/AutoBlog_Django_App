@@ -131,6 +131,46 @@
     </div>
 {% endif %}
 
+{% if blog_history %}
+    <div class="queue-blog-container">
+        <div class="blog-table-title-container">
+            <h3 class="blog-table-title">Published Blogs</h3>
+        </div>
+        <table class="blog-queue-table">
+            <thead>
+                <tr>
+                    <th class="queue-table-header">Title</th>
+                    <th class="queue-table-header"></th>
+                    <th class="queue-table-header"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blog in blog_history %}
+                    <tr>            
+                        <td>
+                            <p class="queue-meta-info">{{ blog.title }}</p>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            <a class="queue-link queue-link-delete" href="{% url 'delete_wordpress_blog' blog.wordpress_post_id %}">Delete from your website</a>
+                        </td> 
+                    </tr>   
+                {% endfor %}
+                <script>
+                    const blog_history_rows = document.querySelectorAll('.blog-queue-table tbody tr');
+        
+                    blog_history_rows.forEach((row, index) => {    
+                        if (index % 2 === 0) {
+                            row.classList.add("row-gray");
+                        }
+                    });
+                </script>         
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
 <!-- History (last 10 posted blogs) -->
 
 {% endblock %}

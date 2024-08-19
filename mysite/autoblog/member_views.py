@@ -4,8 +4,9 @@ import secrets
 import requests
 from PIL import Image
 from io import BytesIO
-from .models import Member, Blog, BlogSkeleton
+from .models import Member, Blog, BlogSkeleton, BlogHistory
 from django.http import JsonResponse
+from datetime import datetime
 from celery.result import AsyncResult
 from .decorators import member_required
 from django.core.mail import EmailMessage
@@ -43,7 +44,11 @@ def toggle_automated_mode(request):
             if not member.on_automated_plan:
                 return redirect("dashboard")
             
-            member.automated_mode_on = not member.automated_mode_on
+            if not member.automated_mode_on:
+                member.automated_mode_on = True
+                member.last_publish_date = datetime(1945, 8, 6, 12, 0, 0)
+            else:
+                member.automated_mode_on = False
             member.save()
         except Member.DoesNotExist:
             pass
@@ -63,12 +68,13 @@ def dashboard(request):
     try:
         blogs = Blog.objects.filter(author=member)
         blog_skeletons = BlogSkeleton.objects.filter(author=member)
+        blog_history = BlogHistory.objects.filter(author=member)
     except Blog.DoesNotExist:
         blogs = []
     except BlogSkeleton.DoesNotExist:
         blog_skeletons = []
 
-    return render(request, "autoblog/dashboard.html", {"blogs" : blogs, "blog_skeletons" : blog_skeletons, "member" : member})
+    return render(request, "autoblog/dashboard.html", {"blogs" : blogs, "blog_skeletons" : blog_skeletons, "blog_history" : blog_history, "member" : member})
 
 @login_required(login_url='/login')
 def display_blog(request, blog_id):
@@ -337,12 +343,14 @@ def email_blog(request, blog_id):
         except Blog.DoesNotExist:
             return redirect("dashboard")
         
-        return redirect("dashboard")
+        return redirect("display_blog", blog_id=blog.id)
     return redirect("dashboard")
 
+
+# WORDPRESS METHODS
+#==================================================================================================
+
 # POST BLOG
-# BREAK DOWN INTO INDIVIDUAL HELPER METHODS
-# ADD AS ASYNC TASK????
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
 def post_blog(request, blog_id):
@@ -394,8 +402,46 @@ def post_blog(request, blog_id):
         except ChangeFeaturedImageError as e:
             return redirect("dashboard")
         
+        blog_histories = BlogHistory.objects.filter(author=member).order_by('-id')
+        if blog_histories.count() >= 10:
+            blog_histories.last().delete()
+        
+        # Create a blog history entry
+        blog_history = BlogHistory.objects.create(author=member, title=blog.title, wordpress_post_id=post_id)
+        blog_history.save()
+
         blog.image.delete()
         blog.delete()
+
+    return redirect("dashboard")
+
+
+# DELETE BLOG FROM WORDPRESS
+@login_required(login_url="/login")
+@user_passes_test(member_required, login_url='member_info')
+def delete_wordpress_blog(request, wordpress_post_id):
+    try:
+        user = request.user
+        member = Member.objects.get(user=user)
+        blog = BlogHistory.objects.filter(author=member).get(wordpress_post_id=wordpress_post_id)
+
+        member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
+        member_wordpress_username = member.wordpress_username
+        member_wordpress_application_password = member.wordpress_application_password
+
+        # Build HTTP Header for POSTing to WordPress REST API
+        credentials = member_wordpress_username + ':' + member_wordpress_application_password
+        token = base64.b64encode(credentials.encode())
+        header = {"Authorization":"Basic " + token.decode("utf-8")}
+
+        try:
+            delete_blog_from_wordpress(member_wordpress_post_url=member_wordpress_post_url, header=header, post_id=blog.wordpress_post_id)
+            blog.delete()
+
+        except DeletingBlogError:
+            pass
+    except BlogHistory.DoesNotExist:
+        pass
 
     return redirect("dashboard")
 

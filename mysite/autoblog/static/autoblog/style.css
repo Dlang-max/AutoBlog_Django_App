@@ -768,9 +768,20 @@ ul::-webkit-details-marker {
     color: var(--button-blue);
 }
 
+
 .queue-link:hover {
     cursor: pointer;
     color: var(--button-hover-blue);
+}
+
+.queue-link-delete {
+    transition: 200ms;
+    color: var(--button-red);
+}
+
+
+.queue-link-delete:hover {
+    color: var(--button-hover-red);
 }
 
 /*

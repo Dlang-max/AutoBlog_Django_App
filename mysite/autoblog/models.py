@@ -80,3 +80,9 @@ class BlogSkeleton(models.Model):
     title = models.CharField(max_length=200, default="")
     topic = models.CharField(max_length=200, default="")
     generate_ai_image = models.BooleanField(default=False)
+
+class BlogHistory(models.Model):
+    author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="blog_history")
+
+    title = models.CharField(max_length=200, default="")
+    wordpress_post_id = models.CharField(max_length=100,default="")

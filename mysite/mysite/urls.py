@@ -40,6 +40,7 @@ urlpatterns = [
 
     path('saveBlog/<str:blog_id>', member_views.save_blog, name='save_blog'),
     path('postBlog/<str:blog_id>', member_views.post_blog, name='post_blog'),
+    path('deleteWordPressBlog/<str:wordpress_post_id>', member_views.delete_wordpress_blog, name='delete_wordpress_blog'),
     path('emailBlog/<str:blog_id>', member_views.email_blog, name='email_blog'),
     path('deleteBlog/<str:blog_id>', member_views.delete_blog, name='delete_blog'),
     path('uploadBlogImage/<str:blog_id>', member_views.upload_blog_image, name='upload_blog_image'),

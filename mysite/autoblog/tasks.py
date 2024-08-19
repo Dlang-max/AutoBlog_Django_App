@@ -2,15 +2,19 @@ import openai
 import requests
 from io import BytesIO
 from PIL import Image
+import base64
 from celery import app
 from openai import OpenAI
 from celery import shared_task
-from .models import User, Member, Blog
+from .models import User, Member, Blog, BlogSkeleton, BlogHistory
 from datetime import timedelta
 from .errors import BlogGenerationError
 from django.utils.timezone import now
+from redis import Redis
 from django.core.files.base import ContentFile
-from django.db.models import F, ExpressionWrapper, FloatField
+from django.db.models import F, ExpressionWrapper, FloatField, Subquery
+from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
+
 
 
 client = OpenAI()
@@ -73,9 +77,7 @@ def generate_blog_from_title_or_topic(id='', username='', title_or_topic='', tit
     return True
 
 @shared_task
-# post blogs for users that need them posted
 def automated_blog_posting():
-
     members = Member.objects.filter(
         on_automated_plan=True, 
         automated_mode_on=True, 
@@ -89,15 +91,187 @@ def automated_blog_posting():
         days_since_last_pub__gte=F("publish_date_ratio")
     )
 
+    blogs = Blog.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)))
+    blog_skeletons = BlogSkeleton.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)))
+
     for member in members:
+        member_blogs = blogs.filter(author=member)
+        member_blog_skeletons = blog_skeletons.filter(author=member)
+
         # If member has generated blogs
+        try:
+            if member_blogs.count() > 0:
+                blog = member_blogs.last()
+                post_blog(blog=blog)
+            
+            # If member has blog skeletons
+            elif member_blog_skeletons.count() > 0:
+                blog_skeleton = member_blog_skeletons.last()
+                generate_and_post_blog_to_wordpress(member=member, blog_skeleton=blog_skeleton)
 
-        # If member has blog skeletons
+            # If member has nothing
+            elif member.blogs_remaining > 0:
+                generate_and_post_blog_to_wordpress(member=member)
 
-        # If member has nothing
-        pass
+            member.last_publish_date = now()
+            member.save()
+        except BlogUploadError:
+            continue
 
     return True
+
+
+
+def post_blog(blog=None):
+    member = blog.author
+
+    # Get member's WordPress information
+    member_wordpress_post_url = member.wordpress_url + "/wp-json/wp/v2/posts"
+    member_wordpress_media_url = member.wordpress_url + "/wp-json/wp/v2/media"
+    member_wordpress_username = member.wordpress_username
+    member_wordpress_application_password = member.wordpress_application_password
+
+    # Build HTTP Header for POSTing to WordPress REST API
+    credentials = member_wordpress_username + ':' + member_wordpress_application_password
+    token = base64.b64encode(credentials.encode())
+    header = {"Authorization":"Basic " + token.decode("utf-8")}
+
+    try:
+        # Post Blog Content to WordPress
+        post_id = post_blog_to_wordpress(member_wordpress_post_url=member_wordpress_post_url, header=header, blog=blog)
+        member_wordpress_current_post_url = member_wordpress_post_url + '/' + str(post_id)
+
+        # Get and Post Blog's header image to WordPress
+        if blog.image:
+            media_id = post_image_to_wordpress(member_wordpress_media_url=member_wordpress_media_url, header=header, blog=blog)
+
+            # Update Blog's featured image
+            update_blogs_featured_image(member_wordpress_current_post_url=member_wordpress_current_post_url, header=header, media_id=media_id)
+        
+    except BlogUploadError as e:
+        raise BlogUploadError
+    except ImageUploadError as e:
+       raise BlogUploadError
+    except ChangeFeaturedImageError as e:
+       raise BlogUploadError
+    
+    blog_histories = BlogHistory.objects.filter(author=member).order_by('-id')
+    if blog_histories.count() >= 10:
+        blog_histories.last().delete()
+    
+    # Create a blog history entry
+    blog_history = BlogHistory.objects.create(author=member, title=blog.title, wordpress_post_id=post_id)
+    blog_history.save()
+
+    blog.image.delete()
+    blog.delete()
+
+def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):    
+    blog = Blog.objects.create(author=member)
+    # Generate Blog
+    try:
+        if not blog_skeleton:
+            title = generate_blog_title(topic=member.company_type)
+            generate_blog(title=title, blog=blog)
+            generate_blog_image(username=member.user.username, title=title, blog=blog)
+            member.blogs_remaining -= 1
+
+        else:
+            generate_blog(title=blog_skeleton.title, blog=blog)
+            if blog_skeleton.generate_ai_image:
+                generate_blog_image(username=member.user.username, title=blog_skeleton.title, blog=blog)
+
+    except openai.APIError:
+        blog.delete()
+    except BlogGenerationError:
+        blog.delete()
+    
+    # Post Blog
+    try:
+        post_blog(blog=blog)
+    except BlogUploadError:
+        raise BlogUploadError
+
+
+def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
+    blog_content = format_blog(blog=blog)
+
+    try:
+        # Post Blog Content to WordPress
+        post = {
+            "title" : blog.title,
+            "content" : blog_content,
+            "status" : "publish",
+        }
+        post_response = requests.post(member_wordpress_post_url, headers=header, json=post)
+        post_id = post_response.json().get("id")
+    except requests.exceptions.ConnectionError:
+        raise BlogUploadError("Error uploading blog to WordPress")
+    return post_id
+
+def post_image_to_wordpress(member_wordpress_media_url='', header='', blog=None):
+    try:
+        media = {
+            'file': ('header_image.webp', blog.image, 'image/webp'),
+            'status': 'publish'
+        }
+        media_response = requests.post(member_wordpress_media_url, headers=header, files=media)
+        media_id = media_response.json().get('id')
+    except requests.exceptions.ConnectionError:
+        raise ImageUploadError("Error uploading image to WordPress")
+    return media_id
+
+def update_blogs_featured_image(member_wordpress_current_post_url='', header='', media_id=''):
+    try:
+        featured_payload = {
+            'featured_media': media_id
+        }
+        # Update Blog's featured image
+        requests.post(member_wordpress_current_post_url, headers=header, json=featured_payload)
+    except requests.exceptions.ConnectionError:
+        raise ChangeFeaturedImageError("Error changing blog's featured image")
+
+def delete_blog_from_wordpress(member_wordpress_post_url='', header='', post_id=''):
+    current_url = member_wordpress_post_url + f"/{post_id}"
+    try:
+        requests.delete(current_url, headers=header)
+    except requests.exceptions.ConnectionError:
+        raise DeletingBlogError("Error deleting blog")
+
+
+
+
+def format_blog(blog):
+    content = ""
+    for i in range(1, 6):
+        subheading = getattr(blog, f"subheading_{i}")
+        section = getattr(blog, f"section_{i}")
+        content += format_subheading_and_section(format_subheading(subheading), format_section(section))
+
+    return f"<article style=\"font-family: Arial; display: flex; flex-direction: column; align-items: center;\">{content}</article>"
+
+def format_title(title):
+    title_html = f"<h2>{title}</h2>"
+    return title_html
+
+def format_subheading(subheading):
+    subheading_html = f"<h3 style=\"text-align: center;\">{subheading}</h3>"    
+    return subheading_html
+
+def format_section(section):
+    section_html = f"<p> &emsp; {section}</p>"
+    return section_html
+
+def format_subheading_and_section(subheading, section):
+    subheading_and_section_html = f"<section style=\"display: flex; flex-direction: column; align-items: center;\">{subheading} {section}</section> "
+    return subheading_and_section_html
+
+
+
+
+
+
+
 
 
 # HELPER METHODS:
@@ -171,6 +345,7 @@ def generate_blog_title(topic=''):
                 section blog."}])
     title = completion.choices[0].message.content
     return title
+
 
 def write_blog_outline(title=''):
     completion = client.chat.completions.create(
