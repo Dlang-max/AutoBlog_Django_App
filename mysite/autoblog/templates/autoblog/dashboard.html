@@ -8,7 +8,7 @@
         <!-- Button to toggle automated mode -->
         {% if member.on_automated_plan %}
             {% if not member.wordpress_linked %}
-                
+                <p id="redirect-sign-in"><a href="{% url 'member_info' %}">Link </a>your website to activate automated mode</p>
             {% else %}
                 <div class="automated_mode_toggle_container">
                     <form action="{% url 'toggle_automated_mode' %}" method="POST">
