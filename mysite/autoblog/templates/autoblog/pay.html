@@ -6,7 +6,8 @@
 <div class="stripe-form">
 
     <div class="payment-card-container">
-
+        
+        <!-- Regular Starter Plan Card -->
         <div id="good-card" class="payment-card">
             <h2 class="payment-plan">Starter Plan</h2>
             <div class="price">                
@@ -20,11 +21,11 @@
             <form class="payment-card-form" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Good"/>
-                {% if member.membership_level == "none" %}
+                {% if member.membership_level_index < 0 %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Subscribe</button>
-                {% elif member.membership_level == "Good" %}
+                {% elif member.membership_level_index == 0 %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
-                {% elif member.membership_level == "Better" or member.membership_level == "Best" %}
+                {% elif member.membership_level_index > 0 %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
                 {% endif %}
             </form>
@@ -42,8 +43,7 @@
         </div>
 
 
-
-
+        <!-- Regular Pro Plan Card -->
         <div id="better-card" class="payment-card">
             <h2 class="payment-plan">Pro Plan</h2>
             <div class="price">                
@@ -57,13 +57,13 @@
             <form class="payment-card-form" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Better"/>
-                {% if member.membership_level == "none" %}
+                {% if member.membership_level_index == -1 %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Subscribe</button>
-                {% elif member.membership_level == "Good" %}
+                {% elif member.membership_level_index < 1 %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Upgrade</button>
-                {% elif member.membership_level == "Better" %}
+                {% elif member.membership_level_index == 1 %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
-                {% elif member.membership_level == "Best" %}
+                {% elif member.membership_level_index > 1 %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
                 {% endif %}
             </form>
@@ -82,7 +82,7 @@
 
 
 
-
+        <!-- Regular Premium Plan Card -->
         <div id="best-card" class="payment-card">
             <h2 class="payment-plan">Premium Plan</h2>
             <div class="price">                
@@ -96,12 +96,14 @@
             <form class="payment-card-form" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="payment" value="Best"/>
-                {% if member.membership_level == "none" %}
+                {% if member.membership_level_index == -1 %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Subscribe</button>
-                {% elif member.membership_level == "Good" or member.membership_level == "Better"%}
+                {% elif member.membership_level_index < 2 %}
                     <button type="submit" class="payment-button" formaction="{% url 'checkout' %}">Upgrade</button>
-                {% elif member.membership_level == "Best" %}
+                {% elif member.membership_level_index == 2 %}
                     <button type="submit" class="cancel-button payment-button" formaction="{% url 'cancel-subscription' %}">Cancel</button>
+                {% elif member.membership_level_index > 2 %}
+                    <button type="submit" class="cancel-button payment-button" formaction="{% url 'upgrade-subscription' %}">Downgrade</button>
                 {% endif %}
             </form>
             <ul class="features">
@@ -117,6 +119,7 @@
             </ul>
         </div>
 
+        <!-- Contact Card -->
         <div id="best-card" class="payment-card">
             <h2 class="payment-plan">Custom</h2>
             <div id="payment-contact-form" class="payment-card-form">

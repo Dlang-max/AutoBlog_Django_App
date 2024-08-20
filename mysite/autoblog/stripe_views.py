@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from .models import Member
-from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan
+from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan, membership_level_indices
 from .decorators import member_required
 import stripe
 import stripe.webhook
@@ -160,6 +160,9 @@ def handle_member_update(event):
     new_membership_level = price_id_to_plan[membership_level]
     member = Member.objects.get(stripe_customer_id=customer_id)
     member.membership_level = new_membership_level
+
+    member.membership_level_index = membership_level_indices[new_membership_level]
+
     member.save()
 
 
@@ -192,4 +195,7 @@ def handle_member_cancellation(event):
     member.stripe_customer_id = ''
     member.stripe_subscription_id = ''
     member.membership_level = 'none'
+
+    member.membership_level_index = -1
+    
     member.save()

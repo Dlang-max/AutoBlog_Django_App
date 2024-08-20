@@ -31,12 +31,19 @@ class Member(models.Model):
 
     membership_levels = {
         'none' : 'none',
+
         'Good' : 'Good',
         'Better' : 'Better',
-        'Best' : 'Best'
-    }
+        'Best' : 'Best',
 
-    membership_level = models.CharField(max_length=10, choices=membership_levels, default='none')
+        'Automated_Good' : 'Automated_Good',
+        'Automated_Better' : 'Automated_Better',
+        'Automated_Best' : 'Automated_Best'
+    }
+    
+    membership_level = models.CharField(max_length=20, choices=membership_levels, default='none')
+    membership_level_index = models.IntegerField(default=-1)
+
     has_paid = models.BooleanField(default=False)
     blogs_remaining = models.IntegerField(default=1)
 
