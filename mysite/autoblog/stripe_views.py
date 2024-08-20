@@ -38,7 +38,7 @@ def create_checkout_session(request):
         option = request.POST['payment']
         if option in plan_to_price_id:
             membership_level = plan_to_price_id[option]
-            domain = "https://yourbloggingassistant.com"
+            domain = "http://localhost:1337"
 
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
@@ -50,8 +50,8 @@ def create_checkout_session(request):
                 ],
                 customer=customer,
                 mode='subscription',
-                success_url=domain + "/memberDash/",
-                cancel_url=domain + "/memberDash/",
+                success_url=domain + "/dashboard/",
+                cancel_url=domain + "/dashboard/",
             )
 
             member.stripe_customer_id = customer.id
@@ -59,7 +59,7 @@ def create_checkout_session(request):
             return redirect(checkout_session.url)
         
     
-    return redirect('member_dashboard')
+    return redirect('pay')
 
 # UPDATE SUBSCRIPTION
 # MEMBER INFO UPDATE HANDLED IN WEBHOOK
@@ -81,7 +81,7 @@ def handle_subscription_update(request):
             except stripe.InvalidRequestError:
                 pass
 
-    return redirect('member_dashboard')
+    return redirect("dashboard")
 
 # CANCEL SUBSCRIPTION
 # MEMBER INFO UPDATE HANDLED IN WEBHOOK
@@ -94,7 +94,7 @@ def handle_subscription_cancelled(request):
         except stripe.InvalidRequestError:
             pass
 
-    return redirect('member_dashboard')
+    return redirect("dashboard")
 
 @csrf_exempt
 def stripe_webhook(request):
