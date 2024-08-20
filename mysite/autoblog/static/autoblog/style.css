@@ -453,6 +453,12 @@ ul::-webkit-details-marker {
 }
 
 /*
+* Member Info
+*/
+.wordpress-linked-header {
+    margin: var(--margin-s);
+}
+/*
 * Dashboard
 */
 .dashboard {

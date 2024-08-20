@@ -7,16 +7,20 @@
     <div class="dashboard-container">
         <!-- Button to toggle automated mode -->
         {% if member.on_automated_plan %}
-            <div class="automated_mode_toggle_container">
-                <form action="{% url 'toggle_automated_mode' %}" method="POST">
-                    {% csrf_token %}
-                    {% if not member.automated_mode_on %}
-                        <button type="submit" class="toggle-automated-mode-btn automated-mode-on">Turn on automated mode</button>
-                    {% else %}
-                        <button type="submit" class="toggle-automated-mode-btn automated-mode-off">Turn off automated mode</button>
-                    {% endif %}
-                </form>
-            </div>
+            {% if not member.wordpress_linked %}
+                
+            {% else %}
+                <div class="automated_mode_toggle_container">
+                    <form action="{% url 'toggle_automated_mode' %}" method="POST">
+                        {% csrf_token %}
+                        {% if not member.automated_mode_on %}
+                            <button type="submit" class="toggle-automated-mode-btn automated-mode-on">Turn on automated mode</button>
+                        {% else %}
+                            <button type="submit" class="toggle-automated-mode-btn automated-mode-off">Turn off automated mode</button>
+                        {% endif %}
+                    </form>
+                </div>
+            {% endif %}
         {% endif %}
 
         {% load static %}

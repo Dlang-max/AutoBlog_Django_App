@@ -4,16 +4,16 @@
 
 {% block content %}
 {% if member.wordpress_linked %}
-    <h2>Your website is linked!</h2>
+    <h2 class="wordpress-linked-header">You're already connected!</h2>
 {% endif %}
 <div class="form-container">
     <form class="auth-form" method="POST">
         {% csrf_token %}
-        <h2 class="introduction">WordPress Information</h2>
+        <h2 class="introduction">Connect your website!</h2>
         <div class="input-container">
-            <input class="auth-input" type="url" name="wordpress_url" placeholder="WordPress URL">
-            <input class="auth-input" type="text" name="wordpress_username" placeholder="WordPress Username">
-            <input class="auth-input" type="text" name="wordpress_application_password" placeholder="Application Password">
+            <input class="auth-input" type="url" name="wordpress_url" placeholder="WordPress URL" required>
+            <input class="auth-input" type="text" name="wordpress_username" placeholder="WordPress Username" required>
+            <input class="auth-input" type="text" name="wordpress_application_password" placeholder="Application Password" required>
         </div>
         <button id="register-button" class="submit-button" type="submit">Update WordPress Info</button>
     </form>
