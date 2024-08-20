@@ -14,7 +14,7 @@ from autoblog.convert_blog_to_docx import *
 from django.shortcuts import render, redirect
 from django.core.files.base import ContentFile
 from django.template.defaulttags import register
-from .tasks import generate_blog_and_header_image, generate_blog_from_title_or_topic
+from .tasks import generate_blog_and_header_image, generate_blog_from_title_or_topic, generate_blog_title_from_topic
 from autoblog.upload_blog_to_google_drive import GoogleDriveManager
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
@@ -67,8 +67,8 @@ def dashboard(request):
         user.save()
     try:
         blogs = Blog.objects.filter(author=member)
-        blog_skeletons = BlogSkeleton.objects.filter(author=member).order_by("-id")
-        blog_history = BlogHistory.objects.filter(author=member)
+        blog_skeletons = BlogSkeleton.objects.filter(author=member)
+        blog_history = BlogHistory.objects.filter(author=member).order_by("-id")
     except Blog.DoesNotExist:
         blogs = []
     except BlogSkeleton.DoesNotExist:
@@ -255,15 +255,17 @@ def generate_blog_batch(request):
 
                     member.blogs_remaining -= 1
                     member.save()
-                else:
+                elif member.on_automated_plan:
                     # create blog skeleton
                     blog_skeleton = BlogSkeleton.objects.create(author=member)
                     blog_skeleton.generate_ai_image = True if generate_images == "True" else False
 
                     if title_or_topic == "Title":
                         blog_skeleton.title = line
+                        blog_skeleton.generated = True
                     else:
                         blog_skeleton.topic = line
+                        generate_blog_title_from_topic.delay(id=blog_skeleton.id)
                     blog_skeleton.save()
 
         return redirect("dashboard")

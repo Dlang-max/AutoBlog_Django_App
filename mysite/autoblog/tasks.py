@@ -44,6 +44,19 @@ def generate_blog_and_header_image(id='', username='', title='', generate_image=
     return True
 
 @shared_task
+def generate_blog_title_from_topic(id=''):
+    try:
+        blog_skeleton = BlogSkeleton.objects.get(id=id)
+        title = generate_blog_title(blog_skeleton.topic)
+        blog_skeleton.title = title
+        blog_skeleton.generated = True
+        
+        blog_skeleton.save()
+
+    except BlogSkeleton.DoesNotExist:
+        pass
+
+@shared_task
 def generate_blog_from_title_or_topic(id='', username='', title_or_topic='', titles_or_topics='', generate_images="False"):
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
@@ -111,22 +124,25 @@ def automated_blog_posting():
         # If member has generated blogs
         try:
             if member_blogs.count() > 0:
+                print("Posting Blog", flush=True)
+
                 blog = member_blogs.first()
                 post_blog(blog=blog)
-                print("Posting Blog: ", blog.title, flush=True)
+                member.last_publish_date = now()
             
             # If member has blog skeletons
             elif member_blog_skeletons.count() > 0 and member.blogs_remaining > 0:
+                print("Generating from Blog Skeleton and Posting Blog", flush=True)
                 blog_skeleton = member_blog_skeletons.first()
                 generate_and_post_blog_to_wordpress(member=member, blog_skeleton=blog_skeleton)
-                print("Generating and Posting Blog: ", blog_skeleton.title, flush=True)
+                member.last_publish_date = now()
 
             # If member has nothing
             elif member.blogs_remaining > 0:
-                generate_and_post_blog_to_wordpress(member=member)
                 print("Generating Blog From Scratch", flush=True)
+                generate_and_post_blog_to_wordpress(member=member)
+                member.last_publish_date = now()
 
-            member.last_publish_date = now()
             member.save()
         except BlogUploadError:
             continue
@@ -192,11 +208,16 @@ def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):
             generate_blog(title=title, blog=blog)
             generate_blog_image(username=member.user.username, title=title, blog=blog)
         else:
-            title = blog_skeleton.title
+            if blog_skeleton.title == "":
+                title = generate_blog_title(topic=blog_skeleton.topic)
+            else:
+                title = blog_skeleton.title
+
             blog.title = title
             generate_blog(title=title, blog=blog)
             if blog_skeleton.generate_ai_image:
                 generate_blog_image(username=member.user.username, title=blog_skeleton.title, blog=blog)
+
             blog_skeleton.delete()
 
         member.blogs_remaining -= 1
@@ -204,7 +225,9 @@ def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):
 
         blog.generated = True
         blog.save()
-    except openai.APIError:
+    except openai.APIError as e:
+        print(e, flush=True)
+
         member.blogs_remaining += 1
         member.save()
         blog.delete()
@@ -237,6 +260,7 @@ def generate_blog(title='', blog=None):
         blog.task_id = ""
         blog.save()
     except openai.APIError as e:
+        print(e, flush=True)
         raise BlogGenerationError("Error generating blog")
 
 def generate_blog_image(username='', title='', blog=None):
@@ -253,7 +277,6 @@ def generate_blog_image(username='', title='', blog=None):
         webp_image = BytesIO()
         image.save(webp_image, "webp")
         webp_image.seek(0)
-
 
         # Save image
         blog.image.save(f"{username}_blog_header_image.webp", ContentFile(webp_image.read()), save=True)
