@@ -18,6 +18,7 @@ from .tasks import generate_blog_and_header_image, generate_blog_from_title_or_t
 from autoblog.upload_blog_to_google_drive import GoogleDriveManager
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
+from autoblog.blog_helper_methods import *
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, GenerateBlogBatchForm
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError, GoogleDriveError
@@ -58,7 +59,6 @@ def toggle_automated_mode(request):
 
 @login_required(login_url='/login')
 def dashboard(request):
-
     user = request.user
     member, created = Member.objects.get_or_create(user=user)
 
@@ -67,7 +67,7 @@ def dashboard(request):
         user.save()
     try:
         blogs = Blog.objects.filter(author=member)
-        blog_skeletons = BlogSkeleton.objects.filter(author=member)
+        blog_skeletons = BlogSkeleton.objects.filter(author=member).order_by("-id")
         blog_history = BlogHistory.objects.filter(author=member)
     except Blog.DoesNotExist:
         blogs = []
@@ -79,8 +79,6 @@ def dashboard(request):
 @login_required(login_url='/login')
 def display_blog(request, blog_id):
     try:
-        user = request.user
-        member = Member.objects.get(user=user)
         blog = Blog.objects.get(id=blog_id)
 
     except Member.DoesNotExist:
@@ -91,19 +89,12 @@ def display_blog(request, blog_id):
     form = BlogForm()
     return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form})
 
-
 @login_required(login_url='/login')
 def get_blog_info(request, blog_id):
     try:
-        user = request.user
-        member = Member.objects.get(user=user)
         blog = Blog.objects.get(id=blog_id)
-    except Member.DoesNotExist:
-        return redirect("dashboard")
-    
     except Blog.DoesNotExist:
         return redirect("dashboard")
-
 
     # get elements of blog
     blog_info = {}
@@ -119,8 +110,6 @@ def get_blog_info(request, blog_id):
 
     # return elements
     return JsonResponse(blog_info)
-
-
 
 def home(request):
     """
@@ -203,7 +192,7 @@ def generate_blog(request):
             title = form.cleaned_data["title"]
             generate_image = request.POST.get("generate_ai_image", 'False')
 
-            blog = Blog.objects.create(id=secrets.token_hex(20), author=member)
+            blog = Blog.objects.create(author=member)
             blog.title = title
             task = generate_blog_and_header_image.delay(id=blog.id, username=username, title=title, generate_image=generate_image)
             blog.task_id = task.id
@@ -231,10 +220,8 @@ def generate_blog_batch(request):
         if form.is_valid():
             username = user.username
             generate_images = request.POST.get("generate_ai_images", 'False')
-
             title_or_topic = form.cleaned_data["title_or_topic"]
             title_or_topic = "Title" if title_or_topic == '1' else "Topic"
-
             titles_or_topics = form.cleaned_data["titles_or_topics"]
 
             lines = titles_or_topics.split('\n')
@@ -245,7 +232,7 @@ def generate_blog_batch(request):
                     continue
                 elif member.blogs_remaining > 0:
                     # create blog
-                    blog = Blog.objects.create(id=secrets.token_hex(20), author=member)
+                    blog = Blog.objects.create(author=member)
                     task = generate_blog_from_title_or_topic.delay(id=blog.id, username=username, title_or_topic=title_or_topic, titles_or_topics=line, generate_images=generate_images)
                     blog.task_id = task.id
                     blog.save()
@@ -347,9 +334,8 @@ def email_blog(request, blog_id):
     return redirect("dashboard")
 
 
-# WORDPRESS METHODS
+# WORDPRESS API METHODS
 #==================================================================================================
-
 # POST BLOG
 @login_required(login_url="/login")
 @user_passes_test(member_required, login_url='member_info')
@@ -445,7 +431,6 @@ def delete_wordpress_blog(request, wordpress_post_id):
 
     return redirect("dashboard")
 
-
 # UPLOAD CUSTOM BLOG IMAGE
 @login_required(login_url='/login')
 @user_passes_test(member_required, login_url='member_info')
@@ -496,79 +481,10 @@ def delete_blog(request, blog_id):
 
     return redirect("dashboard")
 
+
+
 # HELPER METHODS
 #############################################################################
-def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
-    blog_content = format_blog(blog=blog)
-
-    try:
-        # Post Blog Content to WordPress
-        post = {
-            "title" : blog.title,
-            "content" : blog_content,
-            "status" : "publish",
-        }
-        post_response = requests.post(member_wordpress_post_url, headers=header, json=post)
-        post_id = post_response.json().get("id")
-    except requests.exceptions.ConnectionError:
-        raise BlogUploadError("Error uploading blog to WordPress")
-    return post_id
-
-def post_image_to_wordpress(member_wordpress_media_url='', header='', blog=None):
-    try:
-        media = {
-            'file': ('header_image.webp', blog.image, 'image/webp'),
-            'status': 'publish'
-        }
-        media_response = requests.post(member_wordpress_media_url, headers=header, files=media)
-        media_id = media_response.json().get('id')
-    except requests.exceptions.ConnectionError:
-        raise ImageUploadError("Error uploading image to WordPress")
-    return media_id
-
-def update_blogs_featured_image(member_wordpress_current_post_url='', header='', media_id=''):
-    try:
-        featured_payload = {
-            'featured_media': media_id
-        }
-        # Update Blog's featured image
-        requests.post(member_wordpress_current_post_url, headers=header, json=featured_payload)
-    except requests.exceptions.ConnectionError:
-        raise ChangeFeaturedImageError("Error changing blog's featured image")
-
-def delete_blog_from_wordpress(member_wordpress_post_url='', header='', post_id=''):
-    current_url = member_wordpress_post_url + f"/{post_id}"
-    try:
-        requests.delete(current_url, headers=header)
-    except requests.exceptions.ConnectionError:
-        raise DeletingBlogError("Error deleting blog")
-
-
-def format_blog(blog):
-    content = ""
-    for i in range(1, 6):
-        subheading = getattr(blog, f"subheading_{i}")
-        section = getattr(blog, f"section_{i}")
-        content += format_subheading_and_section(format_subheading(subheading), format_section(section))
-
-    return f"<article style=\"font-family: Arial; display: flex; flex-direction: column; align-items: center;\">{content}</article>"
-
-def format_title(title):
-    title_html = f"<h2>{title}</h2>"
-    return title_html
-
-def format_subheading(subheading):
-    subheading_html = f"<h3 style=\"text-align: center;\">{subheading}</h3>"    
-    return subheading_html
-
-def format_section(section):
-    section_html = f"<p> &emsp; {section}</p>"
-    return section_html
-
-def format_subheading_and_section(subheading, section):
-    subheading_and_section_html = f"<section style=\"display: flex; flex-direction: column; align-items: center;\">{subheading} {section}</section> "
-    return subheading_and_section_html
-
 def update_blog_in_db(form, blog):
     # Access blog content from POST request
     title = form.cleaned_data['title']
@@ -582,9 +498,6 @@ def update_blog_in_db(form, blog):
         setattr(blog, f"section_{i}", section)     
 
     blog.save()
-
-
-
 
 def update_blog_docx_file(user, blog):
     document = Document()
@@ -613,8 +526,6 @@ def update_blog_docx_file(user, blog):
         blog.docx_blog.delete()
 
     blog.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
-
-
 
 
 def upload_blog_to_google_drive(user, member, blog):

@@ -14,8 +14,7 @@ from redis import Redis
 from django.core.files.base import ContentFile
 from django.db.models import F, ExpressionWrapper, FloatField, Subquery
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
-
-
+from autoblog.blog_helper_methods import *
 
 client = OpenAI()
 
@@ -24,7 +23,7 @@ def generate_blog_and_header_image(id='', username='', title='', generate_image=
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
     blog = Blog.objects.get(id=id)
-
+    
     try:
         # Generate Blog's Image
         if generate_image == "True":
@@ -32,7 +31,8 @@ def generate_blog_and_header_image(id='', username='', title='', generate_image=
 
         # Generate Blog
         generate_blog(title=title, blog=blog)
-
+        blog.generated = True
+        blog.save()
     except BlogGenerationError as e:
         member.blogs_remaining += 1
         member.save()
@@ -65,6 +65,8 @@ def generate_blog_from_title_or_topic(id='', username='', title_or_topic='', tit
 
         # Generate Blog
         generate_blog(title=title, blog=blog)
+        blog.generated = True
+        blog.save()
 
     except BlogGenerationError as e:
         member.blogs_remaining += 1
@@ -78,7 +80,6 @@ def generate_blog_from_title_or_topic(id='', username='', title_or_topic='', tit
 
 @shared_task
 def automated_blog_posting():
-
     if AutomatedBlogging.objects.last().running:
         return False
 
@@ -99,8 +100,8 @@ def automated_blog_posting():
         days_since_last_pub__gte=F("publish_date_ratio")
     )
 
-    blogs = Blog.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)))
-    blog_skeletons = BlogSkeleton.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)))
+    blogs = Blog.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)), generated=True)
+    blog_skeletons = BlogSkeleton.objects.filter(author__in=Subquery(members.values_list('pk', flat=True)), generated=True)
 
     for member in members:
         print(member.user.username, flush=True)
@@ -137,7 +138,7 @@ def automated_blog_posting():
     return True
 
 
-
+# Post blog to WordPress
 def post_blog(blog=None):
     member = blog.author
 
@@ -171,7 +172,7 @@ def post_blog(blog=None):
     except ChangeFeaturedImageError as e:
        raise BlogUploadError
     
-    blog_histories = BlogHistory.objects.filter(author=member).order_by('-id')
+    blog_histories = BlogHistory.objects.filter(author=member)
     if blog_histories.count() >= 10:
         blog_histories.last().delete()
     
@@ -184,7 +185,6 @@ def post_blog(blog=None):
 
 def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):    
     blog = Blog.objects.create(author=member)
-    # Generate Blog
     try:
         if not blog_skeleton:
             title = generate_blog_title(topic=member.company_type)
@@ -199,11 +199,10 @@ def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):
                 generate_blog_image(username=member.user.username, title=blog_skeleton.title, blog=blog)
             blog_skeleton.delete()
 
-
-
         member.blogs_remaining -= 1
         member.save()
 
+        blog.generated = True
         blog.save()
     except openai.APIError:
         member.blogs_remaining += 1
@@ -214,92 +213,10 @@ def generate_and_post_blog_to_wordpress(member, blog_skeleton=None):
         member.save()
         blog.delete()
     
-    # Post Blog
     try:
         post_blog(blog=blog)
     except BlogUploadError:
         raise BlogUploadError
-
-
-def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
-    blog_content = format_blog(blog=blog)
-
-    try:
-        # Post Blog Content to WordPress
-        post = {
-            "title" : blog.title,
-            "content" : blog_content,
-            "status" : "publish",
-        }
-        post_response = requests.post(member_wordpress_post_url, headers=header, json=post)
-        post_id = post_response.json().get("id")
-    except requests.exceptions.ConnectionError:
-        raise BlogUploadError("Error uploading blog to WordPress")
-    return post_id
-
-def post_image_to_wordpress(member_wordpress_media_url='', header='', blog=None):
-    try:
-        media = {
-            'file': ('header_image.webp', blog.image, 'image/webp'),
-            'status': 'publish'
-        }
-        media_response = requests.post(member_wordpress_media_url, headers=header, files=media)
-        media_id = media_response.json().get('id')
-    except requests.exceptions.ConnectionError:
-        raise ImageUploadError("Error uploading image to WordPress")
-    return media_id
-
-def update_blogs_featured_image(member_wordpress_current_post_url='', header='', media_id=''):
-    try:
-        featured_payload = {
-            'featured_media': media_id
-        }
-        # Update Blog's featured image
-        requests.post(member_wordpress_current_post_url, headers=header, json=featured_payload)
-    except requests.exceptions.ConnectionError:
-        raise ChangeFeaturedImageError("Error changing blog's featured image")
-
-def delete_blog_from_wordpress(member_wordpress_post_url='', header='', post_id=''):
-    current_url = member_wordpress_post_url + f"/{post_id}"
-    try:
-        requests.delete(current_url, headers=header)
-    except requests.exceptions.ConnectionError:
-        raise DeletingBlogError("Error deleting blog")
-
-
-
-
-def format_blog(blog):
-    content = ""
-    for i in range(1, 6):
-        subheading = getattr(blog, f"subheading_{i}")
-        section = getattr(blog, f"section_{i}")
-        content += format_subheading_and_section(format_subheading(subheading), format_section(section))
-
-    return f"<article style=\"font-family: Arial; display: flex; flex-direction: column; align-items: center;\">{content}</article>"
-
-def format_title(title):
-    title_html = f"<h2>{title}</h2>"
-    return title_html
-
-def format_subheading(subheading):
-    subheading_html = f"<h3 style=\"text-align: center;\">{subheading}</h3>"    
-    return subheading_html
-
-def format_section(section):
-    section_html = f"<p> &emsp; {section}</p>"
-    return section_html
-
-def format_subheading_and_section(subheading, section):
-    subheading_and_section_html = f"<section style=\"display: flex; flex-direction: column; align-items: center;\">{subheading} {section}</section> "
-    return subheading_and_section_html
-
-
-
-
-
-
-
 
 
 # HELPER METHODS:
@@ -321,8 +238,6 @@ def generate_blog(title='', blog=None):
         blog.save()
     except openai.APIError as e:
         raise BlogGenerationError("Error generating blog")
-
-
 
 def generate_blog_image(username='', title='', blog=None):
     try:
