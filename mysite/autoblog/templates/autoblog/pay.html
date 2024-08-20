@@ -3,9 +3,20 @@
 {% block title %}Pay{% endblock %}
 
 {% block content %}
-<div class="stripe-form">
+<div class="toggle-pricing-plans-container">
+    <div class="toggle-pricing-plans">
+        <div id="regular-plans-button" class="pricing-toggle-button selected" onclick="togglePaymentPlanCards('regular')">
+            Regular Plans
+        </div>
+    
+        <div id="automated-plans-button" class="pricing-toggle-button" onclick="togglePaymentPlanCards('automated') ">
+            Automated Plans
+        </div>
+    </div>
+</div>
 
-    <div class="payment-card-container regular-plan-payment-cards">
+<div class="stripe-form">
+    <div id="regular-payment-cards" class="payment-card-container regular-plan-payment-cards">
         <!-- Regular Starter Plan Card -->
         <div id="good-card" class="payment-card">
             <h2 class="payment-plan">Starter Plan</h2>
@@ -135,7 +146,7 @@
 
 
 
-    <div class="payment-card-container automated-plan-payment-cards">
+    <div id="automated-payment-cards" class="payment-card-container automated-plan-payment-cards">
         <!-- Automated Starter Plan Card -->
         <div id="good-card" class="payment-card">
             <h2 class="payment-plan">Starter Plan</h2>
@@ -259,4 +270,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    function togglePaymentPlanCards(cardType) {
+        const regularPlans = document.getElementById("regular-payment-cards");
+        const automatedPlans = document.getElementById("automated-payment-cards");
+
+        const regularPlansButton = document.getElementById("regular-plans-button");
+        const automatedPlansButton = document.getElementById("automated-plans-button");
+
+        if(cardType === "regular") {
+            regularPlansButton.classList.add("selected");
+            automatedPlansButton.classList.remove("selected");
+    
+            regularPlans.style.display = "flex";
+            automatedPlans.style.display = "none";
+        } else if (cardType === "automated") {
+            regularPlansButton.classList.remove("selected");
+            automatedPlansButton.classList.add("selected");
+    
+            regularPlans.style.display = "none";
+            automatedPlans.style.display = "flex";
+        }
+    }
+</script>
 {% endblock %}

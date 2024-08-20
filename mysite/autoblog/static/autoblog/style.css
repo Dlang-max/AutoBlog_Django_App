@@ -1162,6 +1162,54 @@ section {
 /*
 * Stripe Payments
 */
+#automated-payment-cards {
+    display: none;
+}
+
+.toggle-pricing-plans-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toggle-pricing-plans {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin-top: var(--margin-m);
+}
+
+.pricing-toggle-button {
+    border: none;
+    border-radius: var(--radius-small);
+    color: gray;
+    border: 1px solid rgb(218, 218, 218);
+    background-color: rgb(218, 218, 218);
+
+    margin-left: var(--margin-xs);
+    margin-right: var(--margin-xs);
+
+    padding: var(--padding-s);
+
+    transition: 200ms;
+}
+
+.pricing-toggle-button:hover {
+    color: var(--primary-color);
+    border: 1px solid var(--button-blue);
+    background-color: var(--button-blue);
+    cursor: pointer;
+}
+
+.selected {
+    display: flex;
+
+    color: var(--primary-color);
+    border: 1px solid var(--button-blue);
+    background-color: var(--button-blue);
+}
+
 .stripe-form {
     font-family: var(--font);
     display: flex;
@@ -1440,7 +1488,7 @@ span strong {
         margin-right: 10px;
         margin-bottom: 10px;
         margin-top: 0px;
-        padding-top: 50px;
+        padding-top: 20px;
     }
     .payment-card-container {
         display: flex;

@@ -161,7 +161,14 @@ def handle_member_update(event):
     member = Member.objects.get(stripe_customer_id=customer_id)
     member.membership_level = new_membership_level
 
-    member.membership_level_index = membership_level_indices[new_membership_level]
+    membership_level_index = membership_level_indices[new_membership_level]
+    member.membership_level_index = membership_level_index
+
+    if membership_level_index >= 3:
+        member.on_automated_plan = True
+    else:
+        member.on_automated_plan = False
+
 
     member.save()
 
@@ -190,12 +197,16 @@ def handle_member_cancellation(event):
     """
     session = event['data']['object']
     customer_id = session['customer']
+
     member = Member.objects.get(stripe_customer_id=customer_id)
+
     member.has_paid = False
     member.stripe_customer_id = ''
     member.stripe_subscription_id = ''
     member.membership_level = 'none'
-
     member.membership_level_index = -1
+
+    member.on_automated_plan = False
+    member.automated_mode_on = False
     
     member.save()
