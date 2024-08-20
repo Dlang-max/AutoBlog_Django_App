@@ -2,7 +2,16 @@ import requests
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError
 
 # HELPER METHODS FOR INTERACTING WITH WORDPRESS REST API #
-# ============================================================================== # 
+# ============================================================================== #
+
+
+def test_member_website_credentials(member_wordpress_post_url='', header=''):
+    try:
+        response = requests.get(member_wordpress_post_url, headers=header)
+        return response.status_code == 200
+    except requests.exceptions.ConnectionError:
+        return False
+    
 def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
     blog_content = format_blog(blog=blog)
 

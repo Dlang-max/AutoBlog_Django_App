@@ -151,27 +151,43 @@ def member_info(request):
         HttpResponse: The HTTP response sent back to the client. This response will either
         rerender the MemberInfoForm or redirect the user to the /home endpoint.
     """
+    user = request.user
+    member,  created = Member.objects.get_or_create(user=user)
+
+    if created:
+        user.is_member = True
+        user.save()
+    
     if request.method == "POST":
         form = MemberInfoForm(request.POST)
         if form.is_valid():
-            user = request.user
             wordpress_url = form.cleaned_data["wordpress_url"]
             wordpress_username = form.cleaned_data["wordpress_username"]
             wordpress_application_password = form.cleaned_data["wordpress_application_password"]
 
-            # Update a Member's Information
-            member, created = Member.objects.get_or_create(user=user)
+            member_wordpress_post_url = wordpress_url + "/wp-json/wp/v2/users/me"
+            member_wordpress_username = wordpress_username
+            member_wordpress_application_password = wordpress_application_password
 
-            if created:
-                user.is_member = True
+            # Build HTTP Header for POSTing to WordPress REST API
+            credentials = member_wordpress_username + ':' + member_wordpress_application_password
+            token = base64.b64encode(credentials.encode())
+            header = {"Authorization":"Basic " + token.decode("utf-8")}
+                
+            # Send test request to check if this is user's website
+            if test_member_website_credentials(member_wordpress_post_url=member_wordpress_post_url, header=header):
+                # Update Member Info
+                member.wordpress_linked = True
+                member.wordpress_url = wordpress_url
+                member.wordpress_username = wordpress_username
+                member.wordpress_application_password = wordpress_application_password
+            else:
+                member.wordpress_linked = False
 
-            member.wordpress_url = wordpress_url
-            member.wordpress_username = wordpress_username
-            member.wordpress_application_password = wordpress_application_password
             member.save()
-            return redirect("dashboard")
+            return redirect("member_info")
 
-    return render(request, "autoblog/memberInfo.html")
+    return render(request, "autoblog/memberInfo.html", {"member" : member})
 
 
 # HANDLE BLOG LOGIC
