@@ -14,6 +14,7 @@ from pathlib import Path
 from celery.schedules import crontab
 
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -160,7 +161,10 @@ MEDIA_ROOT = BASE_DIR / "web/mediafiles/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-SITE_ID = 2
+SITE_ID = 3
+if DEBUG:
+    SITE_ID = 2
+
 LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET= True

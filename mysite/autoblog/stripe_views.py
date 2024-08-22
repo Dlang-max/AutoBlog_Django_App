@@ -4,10 +4,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from .models import Member
-from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan, membership_level_indices
+from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan, membership_level_indices, membership_level_pub_date_ratio
 from .decorators import member_required
 import stripe
 import stripe.webhook
+from django.conf import settings
 
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
@@ -38,7 +39,10 @@ def create_checkout_session(request):
         option = request.POST['payment']
         if option in plan_to_price_id:
             membership_level = plan_to_price_id[option]
-            domain = "http://localhost:1337"
+            
+            domain = "https://yourbloggingassistant.com"
+            if settings.DEBUG:
+                domain = "http://localhost:1337"
 
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
@@ -166,6 +170,7 @@ def handle_member_update(event):
 
     if membership_level_index >= 3:
         member.on_automated_plan = True
+        member.publish_date_ratio = membership_level_pub_date_ratio[new_membership_level]
     else:
         member.on_automated_plan = False
 

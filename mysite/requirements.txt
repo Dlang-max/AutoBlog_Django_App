@@ -16,7 +16,7 @@ click-repl==0.3.0
 colorama==0.4.6
 cryptography==43.0.0
 distro==1.9.0
-Django==5.0.7
+Django==5.1
 django-allauth==64.0.0
 exceptiongroup==1.2.1
 flower==2.0.1
@@ -52,6 +52,7 @@ python-dateutil==2.9.0.post0
 python-docx==1.1.2
 pytz==2024.1
 redis==5.0.5
+replicate==0.31.0
 requests==2.32.3
 rsa==4.9
 six==1.16.0

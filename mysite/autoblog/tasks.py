@@ -2,6 +2,7 @@ import openai
 import requests
 from io import BytesIO
 from PIL import Image
+import replicate
 import base64
 from celery import app
 from openai import OpenAI
@@ -266,7 +267,13 @@ def generate_blog(title='', blog=None):
 def generate_blog_image(username='', title='', blog=None):
     try:
         # Generate Image
-        image_url = generate_image(title=title)
+
+        # Using Dalle 3
+        # image_url = generate_image_dalle3(title=title)
+
+        # Using Flux Schnell
+        image_prompt = generate_image_description(title=title)
+        image_url = generate_image_flux_schnell(image_prompt=image_prompt)
 
         # Read in image
         image_data = requests.get(image_url).content
@@ -283,10 +290,13 @@ def generate_blog_image(username='', title='', blog=None):
     except openai.APIError as e:
         print(e, flush=True)
         raise BlogGenerationError("Error generating blog image")
+    except Exception as e:
+        raise BlogGenerationError("Error generating blog image")
+
 
 # CALLS TO OPENAI API:
 #########################################################################################
-def generate_image(title=''):
+def generate_image_dalle3(title=''):
     response = client.images.generate(
         model="dall-e-3",
         prompt=f"Generate a header image for a blog titled: {title}. Do not include \
@@ -298,6 +308,32 @@ def generate_image(title=''):
     image_url = response.data[0].url
     return image_url
 
+def generate_image_flux_schnell(image_prompt=""):    
+    output = replicate.run(
+        "black-forest-labs/flux-schnell",
+        input= {
+           "prompt" : image_prompt + "DO NOT include text in the generated image."
+        }
+    )
+
+    image_url = output[0]    
+    return image_url
+
+def generate_image_description(title=''):
+    completion = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{'role':'user', "content" : f"Using this example response: Photo of \
+                rolling sand dunes illuminated by the soft light of dusk. Capture \
+                the scene from a low angle to emphasize the sweeping curves and \
+                patterns of the dunes, with the sun setting on the horizon. The \
+                warm colors of the sky contrast with the cool shadows on the sand, \
+                creating a captivating play of light and texture. Use a wide-angle \
+                lens to include the vast expanse of the desert landscape, with a \
+                focus on the intricate patterns formed by the wind. generate a \
+                similar prompt for a blog titled: {title}. Do not say to include \
+                text or specifics in this prompt." }])
+    outline = completion.choices[0].message.content
+    return outline
 
 def generate_blog_title(topic=''):
     completion = client.chat.completions.create(
@@ -311,6 +347,7 @@ def generate_blog_title(topic=''):
                 section blog."}])
     title = completion.choices[0].message.content
     return title
+
 
 
 def write_blog_outline(title=''):

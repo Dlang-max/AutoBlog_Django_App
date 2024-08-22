@@ -6,21 +6,22 @@
     <meta name="keywords" content="AI, Automation, AutoBlogging, AutoBlogger, AI Blogs, Digital Marketing">
     <meta name="author" content="Daniel Lang">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/static/autoblog/logo.png" sizes=32x32 type=image/png>
+    {% load static %}
+    <link rel="icon" href="{% static 'autoblog/logo.svg' %}" sizes=40x40 ype="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'> 
     <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    {% load static %}
     <link rel="stylesheet" href="{% static 'autoblog/style.css' %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
 
 <body>
+    {% load static %}
     <div class="navbar">
         <header class="navbar-container">
-            <a class="navbar-logo" href="{% url 'home' %}"><div class="logo">Logo</div></a>
+            <a class="navbar-logo" href="{% url 'home' %}"><img src="{% static 'autoblog/logo.svg' %}" alt="quill with blue halo surrounding it" width="40" height="40"></a>
             <nav role="navigation" class="navbar-menu">
                 <a class="navbar-link" href="{% url 'dashboard' %}">Dashboard</a>
                 <a class="navbar-link" href="{% url 'settings' %}">Account</a>
