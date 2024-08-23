@@ -64,19 +64,20 @@ body::after {
 }
 
 #content {
-    margin-top: 3.5rem;
+    padding-top: 3.75rem;
 }
+
 
 
 
 /*
 * NavBar
 */
-
 .navbar {
     /*background-color: var(--secondary-color);*/
     background-color: transparent;
     position: fixed;
+    margin-top: var(--margin-xxs);
     width: 100vw;
     display: flex;
     flex-direction: column;
@@ -88,7 +89,7 @@ body::after {
     font-family: var(--font);
     backdrop-filter: blur(.6rem);
     background-color: rgba(255, 255, 255, .85);
-    position: relative;
+    /* position: relative; */
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -814,6 +815,32 @@ article {
 }
 
 
+/*
+* RTE
+*/
+.rte {
+    width: 100%;
+}
+
+.django-quill-widget-container {
+    border: 1px solid #CCC;
+    border-radius: var(--radius-small);
+}
+
+.ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid #CCC !important;
+}
+
+.ql-container.ql-snow {
+    border: none !important;
+}
+
+
+
+
+
+
 
 h2 {
     display: flex;
@@ -821,6 +848,8 @@ h2 {
     align-items: center;
     text-align: center;
 }
+
+
 
 article section h3 {
     float: left;

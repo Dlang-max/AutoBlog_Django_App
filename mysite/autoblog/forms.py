@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.forms import ModelForm, Form
 from .models import User, Member, Blog
+from django_quill.fields import QuillFormField
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField()
@@ -24,7 +25,7 @@ class GenerateBlogForm(Form):
 
     fields = ["title", "generate_ai_image"]
 
-
+# REMOVE SET TO TITLES
 class BlogForm(Form):
     title = forms.CharField(max_length=200)
     
@@ -68,6 +69,9 @@ class GenerateBlogBatchForm(Form):
     generate_ai_images = forms.CharField(max_length=100)
     title_or_topic = forms.ChoiceField(choices=CHOICES)
     titles_or_topics = forms.CharField(widget=forms.Textarea)
+
+class RTEForm(Form):
+    content = QuillFormField()
 
 
 

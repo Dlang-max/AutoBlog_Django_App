@@ -20,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from autoblog.blog_helper_methods import *
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, GenerateBlogBatchForm
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, GenerateBlogBatchForm, RTEForm
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError, GoogleDriveError
 
 @login_required(login_url='/login')
@@ -87,7 +87,7 @@ def display_blog(request, blog_id):
         return redirect('dashboard')
     
     form = BlogForm()
-    return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form})
+    return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form, "rte_form" : RTEForm(initial={"content" : blog.content})})
 
 @login_required(login_url='/login')
 def get_blog_info(request, blog_id):

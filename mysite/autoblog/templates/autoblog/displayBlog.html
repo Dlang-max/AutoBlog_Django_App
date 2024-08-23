@@ -133,70 +133,38 @@
                         </div>
                     {% endif %}
 
-                    <h2 id="title" contentEditable="true"></h2>
+                    <h2 id="title" contentEditable="true">{{ blog.title }}</h2>
+                    <form class="rte" action="" method="POST">
+                        {% csrf_token %}
+                        {{ rte_form.content }}
+                    </form>
+                    
+                    
                     <section>
-                        <h3 id="subheading_1" contentEditable="true"></h3>
-                        <p id="section_1" contentEditable="true">&emsp;</p>
+                        <h3 id="subheading_1" contentEditable="true">{{ blog.subheading_1 }}</h3>
+                        <p id="section_1" contentEditable="true">&emsp; {{ blog.section_1 }}</p>
                     </section>
                     <section>
-                        <h3 id="subheading_2" contentEditable="true"></h3>
-                        <p id="section_2" contentEditable="true">&emsp;</p>
+                        <h3 id="subheading_2" contentEditable="true">{{ blog.subheading_2 }}</h3>
+                        <p id="section_2" contentEditable="true">&emsp; {{ blog.section_2 }}</p>
                     </section>
                     <section>
-                        <h3 id="subheading_3" contentEditable="true"></h3>
-                        <p id="section_3" contentEditable="true">&emsp;</p>
+                        <h3 id="subheading_3" contentEditable="true">{{ blog.subheading_3 }}</h3>
+                        <p id="section_3" contentEditable="true">&emsp; {{ blog.section_3 }}</p>
                     </section>
                     <section>
-                        <h3 id="subheading_4" contentEditable="true"></h3>
-                        <p id="section_4" contentEditable="true">&emsp;</p>
+                        <h3 id="subheading_4" contentEditable="true">{{ blog.subheading_4 }}</h3>
+                        <p id="section_4" contentEditable="true">&emsp; {{ blog.section_4 }}</p>
                     </section>
                     <section>
-                        <h3 id="subheading_5" contentEditable="true"></h3>
-                        <p id="section_5" contentEditable="true">&emsp;</p>
+                        <h3 id="subheading_5" contentEditable="true">{{ blog.subheading_5 }}</h3>
+                        <p id="section_5" contentEditable="true">&emsp; {{ blog.section_5 }}</p>
                     </section>
                 </article>
-                <script>
-                    // need way to handle storing multiple blogs in local storage
-                    document.addEventListener("DOMContentLoaded", () => {
-                        if(!localStorage.getItem("blog_info_{{ blog.id }}")) {
-                            fetch("{% url 'get_blog_info' blog.id %}")
-                            .then(response => response.json())
-                            .then(data => {
-                                localStorage.setItem("blog_info_{{ blog.id }}", JSON.stringify(data));
-                            })
-                            location.reload();
-                        } else {
-                            const blogInfoString = localStorage.getItem("blog_info_{{ blog.id }}")
-                            var blogInfoJSON = JSON.parse(blogInfoString);
-                            
-                            // Update Blog
-                            var title = document.getElementById("title").innerText = blogInfoJSON['title'];
-                            for(let i = 1; i <= 5; i++) {
-                                var subheading =  document.getElementById(`subheading_${i}`)
-                                subheading.innerText = blogInfoJSON[`subheading_${i}`];
 
-                                var section =  document.getElementById(`section_${i}`)
-                                section.innerText = blogInfoJSON[`section_${i}`]; 
-                            }
-                        }
-                    });
 
-                    // update localStorage
-                    var blog = document.getElementById("blog");
-                    blog.addEventListener("input", () => {
-                        const blogInfoObject = {
-                            "title" : document.getElementById("title").innerText
-                        };
 
-                        for(let i = 1; i <= 5; i++) {
-                            blogInfoObject[`subheading_${i}`] = document.getElementById(`subheading_${i}`).innerText; 
-                            blogInfoObject[`section_${i}`] = document.getElementById(`section_${i}`).innerText; 
-                        }
-
-                        localStorage.setItem("blog_info_{{ blog.id }}", JSON.stringify(blogInfoObject));
-                    });    
-
-                </script>
+                
                 {% if member.wordpress_url != '' %}
                     <form id="blog-form" method="POST">
                         {% csrf_token %}
@@ -224,4 +192,7 @@
             <div class="no-blogs-container"><h2>You currently don't have a blog written. Would you like to <a href="{% url 'generate_blog' %}">create</a> one?</h2></div>
         {% endif %}
     </div>
+
+
+
 {% endblock %}

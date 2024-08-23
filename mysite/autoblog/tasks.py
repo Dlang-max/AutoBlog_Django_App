@@ -255,8 +255,11 @@ def generate_blog(title='', blog=None):
             blog_section = write_section(section=section, subheading=blog_subheading, outline=outline, blog=content)
             content += f"{section} subheading: {blog_subheading} {section} section: {blog_section}"
 
-            setattr(blog, f"subheading_{i}", blog_subheading)
-            setattr(blog, f"section_{i}", blog_section) 
+            formatted_blog_subheading = format_subheading(blog_subheading)
+            formatted_blog_section = format_section(blog_section)
+
+            blog.content += formatted_blog_subheading
+            blog.content += formatted_blog_section
         
         blog.task_id = ""
         blog.save()

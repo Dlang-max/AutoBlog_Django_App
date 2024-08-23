@@ -67,7 +67,24 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 
     'autoblog',
+    'django_quill',
 ]
+
+QUILL_CONFIGS = {
+    'default':{
+        'theme': 'snow',
+        'modules': {
+            'syntax': True,
+            'toolbar': [
+                [
+                    {'header': []},
+                    {'align': []},
+                    'bold', 'italic', 'underline',
+                ]
+            ]
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

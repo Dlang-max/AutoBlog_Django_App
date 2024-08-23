@@ -50,6 +50,13 @@ class Member(models.Model):
     def __str__(self):
         return self.user.username
     
+
+
+
+
+
+
+
 class Blog(models.Model):
     docx_blog = models.FileField(upload_to="blogDocx")
     google_drive_blog_folder_id = models.CharField(max_length=100, default="")
@@ -63,7 +70,12 @@ class Blog(models.Model):
 
     image = models.ImageField(upload_to="blogImages")
     title = models.CharField(max_length=200, default="")
+    content = models.TextField(default="")
 
+
+
+
+    # REMOVE THESE
     subheading_1 = models.CharField(max_length=200, default="")
     section_1 = models.TextField(default="")
 
@@ -78,6 +90,11 @@ class Blog(models.Model):
 
     subheading_5 = models.CharField(max_length=200, default="")
     section_5 = models.TextField(default="")
+
+
+
+
+
 
 class BlogSkeleton(models.Model):
     author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="blog_skeletons")
