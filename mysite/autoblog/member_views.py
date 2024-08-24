@@ -2,6 +2,7 @@ import os
 import base64
 import secrets
 import requests
+from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 from .models import Member, Blog, BlogSkeleton, BlogHistory
@@ -308,6 +309,7 @@ def save_blog(request, blog_id):
         try:
             blog = Blog.objects.get(id=blog_id)
             form = BlogForm(request.POST)
+            print(request.POST, flush=True)
             if form.is_valid():
                 update_blog_in_db(form=form, blog=blog)
             else:
@@ -506,16 +508,15 @@ def delete_blog(request, blog_id):
 def update_blog_in_db(form, blog):
     # Access blog content from POST request
     title = form.cleaned_data['title']
+    content = form.cleaned_data["content"]
+
     blog.title = title
-
-    for i in range(1, 6):
-        subheading = form.cleaned_data[f"subheading_{i}"]
-        section = form.cleaned_data[f"section_{i}"]
-
-        setattr(blog, f"subheading_{i}", subheading)
-        setattr(blog, f"section_{i}", section)     
-
+    blog.content = content
     blog.save()
+
+
+
+
 
 def update_blog_docx_file(user, blog):
     document = Document()
@@ -529,13 +530,16 @@ def update_blog_docx_file(user, blog):
         add_image(document, byte_io)
 
     # Add blog content to docx file
+    html_string = blog.content
+    soup = BeautifulSoup(html_string, "html.parser")
+    elements = soup.find_all(["h2", "p"])
     add_title(document, blog.title)
-    for i in range(1, 6):
-        subheading = getattr(blog, f"subheading_{i}")
-        add_subheading(document, subheading)
-        section = getattr(blog, f"section_{i}")
-        add_paragraph(document, section)
-
+    for element in elements:
+        if element.name == "h2" and element.get_text():
+            add_subheading(document, element.get_text())
+        if element.name == "p" and element.get_text():
+            add_paragraph(document, element.get_text())
+    
     buffer = BytesIO()
     document.save(buffer)
     buffer.seek(0)
@@ -544,6 +548,7 @@ def update_blog_docx_file(user, blog):
         blog.docx_blog.delete()
 
     blog.docx_blog.save(f"{user.username}_blog.docx", content=buffer)
+
 
 
 def upload_blog_to_google_drive(user, member, blog):

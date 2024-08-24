@@ -49,7 +49,7 @@
         {% endif %}
 
 
-        {% if blog.subheading_1 %}
+        {% if blog.content %}
             <main>
                 <article id="blog" style="font-family: Arial;">
                     {% if blog.image %}
@@ -138,33 +138,9 @@
                         {% csrf_token %}
                         {{ rte_form.content }}
                     </form>
-                    
-                    
-                    <section>
-                        <h3 id="subheading_1" contentEditable="true">{{ blog.subheading_1 }}</h3>
-                        <p id="section_1" contentEditable="true">&emsp; {{ blog.section_1 }}</p>
-                    </section>
-                    <section>
-                        <h3 id="subheading_2" contentEditable="true">{{ blog.subheading_2 }}</h3>
-                        <p id="section_2" contentEditable="true">&emsp; {{ blog.section_2 }}</p>
-                    </section>
-                    <section>
-                        <h3 id="subheading_3" contentEditable="true">{{ blog.subheading_3 }}</h3>
-                        <p id="section_3" contentEditable="true">&emsp; {{ blog.section_3 }}</p>
-                    </section>
-                    <section>
-                        <h3 id="subheading_4" contentEditable="true">{{ blog.subheading_4 }}</h3>
-                        <p id="section_4" contentEditable="true">&emsp; {{ blog.section_4 }}</p>
-                    </section>
-                    <section>
-                        <h3 id="subheading_5" contentEditable="true">{{ blog.subheading_5 }}</h3>
-                        <p id="section_5" contentEditable="true">&emsp; {{ blog.section_5 }}</p>
-                    </section>
                 </article>
 
 
-
-                
                 {% if member.wordpress_url != '' %}
                     <form id="blog-form" method="POST">
                         {% csrf_token %}

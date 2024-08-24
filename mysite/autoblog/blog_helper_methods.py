@@ -3,8 +3,6 @@ from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError,
 
 # HELPER METHODS FOR INTERACTING WITH WORDPRESS REST API #
 # ============================================================================== #
-
-
 def test_member_website_credentials(member_wordpress_post_url='', header=''):
     try:
         response = requests.get(member_wordpress_post_url, headers=header)
@@ -13,7 +11,7 @@ def test_member_website_credentials(member_wordpress_post_url='', header=''):
         return False
     
 def post_blog_to_wordpress(member_wordpress_post_url='', header='', blog=None):
-    blog_content = format_blog(blog=blog)
+    blog_content = blog.content
 
     try:
         # Post Blog Content to WordPress
@@ -73,7 +71,7 @@ def format_title(title):
     return title_html
 
 def format_subheading(subheading):
-    subheading_html = f"<h3 style=\"text-align: center;\">{subheading}</h3>"    
+    subheading_html = f"<h2>{subheading}</h2>"    
     return subheading_html
 
 def format_section(section):

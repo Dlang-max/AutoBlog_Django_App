@@ -25,29 +25,16 @@ class GenerateBlogForm(Form):
 
     fields = ["title", "generate_ai_image"]
 
-# REMOVE SET TO TITLES
+
+
+
 class BlogForm(Form):
     title = forms.CharField(max_length=200)
-    
-    # BLOG
-    subheading_1 = forms.CharField(max_length=200)
-    section_1 = forms.CharField()
+    content = forms.CharField(widget=forms.Textarea)
 
-    subheading_2 = forms.CharField(max_length=200)
-    section_2 = forms.CharField()
 
-    subheading_3 = forms.CharField(max_length=200)
-    section_3 = forms.CharField()
 
-    subheading_4 = forms.CharField(max_length=200)
-    section_4 = forms.CharField()
 
-    subheading_5 = forms.CharField(max_length=200)
-    section_5 = forms.CharField()
-   
-
-    class Meta:
-        model = Blog
 
 class ContactForm(Form):
     name = forms.CharField(max_length=100)
