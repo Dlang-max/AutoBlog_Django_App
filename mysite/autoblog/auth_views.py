@@ -96,7 +96,7 @@ def login(request):
 
             if user is not None and user.is_verified:
                 auth_login(request=request, user=user)
-                return redirect("generate_blog")
+                return redirect("dashboard")
             else:
                 return render(request, "autoblog/login.html")
     return render(request, "autoblog/login.html")

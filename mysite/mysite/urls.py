@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from autoblog import auth_views, member_views, stripe_views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -40,6 +40,7 @@ urlpatterns = [
 
     path('saveBlog/<str:blog_id>', member_views.save_blog, name='save_blog'),
     path('postBlog/<str:blog_id>', member_views.post_blog, name='post_blog'),
+    path('deleteWordPressBlog/<str:wordpress_post_id>', member_views.delete_wordpress_blog, name='delete_wordpress_blog'),
     path('emailBlog/<str:blog_id>', member_views.email_blog, name='email_blog'),
     path('deleteBlog/<str:blog_id>', member_views.delete_blog, name='delete_blog'),
     path('uploadBlogImage/<str:blog_id>', member_views.upload_blog_image, name='upload_blog_image'),
@@ -56,11 +57,14 @@ urlpatterns = [
     path('dashboard/', member_views.dashboard, name='dashboard'),
     path('getBlogInfo/<str:blog_id>', member_views.get_blog_info, name='get_blog_info'),
     path('displayBlog/<str:blog_id>', member_views.display_blog, name='display_blog'),
-    path('displayBlogQueue/', member_views.display_blog_queue, name='display_blog_queue'),
     path('generateBlogBatch/', member_views.generate_blog_batch, name='generate_blog_batch'),
-    path('generateBlogBatchTitles/', member_views.generate_blog_titles, name='generate_blog_titles'),
 
 
+
+    path('toggleAutomatedMode/', member_views.toggle_automated_mode, name='toggle_automated_mode'),
+
+
+    path('accounts/', include('allauth.urls')),
 
 
 

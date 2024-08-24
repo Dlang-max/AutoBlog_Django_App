@@ -1,6 +1,7 @@
 {% extends "autoblog/authBase.html" %}
 
 {% block title %}Login{% endblock %}
+{% load socialaccount %}
 
 {% block content %}
 <div class="form-container">
@@ -13,6 +14,16 @@
         </div>
         <button id="register-button" class="submit-button" type="submit">Sign in</button>
         <p id="redirect-sign-in">Don't have an account? <a href="{% url 'register' %}">Sign up now</a></p>
+        <div class="google-login-container">
+            <form method="POST" class="google-login-form">
+                {% csrf_token %}
+                <button type="submit" class="google-login-btn" formaction="{% url 'google_login' %}">
+                    {% load static %}
+                    <img src="{% static '/autoblog/google.svg' %}" class="google-icon" alt="Google Icon" width="30" height="30">
+                    <p class="google-login-text">Login with Google</p>
+                </button>
+            </form>
+        </div>
     </form>
 </div>
 {% endblock %}

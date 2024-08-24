@@ -36,6 +36,19 @@ services:
     depends_on:
       - redis
 
+  celery-beat:
+    build:
+      context: .
+      dockerfile: ./docker/prod/Dockerfile
+    volumes:
+      - ./:/app
+      - media_volume:/app/web/mediafiles
+    env_file:
+      - .env
+    command: celery -A mysite beat --loglevel=INFO
+    depends_on:
+      - redis
+
   nginx-proxy:
     container_name: nginx-proxy
     build: ./nginx

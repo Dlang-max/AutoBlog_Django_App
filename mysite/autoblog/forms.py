@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.forms import ModelForm, Form
 from .models import User, Member, Blog
+from django_quill.fields import QuillFormField
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField()
@@ -19,34 +20,21 @@ class MemberInfoForm(ModelForm):
         fields = ["wordpress_url", "wordpress_username", "wordpress_application_password"]
         
 class GenerateBlogForm(Form):
-    generate_ai_image = forms.CharField()
+    generate_ai_image = forms.CharField(max_length=100)
     title = forms.CharField(max_length=200)
 
     fields = ["title", "generate_ai_image"]
 
 
+
+
 class BlogForm(Form):
     title = forms.CharField(max_length=200)
-    
-    # BLOG
-    subheading_1 = forms.CharField(max_length=200)
-    section_1 = forms.CharField()
+    content = forms.CharField(widget=forms.Textarea)
 
-    subheading_2 = forms.CharField(max_length=200)
-    section_2 = forms.CharField()
 
-    subheading_3 = forms.CharField(max_length=200)
-    section_3 = forms.CharField()
 
-    subheading_4 = forms.CharField(max_length=200)
-    section_4 = forms.CharField()
 
-    subheading_5 = forms.CharField(max_length=200)
-    section_5 = forms.CharField()
-   
-
-    class Meta:
-        model = Blog
 
 class ContactForm(Form):
     name = forms.CharField(max_length=100)
@@ -58,11 +46,19 @@ class CustomBlogImageForm(Form):
     image = forms.ImageField()
 
 
-class BlogSkeletonForm(Form):
-    id = forms.CharField(required=False, max_length=20)
-    title = forms.CharField(required=False)
-    topic = forms.CharField(required=False)
-    generate_image = forms.CharField()
-    publish_date = forms.DateField(required=False)
+
+class GenerateBlogBatchForm(Form):
+    CHOICES = [
+        ('1', 'Titles'),
+        ('2', 'Topics'),
+    ]
+
+    generate_ai_images = forms.CharField(max_length=100)
+    title_or_topic = forms.ChoiceField(choices=CHOICES)
+    titles_or_topics = forms.CharField(widget=forms.Textarea)
+
+class RTEForm(Form):
+    content = QuillFormField()
+
 
 

@@ -5,28 +5,176 @@
 {% block content %}
 <div class="dashboard">
     <div class="dashboard-container">
+        <!-- Button to toggle automated mode -->
+        {% if member.on_automated_plan %}
+            {% if not member.wordpress_linked %}
+                <p id="redirect-sign-in"><a href="{% url 'member_info' %}">Link </a>your website to activate automated mode</p>
+            {% else %}
+                <div class="automated_mode_toggle_container">
+                    <form action="{% url 'toggle_automated_mode' %}" method="POST">
+                        {% csrf_token %}
+                        {% if not member.automated_mode_on %}
+                            <button type="submit" class="toggle-automated-mode-btn automated-mode-on">Turn on automated mode</button>
+                        {% else %}
+                            <button type="submit" class="toggle-automated-mode-btn automated-mode-off">Turn off automated mode</button>
+                        {% endif %}
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+
         {% load static %}
         <div class="creation-container">
             <a class="dashboard-item-container single-blog-container" href="{% url 'generate_blog' %}">
-                <img src="{% static '/autoblog/blog.svg' %}" alt="blog opened on computer screen" width="25" height="25">
-                <span>Create a Blog</span>
-            </a>
-            <a class="dashboard-item-container batch-blog-container" href="{% url 'generate_blog_batch' %}">
-                <img src="{% static '/autoblog/stack.svg' %}" alt="stack of pictures" width="25" height="25">
-                <span>Create a Batch of Blogs</span>
+                <div class="blog-icon-text-container">
+                    <div class="blog-icon-container">
+                        <img src="{% static '/autoblog/blog.svg' %}" alt="blog opened on computer screen" width="40" height="40">
+                    </div>
+                    <span>Create Blog</span>
+                </div>
+                <p>Create blogs with the press of a button</p>
             </a>
         </div>
-        <a class="dashboard-item-container queue-blog-container" href="{% url 'display_blog_queue' %}">
-            <img src="{% static '/autoblog/queue.svg' %}" alt="queue with horizontal lines representing elements in queue" width="25" height="25">
-            <span>View Blogs Queued For Publishing</span>
-        </a>
-        <a class="dashboard-item-container history-blog-container" href="{% url 'generate_blog' %}">
-            <img src="{% static '/autoblog/history.svg' %}" alt="clock with hour hand at 4 and minute hand at 12" width="25" height="25">
-            <span>View Blog History</span>
-        </a>
+
+        <div class="creation-container">
+            <a class="dashboard-item-container single-blog-container" href="{% url 'generate_blog_batch' %}">
+                <div class="blog-icon-text-container">
+                    <div class="blog-icon-container batch-icon-container">
+                        <img src="{% static '/autoblog/stack.svg' %}" alt="stack of image icons" width="40" height="40">
+                    </div>
+                    <span>Create Batch</span>
+                </div>
+                <p>Create 100 blogs with the press of a button</p>
+            </a>
+        </div>
     </div>
 </div>
+<!-- Generated Blogs -->
+{% if blogs %}
+    <div class="queue-blog-container">
+        <div class="blog-table-title-container">
+            <h3 class="blog-table-title">Generated Blogs</h3>
+        </div>
+        <table class="blog-queue-table">
+            <thead>
+                <tr>
+                    <th class="queue-table-header">Image</th>
+                    <th class="queue-table-header">Title</th>
+                    <th class="queue-table-header"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blog in blogs %}
+                    <tr>            
+                        <td>
+                            <!-- Image -->
+                            {% if blog.image %}
+                                <img class="queue-image" src="{{ blog.image.url }}" alt="blog header image preview">
+                            {% else %}
+                                <div class="blank-image-placeholder"></div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Title -->
+                            <p class="queue-meta-info">{{ blog.title }}</p>
+                        </td> 
+                        <td class="queue-table-data">
+                            <a class="queue-link" href="{% url 'display_blog' blog.id %}">edit</a>
+                        </td>
+                    </tr>   
+                {% endfor %}
+                <script>
+                    const generated_blog_rows = document.querySelectorAll('.blog-queue-table tbody tr');
+        
+                    generated_blog_rows.forEach((row, index) => {    
+                        if (index % 2 === 0) {
+                            row.classList.add("row-gray");
+                        }
+                    });
+                </script>         
+            </tbody>
+        </table>
+    </div>
+{% endif %}
 
+<!-- Upcoming Blogs -->
+{% if blog_skeletons %}
+    <div class="queue-blog-container">
+        <div class="blog-table-title-container">
+            <h3 class="blog-table-title">Upcoming Blogs</h3>
+        </div>
+        <table class="blog-queue-table">
+            <thead>
+                <tr>
+                    <th class="queue-table-header">Title</th>
+                    <th class="queue-table-header">Topic</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blog_skeleton in blog_skeletons %}
+                    <tr>            
+                        <td>
+                            <p class="queue-meta-info">{{ blog_skeleton.title }}</p>
+                        </td>
+                        <td>
+                            <p class="queue-meta-info">{{ blog_skeleton.topic }}</p>
+                        </td> 
+                    </tr>   
+                {% endfor %}
+                <script>
+                    const blog_skeletons_rows = document.querySelectorAll('.blog-queue-table tbody tr');
+        
+                    blog_skeletons_rows.forEach((row, index) => {    
+                        if (index % 2 === 0) {
+                            row.classList.add("row-gray");
+                        }
+                    });
+                </script>         
+            </tbody>
+        </table>
+    </div>
+{% endif %}
 
-</table>
+{% if blog_history %}
+    <div class="queue-blog-container">
+        <div class="blog-table-title-container">
+            <h3 class="blog-table-title">Published Blogs</h3>
+        </div>
+        <table class="blog-queue-table">
+            <thead>
+                <tr>
+                    <th class="queue-table-header">Title</th>
+                    <th class="queue-table-header"></th>
+                    <th class="queue-table-header"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blog in blog_history %}
+                    <tr>            
+                        <td>
+                            <p class="queue-meta-info">{{ blog.title }}</p>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            <a class="queue-link queue-link-delete" href="{% url 'delete_wordpress_blog' blog.wordpress_post_id %}">Delete from your website</a>
+                        </td> 
+                    </tr>   
+                {% endfor %}
+                <script>
+                    const blog_history_rows = document.querySelectorAll('.blog-queue-table tbody tr');
+        
+                    blog_history_rows.forEach((row, index) => {    
+                        if (index % 2 === 0) {
+                            row.classList.add("row-gray");
+                        }
+                    });
+                </script>         
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<!-- History (last 10 posted blogs) -->
+
 {% endblock %}

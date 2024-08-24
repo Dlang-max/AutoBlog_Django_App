@@ -1,0 +1,62 @@
+{% extends "autoblog/base.html" %}
+
+{% block title %}Generate Batch{% endblock %}
+
+{% block content %}
+    <div class="batch-generation-container">
+        <form class="auth-form" method="POST" action="{% url 'generate_blog_batch' %}">
+            <h2 class="introduction">Create Blog Batch</h2>
+            {% csrf_token %}
+            <div class="input-container">
+                <!-- Generate AI Images Checkbox -->
+                <input type="hidden" name="generate_ai_images" id="generate-ai-image-checkbox" value="False">
+                <div class="generate-ai-image-checkbox">
+                    <label for="generate-ai-image-checkbox">Generate AI Images</label>
+                    <input type="checkbox" name="generate_ai_images" id="generate-ai-image-checkbox" value="True">
+                </div>
+
+                <!-- Toggle Whether Inputs are Titles or Topics -->
+                <div class="titles-radio-container">
+                    <input type="radio" name="title_or_topic" id="titles" class="titles-or-topics-radio" value="1" onchange="updateRadio()" checked>
+                    <label for="titles" id="titles-radio" class="radio-label titles-label batch-titles-radio-checked">Titles</label>
+    
+                    <input type="radio" name="title_or_topic" id="topics" class="titles-or-topics-radio" value="2" onchange="updateRadio()">
+                    <label for="topics" id="topics-radio" class="radio-label topics-label">Topics</label>
+                </div>
+
+
+
+                <!-- Titles/Topics Input -->
+                <textarea name="titles_or_topics" id="titles-or-topics" class="auth-input" placeholder="Title 1&#10;Title 2&#10;Title 3&#10;..." required></textarea>
+            </div>
+            <button id="register-button" class="submit-button" type="submit">Create Batch</button>
+        </form>
+    </div>
+    <script>
+        function updateRadio(){
+            // Radio inputs
+            const titlesRadio = document.getElementById("titles");
+            const topicsRadio = document.getElementById("topics");
+
+            // Radio labels
+            const titlesRadioLabel = document.getElementById("titles-radio");
+            const topicsRadioLabel = document.getElementById("topics-radio");
+
+            //Textarea
+            const batchTextarea = document.getElementById("titles-or-topics");
+
+            if (titlesRadio.checked) {
+                titlesRadioLabel.classList.add('batch-titles-radio-checked');
+                topicsRadioLabel.classList.remove('batch-topics-radio-checked');
+
+                batchTextarea.placeholder = "Title 1\nTitle 2\nTitle 3\n..."
+
+            } else if (topicsRadio.checked) {
+                titlesRadioLabel.classList.remove('batch-titles-radio-checked');
+                topicsRadioLabel.classList.add('batch-topics-radio-checked');
+
+                batchTextarea.placeholder = "Topic 1\nTopic 2\nTopic 3\n..."
+            }
+        }
+    </script>
+{% endblock %}

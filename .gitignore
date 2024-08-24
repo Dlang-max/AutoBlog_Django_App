@@ -8,3 +8,4 @@ config.py
 staticfiles
 AutoBlog-key-pair.pem
 web
+credentials.json

@@ -4,10 +4,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from .models import Member
-from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan
+from .config import plan_to_blogs_per_month, plan_to_price_id, price_id_to_plan, membership_level_indices, membership_level_pub_date_ratio
 from .decorators import member_required
 import stripe
 import stripe.webhook
+from django.conf import settings
 
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
@@ -38,7 +39,10 @@ def create_checkout_session(request):
         option = request.POST['payment']
         if option in plan_to_price_id:
             membership_level = plan_to_price_id[option]
+            
             domain = "https://yourbloggingassistant.com"
+            if settings.DEBUG:
+                domain = "http://localhost:1337"
 
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
@@ -50,8 +54,8 @@ def create_checkout_session(request):
                 ],
                 customer=customer,
                 mode='subscription',
-                success_url=domain + "/memberDash/",
-                cancel_url=domain + "/memberDash/",
+                success_url=domain + "/dashboard/",
+                cancel_url=domain + "/dashboard/",
             )
 
             member.stripe_customer_id = customer.id
@@ -59,7 +63,7 @@ def create_checkout_session(request):
             return redirect(checkout_session.url)
         
     
-    return redirect('member_dashboard')
+    return redirect('pay')
 
 # UPDATE SUBSCRIPTION
 # MEMBER INFO UPDATE HANDLED IN WEBHOOK
@@ -81,7 +85,7 @@ def handle_subscription_update(request):
             except stripe.InvalidRequestError:
                 pass
 
-    return redirect('member_dashboard')
+    return redirect("dashboard")
 
 # CANCEL SUBSCRIPTION
 # MEMBER INFO UPDATE HANDLED IN WEBHOOK
@@ -94,7 +98,7 @@ def handle_subscription_cancelled(request):
         except stripe.InvalidRequestError:
             pass
 
-    return redirect('member_dashboard')
+    return redirect("dashboard")
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -160,6 +164,17 @@ def handle_member_update(event):
     new_membership_level = price_id_to_plan[membership_level]
     member = Member.objects.get(stripe_customer_id=customer_id)
     member.membership_level = new_membership_level
+
+    membership_level_index = membership_level_indices[new_membership_level]
+    member.membership_level_index = membership_level_index
+
+    if membership_level_index >= 3:
+        member.on_automated_plan = True
+        member.publish_date_ratio = membership_level_pub_date_ratio[new_membership_level]
+    else:
+        member.on_automated_plan = False
+
+
     member.save()
 
 
@@ -187,9 +202,16 @@ def handle_member_cancellation(event):
     """
     session = event['data']['object']
     customer_id = session['customer']
+
     member = Member.objects.get(stripe_customer_id=customer_id)
+
     member.has_paid = False
     member.stripe_customer_id = ''
     member.stripe_subscription_id = ''
     member.membership_level = 'none'
+    member.membership_level_index = -1
+
+    member.on_automated_plan = False
+    member.automated_mode_on = False
+    
     member.save()
