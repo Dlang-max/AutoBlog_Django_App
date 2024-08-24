@@ -27,6 +27,7 @@ urlpatterns = [
     path('home/', member_views.home, name='home'),
     path('register/', auth_views.register, name='register'),
     path('login/', auth_views.login, name='login'),
+    path('additionalInfo/', member_views.additional_info, name='additional_info'),
     path('logout/', auth_views.logout, name='logout'),
     path('verification/', auth_views.verification, name='verification'),
     path('verifyEmail/<str:key>/', auth_views.verify_email, name='verify_email'),

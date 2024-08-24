@@ -68,8 +68,6 @@ def verify_email(request, key):
     except User.DoesNotExist:
         return redirect('login')
     return redirect('login')
-    
-
 
 def login(request):
     """

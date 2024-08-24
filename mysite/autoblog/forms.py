@@ -18,6 +18,10 @@ class MemberInfoForm(ModelForm):
     class Meta:
         model = Member
         fields = ["wordpress_url", "wordpress_username", "wordpress_application_password"]
+
+class AdditionalInfoForm(Form):
+    company_name = forms.CharField(max_length=100)
+    company_type = forms.CharField(max_length=100)
         
 class GenerateBlogForm(Form):
     generate_ai_image = forms.CharField(max_length=100)
@@ -25,16 +29,9 @@ class GenerateBlogForm(Form):
 
     fields = ["title", "generate_ai_image"]
 
-
-
-
 class BlogForm(Form):
     title = forms.CharField(max_length=200)
     content = forms.CharField(widget=forms.Textarea)
-
-
-
-
 
 class ContactForm(Form):
     name = forms.CharField(max_length=100)
@@ -44,8 +41,6 @@ class ContactForm(Form):
 
 class CustomBlogImageForm(Form):
     image = forms.ImageField()
-
-
 
 class GenerateBlogBatchForm(Form):
     CHOICES = [
@@ -59,6 +54,3 @@ class GenerateBlogBatchForm(Form):
 
 class RTEForm(Form):
     content = QuillFormField()
-
-
-

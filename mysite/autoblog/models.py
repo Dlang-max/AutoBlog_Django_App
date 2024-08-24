@@ -17,8 +17,10 @@ class Member(models.Model):
     publish_date_ratio = models.FloatField(default=0.0)
     last_publish_date = models.DateTimeField(null=True)
 
+    additional_info_completed = models.BooleanField(default=False)
     company_name = models.CharField(max_length=100, default="")
     company_type = models.CharField(max_length=100, default="")
+
     google_drive_folder_id = models.CharField(max_length=100, default="")
 
     wordpress_linked = models.BooleanField(default=False)

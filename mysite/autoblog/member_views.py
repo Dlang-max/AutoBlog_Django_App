@@ -21,7 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from autoblog.blog_helper_methods import *
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, GenerateBlogBatchForm, RTEForm
+from .forms import MemberInfoForm, GenerateBlogForm, BlogForm, ContactForm, CustomBlogImageForm, GenerateBlogBatchForm, RTEForm, AdditionalInfoForm
 from .errors import BlogUploadError, ImageUploadError, ChangeFeaturedImageError, DeletingBlogError, GoogleDriveError
 
 @login_required(login_url='/login')
@@ -60,12 +60,17 @@ def toggle_automated_mode(request):
 
 @login_required(login_url='/login')
 def dashboard(request):
+
     user = request.user
     member, created = Member.objects.get_or_create(user=user)
 
     if created:
         user.is_member = True
         user.save()
+
+    if not member.additional_info_completed:
+        return redirect("additional_info")
+    
     try:
         blogs = Blog.objects.filter(author=member)
         blog_skeletons = BlogSkeleton.objects.filter(author=member)
@@ -76,6 +81,34 @@ def dashboard(request):
         blog_skeletons = []
 
     return render(request, "autoblog/dashboard.html", {"blogs" : blogs, "blog_skeletons" : blog_skeletons, "blog_history" : blog_history, "member" : member})
+
+@login_required(login_url='/login')
+def additional_info(request):
+    user = request.user
+    member, created = Member.objects.get_or_create(user=user)
+
+    if created:
+        user.is_member = True
+        user.save()
+
+    if request.method == "POST":
+
+        form = AdditionalInfoForm(request.POST)
+
+        if form.is_valid():
+            company_name = form.cleaned_data["company_name"]
+            company_type = form.cleaned_data["company_type"]
+
+            member.company_name = company_name
+            member.company_type = company_type
+            member.additional_info_completed = True
+            member.save()
+
+            return redirect("dashboard")
+        
+    return render(request, "autoblog/additionalInfo.html")
+
+
 
 @login_required(login_url='/login')
 def display_blog(request, blog_id):
@@ -511,12 +544,17 @@ def update_blog_in_db(form, blog):
     content = form.cleaned_data["content"]
 
     blog.title = title
-    blog.content = content
+    formatted_content = ""
+    soup = BeautifulSoup(content, "html.parser")
+    elements = soup.find_all(["h2", "p"])
+    for element in elements:
+        if element.name == "h2" and element.get_text():
+            formatted_content += str(element)
+        if element.name == "p" and element.get_text():
+            formatted_content += str(element)
+
+    blog.content = formatted_content
     blog.save()
-
-
-
-
 
 def update_blog_docx_file(user, blog):
     document = Document()
@@ -557,7 +595,7 @@ def upload_blog_to_google_drive(user, member, blog):
     # Upload Client Folder to Google Drive 
     member_folder_id = member.google_drive_folder_id
     if member_folder_id == '' or not manager.folder_exists(member_folder_id):
-        member_folder_id = manager.create_folder(folder_name=user.email)
+        member_folder_id = manager.create_folder(folder_name=member.company_name)
 
         if member_folder_id:
             member.google_drive_folder_id = member_folder_id
