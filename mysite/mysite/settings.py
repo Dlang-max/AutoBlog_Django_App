@@ -178,11 +178,9 @@ MEDIA_ROOT = BASE_DIR / "web/mediafiles/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-SITE_ID = 3
-if DEBUG:
-    SITE_ID = 2
+SITE_ID = 2
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET= True
 ACCOUNT_UNIQUE_EMAIL = True
