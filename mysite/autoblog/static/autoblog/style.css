@@ -306,6 +306,7 @@ ul::-webkit-details-marker {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
 }
 
 .hero-container {
@@ -313,10 +314,36 @@ ul::-webkit-details-marker {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
+
+    width: 100%;
+    padding-top: var(--padding-m);
+    padding-bottom: var(--padding-m);
+
+    background: rgb(238,174,202);
+    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 65%, rgb(195, 217, 243) 100%);}
 
 .hero-title {
-    font-size: 5em;
+    font-size: 3rem;
+    font-weight: bold;
+
+    margin-top: var(--margin-xxxl);
+    margin-bottom: var(--margin-m);
+
+    padding: var(--padding-xxs);
+
+    max-width: 40rem;
+
+}
+
+.hero-subheading {
+    font-weight: 500;
+
+    margin-top: var(--margin-s);
+
+    padding: var(--padding-xxs);
+
+    max-width: 40rem;
+
 }
 
 #home-typed-output {
@@ -326,18 +353,19 @@ ul::-webkit-details-marker {
 }
 
 .home-link-container {
-    border-radius: 15px;
+    padding: var(--padding-xs);
+    border-radius: var(--radius-small);
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 300px;
+    width: 10rem;
     height: 50px;
-    background-color: var(--button-blue);
+    background-color: var(--secondary-color);
     transition: 500ms;
 }
 
 .home-link-container:hover {
-    background-color: var(--button-hover-blue);
+    border-radius: var(--radius-medium);
     cursor: pointer;
 }
 
@@ -460,6 +488,7 @@ ul::-webkit-details-marker {
 .wordpress-linked-header {
     margin: var(--margin-s);
 }
+
 /*
 * Dashboard
 */
@@ -815,51 +844,6 @@ article {
     width: 95%;
 }
 
-
-/*
-* RTE
-*/
-.rte {
-    width: 100%;
-}
-
-.django-quill-widget-container {
-    border: 1px solid #CCC;
-    border-radius: var(--radius-small);
-}
-
-.ql-toolbar.ql-snow {
-    border: none !important;
-    border-bottom: 1px solid #CCC !important;
-}
-
-.ql-container.ql-snow {
-    border: none !important;
-}
-
-.ql-editor {
-    font-family: "Arial";
-    font-size: medium;
-}
-
-
-article section h3 {
-    float: left;
-    text-align: left;
-    margin-bottom: var(--margin-xxs);
-
-}
-
-article section p {
-    margin-top: var(--margin-s);
-}
-
-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
 #blog-form {
     display: flex;
     flex-direction: row;
@@ -933,14 +917,13 @@ section {
     overflow: hidden;
     border-radius: var(--radius-small);
 }
+
 .generating-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
-
-
 
 .generate-ai-image-checkbox {
     display: flex;
@@ -1093,9 +1076,34 @@ section {
     display: none;
 }
 
-
 .file-upload-button:hover {
     cursor: pointer;
+}
+
+/*
+* RTE
+*/
+.rte {
+    width: 100%;
+}
+
+.django-quill-widget-container {
+    border: 1px solid #CCC;
+    border-radius: var(--radius-small);
+}
+
+.ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid #CCC !important;
+}
+
+.ql-container.ql-snow {
+    border: none !important;
+}
+
+.ql-editor {
+    font-family: "Arial";
+    font-size: medium;
 }
 
 /*
