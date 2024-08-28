@@ -3,14 +3,56 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+{% load static %}
 <div class="home-container">
-    {% load static %}
     <div class="hero-container">
         <h1 class="hero-title">The Easiest Way to Boost Website Rankings</h1>
         <h2 class="hero-subheading">Your Blogging Assistant is an effortlessly simple content creation tool designed for teams of one.</h2>
         <a class="home-link" href="{% url 'register' %}">
             <div class="home-link-container">Get Started</div>
         </a>
+    </div>
+    <div class="mission-container">
+        <div class="mission-info">
+            <h2 class="mission-title">Our Mission</h2>
+            <p class="mission-statement">&emsp;To simplify the creation of high-quality content for your website, empowering you to focus on what matters most.</p>
+        </div>
+    </div>
+    <div class="product-info-container">
+        <!-- AI content writer card -->
+        <div class="product-card">
+            <img class="product-card-image" src="{% static '/autoblog/logo.svg' %}" alt="Your Blogging Assistant LLC logo" width="60" height="60">
+            <h3 class="product-card-title">AI-powered SEO Writer</h3>
+            <p class="product-card-text">Leverage AI to craft SEO-optimized content that ranks higher on search engines and drives organic traffic to your site.</p>
+        </div>
+    
+        <!-- Post to WordPress -->
+        <div class="product-card">
+            <img class="product-card-image" src="{% static '/autoblog/wordpress.svg' %}" alt="WordPress logo" width="60" height="60">
+            <h3 class="product-card-title">WordPress Blog Publisher</h3>
+            <p class="product-card-text">Seamlessly post your blog content directly to your WordPress site with just a few clicks, saving you time and effort.</p>
+        </div>
+    
+        <!-- Email link to Google Doc -->
+        <div class="product-card">
+            <img class="product-card-image" src="{% static '/autoblog/google-docs.svg' %}" alt="Google Docs logo" width="60" height="60">
+            <h3 class="product-card-title">Blog Emailing</h3>
+            <p class="product-card-text">Automatically email your blog content as a link to a Google Doc, ensuring easy access and collaboration.</p>
+        </div>
+    
+        <!-- Fully automated upload of blog -->
+        <div class="product-card">
+            <img class="product-card-image" src="{% static '/autoblog/settings.svg' %}" alt="Blue settings icon" width="60" height="60">
+            <h3 class="product-card-title">Hands-Free Blog Automation</h3>
+            <p class="product-card-text">Automate the entire blogging process, from content creation to publication, with minimal manual intervention.</p>
+        </div>
+    </div>
+    
+    <div class="examples-container">
+        
+    </div>
+    <div class="pricing-container">
+        
     </div>
 </div>
 {% endblock %}

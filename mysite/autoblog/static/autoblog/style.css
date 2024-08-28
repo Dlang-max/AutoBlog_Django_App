@@ -140,7 +140,7 @@ body::after {
     opacity: 1;
     height: 100%;
     width: 100%;
-    background-color: #f0f0f0;
+    background-color: #e9e7e7;
 }
 
 #navbar-register {
@@ -317,16 +317,15 @@ ul::-webkit-details-marker {
 
     width: 100%;
     padding-top: var(--padding-m);
-    padding-bottom: var(--padding-m);
+    padding-bottom: var(--padding-l);
 
-    background: rgb(238,174,202);
-    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 65%, rgb(195, 217, 243) 100%);}
+    background: linear-gradient(rgba(238,174,202,1) 0%, rgba(148,187,233,1) 30%, rgb(191, 212, 238) 70%, rgb(255, 255, 255) 100%);}
 
 .hero-title {
     font-size: 3rem;
     font-weight: bold;
 
-    margin-top: var(--margin-xxxl);
+    margin-top: 8rem;
     margin-bottom: var(--margin-m);
 
     padding: var(--padding-xxs);
@@ -370,10 +369,84 @@ ul::-webkit-details-marker {
 }
 
 .home-link {
+    margin-top: var(--margin-s);
+
     color: white;
     text-decoration: none;
     font-size: 1.5em;
 }
+
+
+/*
+* Mission Section
+*/
+.mission-container {
+    margin-top: 4rem;
+}
+
+.mission-info {
+    padding: var(--padding-s);
+    margin: var(--margin-xxs);
+    border-radius: var(--radius-small);
+    box-shadow: 0 0 10px 0 var(--secondary-color);
+    max-width: 40rem;
+}
+
+.mission-title {
+    margin-left: var(--margin-xs);
+    text-align: left;
+}
+
+.mission-statement {
+    text-align: left;
+    
+}
+
+
+/*
+* Product Section
+*/
+.product-info-container {
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+
+    margin-top: var(--margin-l);
+
+    width: 90%;
+}
+
+.product-card {
+    scale: 1;
+    transition: 200ms;
+    text-align: left;
+
+    margin: var(--margin-s);
+    padding: var(--padding-s);
+
+    width: 33%;
+    border-radius: var(--radius-small);
+    box-shadow: 0 0 5px 0 var(--secondary-color);
+}
+
+.product-card:hover {
+    scale: 1.05;
+}
+
+.product-card-image {
+    margin-top: var(--margin-s);
+    margin-left: var(--margin-s);
+}
+
+.product-card-title {
+    margin-top: var(--margin-xs);
+    margin-left: var(--margin-s);
+}
+
+.product-card-text {
+    margin-left: var(--margin-s);
+}
+
 
 
 
@@ -1468,7 +1541,10 @@ span strong {
     #redirect-sign-in a {
         font-size: large;
     }
-
+    
+    .product-card {
+        width: 100%;
+    }
     /*
     * Blog Container
     */
