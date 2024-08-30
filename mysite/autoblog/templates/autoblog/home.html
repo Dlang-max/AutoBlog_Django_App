@@ -15,7 +15,7 @@
     <div class="mission-container">
         <div class="mission-info">
             <h2 class="mission-title">Our Mission</h2>
-            <p class="mission-statement">&emsp;To simplify the creation of high-quality content for your website, empowering you to focus on what matters most.</p>
+            <h3 class="mission-statement">&emsp;To simplify the creation of high-quality content for your website, empowering you to focus on what matters most.</h3>
         </div>
     </div>
     <div class="product-info-container">
@@ -42,14 +42,21 @@
     
         <!-- Fully automated upload of blog -->
         <div class="product-card">
-            <img class="product-card-image" src="{% static '/autoblog/settings.svg' %}" alt="Blue settings icon" width="60" height="60">
+            <img class="product-card-image" src="{% static '/autoblog/settings.svg' %}" alt="Blue settings icon. Copied from: https://icons8.com/icon/Tb2Gc2HE05aa/settings" width="60" height="60">
             <h3 class="product-card-title">Hands-Free Blog Automation</h3>
             <p class="product-card-text">Automate the entire blogging process, from content creation to publication, with minimal manual intervention.</p>
         </div>
     </div>
-    
+
+    <h1 class="examples-title">Example Blogs</h1>
     <div class="examples-container">
-        
+        {% for blog in example_blogs %}
+            <a class="example-blog-card" href="{% url 'example_blog' blog.id %}">
+                <img src="{{ blog.image.url }}" alt="blog header image" class="blog-card-image">
+                <h3 class="blog-intro-title">{{ blog.title }}</h3>
+                <p class="blog-card-intro">{{ blog.description }}</p>
+            </a>
+        {% endfor %}
     </div>
     <div class="pricing-container">
         

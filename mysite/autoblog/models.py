@@ -94,7 +94,12 @@ class Blog(models.Model):
     section_5 = models.TextField(default="")
 
 
-
+class ExampleBlog(models.Model):
+    image = models.ImageField(upload_to="exampleBlogImages")
+    
+    title = models.CharField(max_length=200, default="")
+    description = models.CharField(max_length=500, default="")
+    content = models.TextField(default="")
 
 
 

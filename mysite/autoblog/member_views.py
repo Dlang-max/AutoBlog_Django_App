@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
-from .models import Member, Blog, BlogSkeleton, BlogHistory
+from .models import Member, Blog, ExampleBlog, BlogSkeleton, BlogHistory
 from django.http import JsonResponse
 from datetime import datetime
 from celery.result import AsyncResult
@@ -154,9 +154,21 @@ def home(request):
 
     Returns:
         HttpResponse: The HTTP response sent back to the client. Renders home.html. 
-    """    
-    return render(request, "autoblog/home.html")
+    """
 
+    example_blogs = ExampleBlog.objects.all()
+    return render(request, "autoblog/home.html", {"example_blogs" : example_blogs})
+
+
+def example_blog(request, example_blog_id):
+    try:
+        example_blog = ExampleBlog.objects.get(id=example_blog_id)
+
+    except ExampleBlog.DoesNotExist:
+        return redirect("home")
+    
+    return render(request, "autoblog/displayExampleBlog.html", {"example_blog" : example_blog})
+    
 
 @login_required(login_url="/login")
 def contact(request):

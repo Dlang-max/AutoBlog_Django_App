@@ -386,19 +386,29 @@ ul::-webkit-details-marker {
 
 .mission-info {
     padding: var(--padding-s);
+    padding-bottom: var(--padding-xxs);
+
     margin: var(--margin-xxs);
-    border-radius: var(--radius-small);
-    box-shadow: 0 0 10px 0 var(--secondary-color);
     max-width: 40rem;
 }
 
 .mission-title {
+    font-size: 3rem;
+    font-weight: bold;
+
     margin-left: var(--margin-xs);
-    text-align: left;
+    margin-bottom: var(--margin-s);
+
+    text-align: center;
 }
 
 .mission-statement {
     text-align: left;
+    font-weight: 500;
+
+    margin-top: var(--margin-xxs);
+    margin-bottom: var(--margin-xs);
+
     
 }
 
@@ -447,7 +457,76 @@ ul::-webkit-details-marker {
     margin-left: var(--margin-s);
 }
 
+/*
+* Example Blog Sections
+*/
+.examples-title {
+    font-size: 3rem;
+    font-weight: bold;
 
+    margin-top: 6rem;
+    margin-bottom: var(--margin-xs);
+}
+
+.examples-container {
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+
+    margin-top: var(--margin-xs);
+
+    width: 90%;
+}
+
+.example-blog-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-decoration: none;
+    scale: 1;
+    transition: 200ms;
+    text-align: left;
+
+    margin: var(--margin-s);
+    padding: var(--padding-s);
+
+    width: 33%;
+    border-radius: var(--radius-small);
+
+    color: var(--secondary-color);
+    box-shadow: 0 0 5px 0 var(--secondary-color);
+}
+
+.example-blog-card:hover {
+    scale: 1.05;
+}
+
+.blog-card-image {
+    width: 70%;
+    height: 70%;
+    object-fit: cover;
+    overflow: hidden;
+    border-radius: var(--radius-small);
+}
+
+.blog-intro-title {
+    font-size: medium;
+
+    margin-bottom: var(--margin-xxs);
+}
+
+.blog-card-intro {
+    font-size: small;
+
+    margin-top: var(--margin-xxs);
+
+}
+
+.example-blog-title {
+    text-align: center;
+}
 
 
 /*
@@ -1541,10 +1620,18 @@ span strong {
     #redirect-sign-in a {
         font-size: large;
     }
-    
+    /*
+    * Home
+    */
+
     .product-card {
         width: 100%;
     }
+
+    .example-blog-card {
+        width: 100%;
+    }
+
     /*
     * Blog Container
     */

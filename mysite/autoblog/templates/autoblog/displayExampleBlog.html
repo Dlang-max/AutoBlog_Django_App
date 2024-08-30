@@ -1,0 +1,13 @@
+{% extends "autoblog/homeBase.html" %}
+
+{% block title %}Example Blog{% endblock %}
+
+{% block content %}
+<main>
+    <article id="blog">
+        <img id="blog-header-image" src="{{ example_blog.image.url }}" alt="Blog Header Image">
+        <h2 id="title" class="example-blog-title">{{ example_blog.title }}</h2>
+        {{ example_blog.content | safe }}
+    </article>
+</main>
+{% endblock %}
