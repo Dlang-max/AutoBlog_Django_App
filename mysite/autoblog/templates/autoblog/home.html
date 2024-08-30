@@ -58,8 +58,216 @@
             </a>
         {% endfor %}
     </div>
-    <div class="pricing-container">
-        
+    
+    <div class="stripe-form">
+        <div id="regular-payment-cards" class="payment-card-container regular-plan-payment-cards">
+            <!-- Regular Starter Plan Card -->
+            <div id="good-card" class="payment-card">
+                <h2 class="payment-plan">Starter Plan</h2>
+                <div class="price">                
+                    <span class="number">
+                        $24.99
+                    </span>
+                    <span>
+                        <strong>per month</strong>
+                    </span>
+                </div>
+                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                </form>
+                <ul class="features">
+                    <li class="feature-list-item">
+                        <span class="feature-info">Create 4 blogs per month</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Post blogs to your WordPress site</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Send blogs to your email</span>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Regular Pro Plan Card -->
+            <div id="better-card" class="payment-card">
+                <h2 class="payment-plan">Pro Plan</h2>
+                <div class="price">                
+                    <span class="number">
+                        $49.99
+                    </span>
+                    <span>
+                        <strong>per month</strong>
+                    </span>
+                </div>
+                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <ul class="features">
+                    <li class="feature-list-item">
+                        <span class="feature-info">Create 8 blogs per month</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Post blogs to your WordPress site</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Send blogs to your email</span>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Regular Premium Plan Card -->
+            <div id="best-card" class="payment-card">
+                <h2 class="payment-plan">Premium Plan</h2>
+                <div class="price">                
+                    <span class="number">
+                        $99.99
+                    </span>
+                    <span>
+                        <strong>per month</strong>
+                    </span>
+                </div>
+                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <ul class="features">
+                    <li class="feature-list-item">
+                        <span class="feature-info">Create 16 blogs per month</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Post blogs to your WordPress site</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Send blogs to your email</span>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Contact Card -->
+            <div id="best-card" class="payment-card">
+                <h2 class="payment-plan">Custom</h2>
+                <div id="payment-contact-form" class="payment-card-form">
+                    <span class="feature-info">Need more blogs for your business?</span>
+                    <a class="payment-contact" href="{% url 'contact' %}">
+                        <button class="payment-button" >Contact Us</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        <div id="automated-payment-cards" class="payment-card-container automated-plan-payment-cards">
+            <!-- Automated Starter Plan Card -->
+            <div id="good-card" class="payment-card">
+                <h2 class="payment-plan">Starter Plan</h2>
+                <div class="price">                
+                    <span class="number">
+                        $100
+                    </span>
+                    <span>
+                        <strong>per month</strong>
+                    </span>
+                </div>
+                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <ul class="features">
+                    <li class="feature-list-item">
+                        <span class="feature-info">Create 4 blogs per month</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Send blogs to your email</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Automated WordPress posting</span>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Automated Pro Plan Card -->
+            <div id="better-card" class="payment-card">
+                <h2 class="payment-plan">Pro Plan</h2>
+                <div class="price">                
+                    <span class="number">
+                        $120
+                    </span>
+                    <span>
+                        <strong>per month</strong>
+                    </span>
+                </div>
+                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <ul class="features">
+                    <li class="feature-list-item">
+                        <span class="feature-info">Create 8 blogs per month</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Send blogs to your email</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Automated WordPress posting</span>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Automated Premium Plan Card -->
+            <div id="best-card" class="payment-card">
+                <h2 class="payment-plan">Premium Plan</h2>
+                <div class="price">                
+                    <span class="number">
+                        $140
+                    </span>
+                    <span>
+                        <strong>per month</strong>
+                    </span>
+                </div>
+                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <ul class="features">
+                    <li class="feature-list-item">
+                        <span class="feature-info">Create 16 blogs per month</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Send blogs to your email</span>
+                    </li>
+                    <li class="feature-list-item">
+                        <span class="feature-info">Automated WordPress posting</span>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Contact Card -->
+            <div id="best-card" class="payment-card">
+                <h2 class="payment-plan">Custom</h2>
+                <div id="payment-contact-form" class="payment-card-form">
+                    <span class="feature-info">Need more blogs for your business?</span>
+                    <a class="payment-contact" href="{% url 'contact' %}">
+                        <button class="payment-button" >Contact Us</button>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <script>
+        function togglePaymentPlanCards(cardType) {
+            const regularPlans = document.getElementById("regular-payment-cards");
+            const automatedPlans = document.getElementById("automated-payment-cards");
+    
+            const regularPlansButton = document.getElementById("regular-plans-button");
+            const automatedPlansButton = document.getElementById("automated-plans-button");
+    
+            if(cardType === "regular") {
+                regularPlansButton.classList.add("selected");
+                automatedPlansButton.classList.remove("selected");
+        
+                regularPlans.style.display = "flex";
+                automatedPlans.style.display = "none";
+            } else if (cardType === "automated") {
+                regularPlansButton.classList.remove("selected");
+                automatedPlansButton.classList.add("selected");
+        
+                regularPlans.style.display = "none";
+                automatedPlans.style.display = "flex";
+            }
+        }
+    </script>
 </div>
 {% endblock %}
