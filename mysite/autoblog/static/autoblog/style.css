@@ -458,7 +458,7 @@ ul::-webkit-details-marker {
 }
 
 /*
-* Example Blog Sections
+* Example Blog Section
 */
 .examples-title {
     font-size: 3rem;
@@ -495,7 +495,8 @@ ul::-webkit-details-marker {
     width: 33%;
     border-radius: var(--radius-small);
 
-    color: var(--secondary-color);
+    color: var(--primary-color);
+    background-color: var(--secondary-color);
     box-shadow: 0 0 5px 0 var(--secondary-color);
 }
 
@@ -513,7 +514,6 @@ ul::-webkit-details-marker {
 
 .blog-intro-title {
     font-size: medium;
-
     margin-bottom: var(--margin-xxs);
 }
 
@@ -526,6 +526,24 @@ ul::-webkit-details-marker {
 
 .example-blog-title {
     text-align: center;
+}
+
+/*
+* Home Payments Section
+*/
+.payment-title {
+    font-size: 3rem;
+    font-weight: bold;
+
+    margin-top: 6rem;
+    margin-bottom: var(--margin-xs);
+}
+
+.home-payment-plan-link {
+    display: flex;
+    justify-content: center;
+
+    text-decoration: none;
 }
 
 

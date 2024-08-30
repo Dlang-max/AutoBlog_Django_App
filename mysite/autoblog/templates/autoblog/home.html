@@ -59,7 +59,20 @@
         {% endfor %}
     </div>
     
+    <h1 class="payment-title">Payment Plans</h1>
+    <div class="toggle-pricing-plans-container">
+        <div class="toggle-pricing-plans">
+            <div id="regular-plans-button" class="pricing-toggle-button selected" onclick="togglePaymentPlanCards('regular')">
+                Regular Plans
+            </div>
+        
+            <div id="automated-plans-button" class="pricing-toggle-button" onclick="togglePaymentPlanCards('automated') ">
+                Automated Plans
+            </div>
+        </div>
+    </div>
     <div class="stripe-form">
+        <!-- Regular Plans -->
         <div id="regular-payment-cards" class="payment-card-container regular-plan-payment-cards">
             <!-- Regular Starter Plan Card -->
             <div id="good-card" class="payment-card">
@@ -72,8 +85,9 @@
                         <strong>per month</strong>
                     </span>
                 </div>
-                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
-                </form>
+                <a href="{% url 'register' %}" class="home-payment-plan-link">
+                    <button class="payment-button">Get Started</button>
+                </a>
                 <ul class="features">
                     <li class="feature-list-item">
                         <span class="feature-info">Create 4 blogs per month</span>
@@ -98,7 +112,9 @@
                         <strong>per month</strong>
                     </span>
                 </div>
-                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <a href="{% url 'register' %}" class="home-payment-plan-link">
+                    <button class="payment-button">Get Started</button>
+                </a>
                 <ul class="features">
                     <li class="feature-list-item">
                         <span class="feature-info">Create 8 blogs per month</span>
@@ -123,7 +139,9 @@
                         <strong>per month</strong>
                     </span>
                 </div>
-                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <a href="{% url 'register' %}" class="home-payment-plan-link">
+                    <button class="payment-button">Get Started</button>
+                </a>
                 <ul class="features">
                     <li class="feature-list-item">
                         <span class="feature-info">Create 16 blogs per month</span>
@@ -149,14 +167,7 @@
             </div>
         </div>
     
-    
-    
-    
-    
-    
-    
-    
-    
+        <!-- Automated Plans -->
         <div id="automated-payment-cards" class="payment-card-container automated-plan-payment-cards">
             <!-- Automated Starter Plan Card -->
             <div id="good-card" class="payment-card">
@@ -169,7 +180,9 @@
                         <strong>per month</strong>
                     </span>
                 </div>
-                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <a href="{% url 'register' %}" class="home-payment-plan-link">
+                    <button class="payment-button">Get Started</button>
+                </a>
                 <ul class="features">
                     <li class="feature-list-item">
                         <span class="feature-info">Create 4 blogs per month</span>
@@ -194,7 +207,9 @@
                         <strong>per month</strong>
                     </span>
                 </div>
-                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <a href="{% url 'register' %}" class="home-payment-plan-link">
+                    <button class="payment-button">Get Started</button>
+                </a>
                 <ul class="features">
                     <li class="feature-list-item">
                         <span class="feature-info">Create 8 blogs per month</span>
@@ -219,7 +234,9 @@
                         <strong>per month</strong>
                     </span>
                 </div>
-                <a href="{% url 'login' %}" class="payment-button">Get Started</a>
+                <a href="{% url 'register' %}" class="home-payment-plan-link">
+                    <button class="payment-button">Get Started</button>
+                </a>
                 <ul class="features">
                     <li class="feature-list-item">
                         <span class="feature-info">Create 16 blogs per month</span>
