@@ -113,6 +113,8 @@ def additional_info(request):
 @login_required(login_url='/login')
 def display_blog(request, blog_id):
     try:
+        user = request.user
+        member = Member.objects.get(user=user)
         blog = Blog.objects.get(id=blog_id)
 
     except Member.DoesNotExist:
@@ -121,7 +123,7 @@ def display_blog(request, blog_id):
         return redirect('dashboard')
     
     form = BlogForm()
-    return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form, "rte_form" : RTEForm(initial={"content" : blog.content})})
+    return render(request, "autoblog/displayBlog.html", {"blog" : blog, "form" : form, "rte_form" : RTEForm(initial={"content" : blog.content}), "member" : member})
 
 @login_required(login_url='/login')
 def get_blog_info(request, blog_id):

@@ -141,7 +141,7 @@
                 </article>
 
 
-                {% if member.wordpress_url != '' %}
+                {% if member.wordpress_linked %}
                     <form id="blog-form" method="POST">
                         {% csrf_token %}
                         {% for field in form %}
@@ -153,13 +153,13 @@
                         <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' blog.id %}" value="Delete">
                     </form>
                 {% else %}
-                    <form id="blog-form" method="POST">
-                        {% csrf_token %}
-                        <input class="submit-button" type="submit" formaction="{% url 'email_blog' blog.id %}" value="Email">
-                        <input class="submit-button" type="submit" formaction="{% url 'save_blog' blog.id %}" value="Save">
-                        <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' blog.id %}" value="Delete">
-                    </form>
                     <div id="member-info-link"><h3><a href="{% url 'member_info' %}">Link</a> your WordPress Site!</h3></div>
+                    <form id="blog-form" method="POST">
+                            {% csrf_token %}
+                            <input class="submit-button" type="submit" formaction="{% url 'email_blog' blog.id %}" value="Email">
+                            <input class="submit-button" type="submit" formaction="{% url 'save_blog' blog.id %}" value="Save">
+                            <input id="delete-blog" class="submit-button" type="submit" formaction="{% url 'delete_blog' blog.id %}" value="Delete">
+                    </form>
                 {% endif %}
             </main>
             {% load static %}
