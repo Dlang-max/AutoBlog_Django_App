@@ -12,7 +12,7 @@
             <div class="home-link-container">Get Started</div>
         </a>
     </div>
-    <div class="mission-container">
+    <div id="about" class="mission-container">
         <div class="mission-info">
             <h2 class="mission-title">Our Mission</h2>
             <h3 class="mission-statement">&emsp;To simplify the creation of high-quality content for your website, empowering you to focus on what matters most.</h3>
@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <h1 class="examples-title">Example Blogs</h1>
+    <h1 id="example-blogs" class="examples-title">Example Blogs</h1>
     <div class="examples-container">
         {% for blog in example_blogs %}
             <a class="example-blog-card" href="{% url 'example_blog' blog.id %}">
@@ -59,7 +59,7 @@
         {% endfor %}
     </div>
     
-    <h1 class="payment-title">Payment Plans</h1>
+    <h1 id="payment-plans" class="payment-title">Payment Plans</h1>
     <div class="toggle-pricing-plans-container">
         <div class="toggle-pricing-plans">
             <div id="regular-plans-button" class="pricing-toggle-button selected" onclick="togglePaymentPlanCards('regular')">

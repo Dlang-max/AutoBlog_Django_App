@@ -47,6 +47,10 @@
     --translation-distance: calc(var(--hamburger-height) - 3 * var(--hamburger-line-height));
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: var(--font);
     background-color: var(--primary-color);
@@ -657,6 +661,24 @@ ul::-webkit-details-marker {
 */
 .wordpress-linked-header {
     text-align: center;
+}
+
+.member-info-text {
+    font-family: var(--font);
+    margin-top: var(--margin-s);
+    margin-bottom: var(--margin-xxs);
+    text-align: center;
+}
+
+.member-info-text a {
+    text-decoration: none;
+    transition: 200ms;
+    color: var(--button-blue);
+}
+
+
+.member-info-text a:hover {
+    color: var(--button-hover-blue);
 }
 
 /*
@@ -1421,7 +1443,7 @@ article {
 .payment-card-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
     width: 90%;
 }
 

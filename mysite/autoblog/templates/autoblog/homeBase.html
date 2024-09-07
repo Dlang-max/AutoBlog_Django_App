@@ -21,9 +21,9 @@
         <header class="navbar-container">
             <a class="navbar-logo" href="{% url 'home' %}"><img src="{% static 'autoblog/logo.svg' %}" alt="quill with blue halo surrounding it" width="40" height="40"></a>
             <nav role="navigation" class="navbar-menu">
-                <a class="navbar-link" href="">About</a>
-                <a class="navbar-link" href="">Examples</a>
-                <a class="navbar-link" href="">Pricing</a>
+                <a class="navbar-link" href="#about">About</a>
+                <a class="navbar-link" href="#example-blogs">Examples</a>
+                <a class="navbar-link" href="#payment-plans">Pricing</a>
             </nav>
             <nav class="navbar-action">
                 {% if not user.is_authenticated %}
@@ -50,9 +50,9 @@
         <div id="overlay" class="overlay">
             <nav role="navigation" class="mobile-navbar-menu">
                 
-                <a class="mobile-navbar-link" href="">About</a>
-                <a class="mobile-navbar-link" href="">Examples</a>
-                <a class="mobile-navbar-link" href="">Pricing</a>
+                <a class="mobile-navbar-link" href="#about">About</a>
+                <a class="mobile-navbar-link" href="#example-blogs">Examples</a>
+                <a class="mobile-navbar-link" href="#payment-plans">Pricing</a>
             </nav>
         </div>
     </div>
