@@ -1,6 +1,6 @@
 {% extends "autoblog/homeBase.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}YourBloggingAssistant: The simplest SEO tool{% endblock %}
 
 {% block content %}
 {% load static %}
@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <h1 id="example-blogs" class="examples-title">Example Blogs</h1>
+    <h2 id="example-blogs" class="examples-title">Example Blogs</h2>
     <div class="examples-container">
         {% for blog in example_blogs %}
             <a class="example-blog-card" href="{% url 'example_blog' blog.id %}">
@@ -59,7 +59,7 @@
         {% endfor %}
     </div>
     
-    <h1 id="payment-plans" class="payment-title">Payment Plans</h1>
+    <h2 id="payment-plans" class="payment-title">Payment Plans</h2>
     <div class="toggle-pricing-plans-container">
         <div class="toggle-pricing-plans">
             <div id="regular-plans-button" class="pricing-toggle-button selected" onclick="togglePaymentPlanCards('regular')">
