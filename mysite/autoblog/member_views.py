@@ -60,7 +60,6 @@ def toggle_automated_mode(request):
 
 @login_required(login_url='/login')
 def dashboard(request):
-
     user = request.user
     member, created = Member.objects.get_or_create(user=user)
 

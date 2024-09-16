@@ -49,6 +49,7 @@
         </div>
     </div>
 </div>
+
 <!-- Generated Blogs -->
 {% if blogs %}
     <div class="queue-blog-container">
@@ -91,9 +92,9 @@
                             row.classList.add("row-gray");
                         }
                     });
-                </script>         
+                </script>
             </tbody>
-        </table>
+        </table>     
     </div>
 {% endif %}
 
@@ -135,6 +136,7 @@
     </div>
 {% endif %}
 
+<!-- History (last 10 posted blogs) -->
 {% if blog_history %}
     <div class="queue-blog-container">
         <div class="blog-table-title-container">
@@ -163,7 +165,6 @@
                 {% endfor %}
                 <script>
                     const blog_history_rows = document.querySelectorAll('.blog-queue-table tbody tr');
-        
                     blog_history_rows.forEach((row, index) => {    
                         if (index % 2 === 0) {
                             row.classList.add("row-gray");
@@ -174,7 +175,4 @@
         </table>
     </div>
 {% endif %}
-
-<!-- History (last 10 posted blogs) -->
-
 {% endblock %}

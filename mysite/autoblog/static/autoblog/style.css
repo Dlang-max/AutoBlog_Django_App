@@ -363,8 +363,9 @@ ul::-webkit-details-marker {
     align-items: center;
     width: 10rem;
     height: 50px;
-    background-color: var(--secondary-color);
     transition: 500ms;
+
+    background-color: var(--secondary-color);
 }
 
 .home-link-container:hover {
@@ -760,7 +761,6 @@ ul::-webkit-details-marker {
     margin-left: var(--margin-l);
 }
 
-
 .automated_mode_toggle_container {
     display: flex;
     justify-content: center;
@@ -946,7 +946,7 @@ ul::-webkit-details-marker {
     width: 95%;
     max-width: 35rem;
     border-spacing: 0px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .queue-table-header {
